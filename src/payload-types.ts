@@ -63,12 +63,16 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    users: UserAuthOperations;
+    user: UserAuthOperations;
   };
   blocks: {};
   collections: {
-    users: User;
+    user: User;
     media: Media;
+    page: Page;
+    section: Section;
+    card: Card;
+    project: Project;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,8 +80,12 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    user: UserSelect<false> | UserSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    page: PageSelect<false> | PageSelect<true>;
+    section: SectionSelect<false> | SectionSelect<true>;
+    card: CardSelect<false> | CardSelect<true>;
+    project: ProjectSelect<false> | ProjectSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,8 +95,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    header: Header;
+    footer: Footer;
+  };
+  globalsSelect: {
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -119,10 +133,12 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "user".
  */
 export interface User {
   id: number;
+  name: string;
+  role: 'admin' | 'editor' | 'viewer';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -140,7 +156,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
-  collection: 'users';
+  collection: 'user';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -158,6 +174,176 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  heading?: string | null;
+  subheading?: string | null;
+  url: string;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  constant?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  layoutSections?: (number | Section)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "section".
+ */
+export interface Section {
+  id: number;
+  title: string;
+  heading?: string | null;
+  subheading?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  cards?: (number | Card)[] | null;
+  constant?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "card".
+ */
+export interface Card {
+  id: number;
+  title: string;
+  heading?: string | null;
+  subheading?: string | null;
+  category?: string | null;
+  image?: (number | null) | Media;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  additionalDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  type?: ('grid' | 'gaint' | 'layout') | null;
+  tags?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project".
+ */
+export interface Project {
+  id: number;
+  title: string;
+  slug?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  category?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  tags?: string | null;
+  Images?: {
+    landingImage?: (number | null) | Media;
+    pageImages?:
+      | {
+          image: number | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  cardCta?: {
+    label?: string | null;
+    link?: string | null;
+  };
+  pageCta?: {
+    label?: string | null;
+    link?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -184,16 +370,32 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
+        relationTo: 'user';
         value: number | User;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'page';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'section';
+        value: number | Section;
+      } | null)
+    | ({
+        relationTo: 'card';
+        value: number | Card;
+      } | null)
+    | ({
+        relationTo: 'project';
+        value: number | Project;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'users';
+    relationTo: 'user';
     value: number | User;
   };
   updatedAt: string;
@@ -206,7 +408,7 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user: {
-    relationTo: 'users';
+    relationTo: 'user';
     value: number | User;
   };
   key?: string | null;
@@ -235,9 +437,11 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "user_select".
  */
-export interface UsersSelect<T extends boolean = true> {
+export interface UserSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -270,6 +474,92 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page_select".
+ */
+export interface PageSelect<T extends boolean = true> {
+  title?: T;
+  heading?: T;
+  subheading?: T;
+  url?: T;
+  body?: T;
+  constant?: T;
+  layoutSections?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "section_select".
+ */
+export interface SectionSelect<T extends boolean = true> {
+  title?: T;
+  heading?: T;
+  subheading?: T;
+  body?: T;
+  cards?: T;
+  constant?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "card_select".
+ */
+export interface CardSelect<T extends boolean = true> {
+  title?: T;
+  heading?: T;
+  subheading?: T;
+  category?: T;
+  image?: T;
+  description?: T;
+  additionalDescription?: T;
+  ctaLabel?: T;
+  ctaUrl?: T;
+  type?: T;
+  tags?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project_select".
+ */
+export interface ProjectSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  heading?: T;
+  subheading?: T;
+  category?: T;
+  body?: T;
+  tags?: T;
+  Images?:
+    | T
+    | {
+        landingImage?: T;
+        pageImages?:
+          | T
+          | {
+              image?: T;
+              id?: T;
+            };
+      };
+  cardCta?:
+    | T
+    | {
+        label?: T;
+        link?: T;
+      };
+  pageCta?:
+    | T
+    | {
+        label?: T;
+        link?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -310,6 +600,150 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header".
+ */
+export interface Header {
+  id: number;
+  primaryLogo: number | Media;
+  secondaryLogo?: (number | null) | Media;
+  navItems?:
+    | {
+        type: 'internal' | 'anchor' | 'external';
+        label: string;
+        url: string;
+        newTab?: boolean | null;
+        subMenuItems?:
+          | {
+              type: 'internal' | 'anchor' | 'external';
+              label: string;
+              url: string;
+              newTab?: boolean | null;
+              nestedMenuItems?:
+                | {
+                    type: 'internal' | 'anchor' | 'external';
+                    label: string;
+                    url: string;
+                    newTab?: boolean | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  logo: number | Media;
+  categories?:
+    | {
+        title: string;
+        links?:
+          | {
+              type: 'internal' | 'anchor' | 'external';
+              label: string;
+              url: string;
+              newTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  copyright: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  primaryLogo?: T;
+  secondaryLogo?: T;
+  navItems?:
+    | T
+    | {
+        type?: T;
+        label?: T;
+        url?: T;
+        newTab?: T;
+        subMenuItems?:
+          | T
+          | {
+              type?: T;
+              label?: T;
+              url?: T;
+              newTab?: T;
+              nestedMenuItems?:
+                | T
+                | {
+                    type?: T;
+                    label?: T;
+                    url?: T;
+                    newTab?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  logo?: T;
+  categories?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              type?: T;
+              label?: T;
+              url?: T;
+              newTab?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  content?: T;
+  copyright?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

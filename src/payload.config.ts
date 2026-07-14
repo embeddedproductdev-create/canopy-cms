@@ -8,8 +8,14 @@ import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
 import { GetPlatformProxyOptions } from 'wrangler'
 import { r2Storage } from '@payloadcms/storage-r2'
 
-import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Header } from './globals/Header'
+import { Footer } from './globals/Footer'
+import { Page } from './collections/Page'
+import { Section } from './collections/Section'
+import { Card } from './collections/Card'
+import { Project } from './collections/Project'
+import { User } from './collections/User'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -45,12 +51,15 @@ const cloudflare =
 
 export default buildConfig({
   admin: {
-    user: Users.slug,
+    user: User.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  cors: ['http://localhost:4200', 'http://localhost:3000'],
+  csrf: ['http://localhost:4200', 'http://localhost:3000'],
+  globals: [Header, Footer],
+  collections: [User, Media, Page, Section, Card, Project],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -58,12 +67,12 @@ export default buildConfig({
   },
   db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
   logger: isProduction ? cloudflareLogger : undefined,
-  storage: [
-    r2Storage({
-      bucket: cloudflare.env.R2,
-      collections: { media: true },
-    }),
-  ],
+  // storage: [
+  //   r2Storage({
+  //     bucket: cloudflare.env.R2,
+  //     collections: { media: true },
+  //   }),
+  // ],
 })
 
 // Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
