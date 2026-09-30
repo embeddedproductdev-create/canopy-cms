@@ -1,0 +1,220 @@
+{
+  "title": "Home",
+  "htmlTitle": "Canopy Embedded | From first sketch to field-ready product",
+  "banner": {
+    "imageAlt": "",
+    "logo": "",
+    "backgroundImage": "",
+    "backgroundVideo": "",
+    "heading": "You Have the Idea. We're the Team to Build It.",
+    "headingFirstLine": "You Have the Idea.",
+    "headingSecondLine": "We're the Team to Build It.",
+    "tagLine": "Canopy Embedded",
+    "subheading": "From the first sketch to the final product, we work alongside you to design, build, test.",
+    "body": "",
+    "primaryCta": { "label": "Book a Consultation", "href": "mailto:hello@canopyembedded.com" },
+    "navItems": [],
+    "navCta": { "label": "Start a project", "href": "#contact" }
+  },
+  "serviceCards": {
+    "title": "services",
+    "heading": "",
+    "subHeading": "",
+    "type": "services",
+    "controls": {
+      "tabsLabel": "Engineering disciplines",
+      "previousLabel": "Previous discipline",
+      "nextLabel": "Next discipline"
+    },
+    "categories": ["Hardware", "Mechanical & Enclosure", "Industrial Design", "UI/UX & HMI", "Apps & Cloud"],
+    "serviceCard": [
+      {
+        "index": "01",
+        "title": "Core Discipline",
+        "heading": "Hardware & PCB",
+        "description": "Get the physical layer right once — before a respin costs you the schedule. High-speed layouts, SI/PI, and BMS circuitry, designed by the team that also writes the firmware talking to it.",
+        "icon": "",
+        "theme": "lime",
+        "body": "",
+        "subheading": "",
+        "type": "service",
+        "ctaLabel": "View details",
+        "ctaHref": "/capabilities/pcb-design/",
+        "tags": ["Multi-layer PCB", "SI/PI", "BMS circuitry"]
+      },
+      {
+        "index": "02",
+        "title": "Mechanical & Enclosure",
+        "heading": "Mechanical and enclosure design",
+        "description": "A complete enclosure and mechanical package, designed with electronics and manufacturing in mind.",
+        "icon": "",
+        "theme": "charcoal",
+        "body": "",
+        "subheading": "",
+        "type": "service",
+        "ctaLabel": "Explore service",
+        "ctaHref": "/capabilities/"
+      },
+      {
+        "index": "03",
+        "title": "Industrial Design",
+        "heading": "Industrial design",
+        "description": "Considered product form and interaction design shaped around real users and engineering constraints.",
+        "icon": "",
+        "theme": "paper",
+        "body": "",
+        "subheading": "",
+        "type": "service",
+        "ctaLabel": "Explore service",
+        "ctaHref": "/capabilities/"
+      },
+      {
+        "index": "04",
+        "title": "UI/UX & HMI",
+        "heading": "UI/UX and HMI",
+        "description": "Clear interfaces that connect people to complex embedded products.",
+        "icon": "",
+        "theme": "slate",
+        "body": "",
+        "subheading": "",
+        "type": "service",
+        "ctaLabel": "Explore service",
+        "ctaHref": "/capabilities/"
+      },
+      {
+        "index": "05",
+        "title": "Apps & Cloud",
+        "heading": "Apps and cloud",
+        "description": "Connected product experiences and supporting cloud services, built alongside the device.",
+        "icon": "",
+        "theme": "lime",
+        "body": "",
+        "subheading": "",
+        "type": "service",
+        "ctaLabel": "",
+        "ctaHref": ""
+      }
+    ]
+  },
+  "capabilityCards": {
+    "title": "capabilities",
+    "heading": "Seven Sectors. One Engineering Team That Already Speaks the Domain.",
+    "subHeading": "Embedded product experience shaped around the real-world demands of each industry.",
+    "type": "marquee",
+    "serviceCard": [
+      { "index": "01", "title": "BMS / EV", "heading": "BMS / EV", "description": "Cell balancing, protection circuitry, and telemetry firmware for battery-electric platforms.", "icon": "", "theme": "lime", "body": "", "subheading": "", "type": "marquee", "ctaLabel": "", "ctaHref": "" },
+      { "index": "02", "title": "Industrial IoT", "heading": "Industrial IoT", "description": "Sensor fusion and predictive maintenance firmware built for 24/7 uptime.", "icon": "", "theme": "charcoal", "body": "", "subheading": "", "type": "marquee", "ctaLabel": "", "ctaHref": "" },
+      { "index": "03", "title": "Agritech", "heading": "Agritech", "description": "Field-deployable sensor platforms designed for rugged outdoor conditions.", "icon": "", "theme": "paper", "body": "", "subheading": "", "type": "marquee", "ctaLabel": "", "ctaHref": "" },
+      { "index": "04", "title": "Healthcare", "heading": "Healthcare", "description": "ISO 13485-aligned systems for diagnostics and remote patient monitoring.", "icon": "", "theme": "slate", "body": "", "subheading": "", "type": "marquee", "ctaLabel": "", "ctaHref": "" },
+      { "index": "05", "title": "Automotive", "heading": "Automotive", "description": "EMC-hardened PCB design and CAN integration for vehicle electronics.", "icon": "", "theme": "lime", "body": "", "subheading": "", "type": "marquee", "ctaLabel": "", "ctaHref": "" },
+      { "index": "06", "title": "Retail", "heading": "Retail", "description": "BLE/Wi-Fi provisioning and edge hardware for POS and in-store telemetry.", "icon": "", "theme": "charcoal", "body": "", "subheading": "", "type": "marquee", "ctaLabel": "", "ctaHref": "" }
+    ]
+  },
+  "clients": {
+    "title": "approach",
+    "eyebrow": "Here's Where Most Builds Break.",
+    "stats": [
+      { "value": "20x", "label": "Years of Expertise" },
+      { "value": "10+", "label": "Successful Clients" }
+    ],
+    "clientNames": [],
+    "imageLabel": "",
+    "summary": "We don't hand off a spec sheet and disappear. One team stays hands-on from first schematic to field-ready product — no vendor handoffs in between.",
+    "breakPoints": [
+      { "heading": "An Idea, Not Yet a Team", "description": "You have the product brief. We bring the hardware, firmware, and software disciplines together." },
+      { "heading": "Field Failures & Recalls", "description": "Catch integration risks early, while design decisions are still flexible." },
+      { "heading": "Vendor Handoff Friction", "description": "One team owns the full path from concept through production." }
+    ]
+  },
+  "howWeWork": {
+    "heading": "Ideate. Innovate.",
+    "highlight": "Deploy.",
+    "type": "engagement-models",
+    "description": "We don't hand off a spec sheet and disappear. One team stays hands-on from first schematic to field-ready product — no vendor handoffs in between.",
+    "image": "",
+    "previewAlt": "Process preview",
+    "mockup": {
+      "assistantName": "Callie",
+      "schedulingMessage": "Happy to set up a call with Dominic. Here are available times:",
+      "timeSlots": ["10:00 AM", "2:30 PM", "3:00 PM"],
+      "syncTitle": "PCB & Firmware Sync",
+      "telemetryTitle": "Telemetry Live",
+      "telemetryMetrics": ["EMC Noise: +14.2 dB", "CAN Latency: 1.2 ms"]
+    },
+    "cta": { "label": "Book a Consultation", "href": "mailto:hello@canopyembedded.com" },
+    "steps": [
+      { "label": "Discover & Scope", "description": "We map the product against hardware, firmware, mechanical, and software requirements at the scoping call." },
+      { "label": "Design & Build", "description": "PCB layout, firmware, enclosure, and UI/UX move in parallel under one roof." },
+      { "label": "Validate & Deploy", "description": "Bring-up, HIL testing, and certification prep before the first unit ships." }
+    ]
+  },
+  "team": {
+    "title": "",
+    "heading": "",
+    "teamMembers": []
+  },
+  "newsroom": {
+    "title": "insights",
+    "type": "featured",
+    "heading": "Not a pitch. Products we've actually shipped.",
+    "description": "We take a personalized approach to each project, working closely with our clients to understand their goals and requirements.",
+    "lable": "View Projects",
+    "href": "/work/",
+    "featured": [
+      {
+        "tags": ["Recently Added"],
+        "date": "",
+        "title": "Dual-Channel Smart Charger",
+        "ctaLabel": "View Project",
+        "ctaHref": "/work/dual-channel-smart-charger",
+        "shortDescription": "Power electronics and control firmware engineered together, not bolted on.",
+        "body": "",
+        "heading": "Dual-Channel Smart Charger",
+        "subheading": "Power electronics and control firmware engineered together, not bolted on.",
+        "image": "",
+        "readMoreLabel": "Read article",
+        "theme": "light",
+        "type": "featured"
+      },
+      {
+        "tags": [],
+        "date": "",
+        "title": "BLE Mesh + RS485 Board",
+        "ctaLabel": "View Project",
+        "ctaHref": "/work/ble-mesh-rs485-board",
+        "shortDescription": "Mesh-networked node for energy meter retrofits — BLE mesh upstream, RS485/Modbus downstream.",
+        "body": "",
+        "heading": "BLE Mesh + RS485 Board",
+        "subheading": "Mesh-networked node for energy meter retrofits — BLE mesh upstream, RS485/Modbus downstream.",
+        "image": "",
+        "readMoreLabel": "Read article",
+        "theme": "slate",
+        "type": "featured"
+      },
+      {
+        "tags": [],
+        "date": "",
+        "title": "Edge Compute Gateway",
+        "ctaLabel": "View Project",
+        "ctaHref": "/work/edge-compute-gateway",
+        "shortDescription": "OTA fleet management across distributed edge nodes for smart infrastructure.",
+        "body": "",
+        "heading": "Edge Compute Gateway",
+        "subheading": "OTA fleet management across distributed edge nodes for smart infrastructure.",
+        "image": "",
+        "readMoreLabel": "Read article",
+        "theme": "dark",
+        "type": "featured"
+      }
+    ]
+  },
+  "contactCta": {
+    "title": "contact",
+    "logo": "",
+    "heading": "Not ready to talk? Download the 10-Point Hardware Audit Checklist.",
+    "description": "",
+    "cta": { "label": "Get the checklist", "href": "/resources/hardware-audit-checklist/" },
+    "secondaryCta": { "label": "Book a scoping call", "href": "mailto:hello@canopyembedded.com" },
+    "imageLabels": []
+  }
+}

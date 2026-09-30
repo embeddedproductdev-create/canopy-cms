@@ -212,15 +212,10 @@ export interface Page {
     };
     [k: string]: unknown;
   } | null;
-  constant?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  cta?: {
+    label?: string | null;
+    href?: string | null;
+  };
   layoutSections?: (number | Section)[] | null;
   /**
    * Pill-shaped tags above the main heading
@@ -296,9 +291,47 @@ export interface Page {
 export interface Section {
   id: number;
   title: string;
+  sectionKey?: string | null;
   heading?: string | null;
+  headingFirstLine?: string | null;
+  headingSecondLine?: string | null;
   subheading?: string | null;
+  summary?: string | null;
+  eyebrow?: string | null;
+  tagLine?: string | null;
+  highlight?: string | null;
+  type?: string | null;
   image?: (number | null) | Media;
+  imageUrl?: string | null;
+  logo?: string | null;
+  imageAlt?: string | null;
+  backgroundImage?: string | null;
+  backgroundVideo?: string | null;
+  previewAlt?: string | null;
+  mockup?: {
+    assistantName?: string | null;
+    schedulingMessage?: string | null;
+    timeSlots?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    syncTitle?: string | null;
+    telemetryTitle?: string | null;
+    telemetryMetrics?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  imageLabels?:
+    | {
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   body?: {
     root: {
       type: string;
@@ -314,16 +347,26 @@ export interface Section {
     };
     [k: string]: unknown;
   } | null;
-  cards?: (number | Card)[] | null;
-  constant?:
+  cta?: {
+    label?: string | null;
+    href?: string | null;
+  };
+  secondaryCta?: {
+    label?: string | null;
+    href?: string | null;
+  };
+  controls?: {
+    tabsLabel?: string | null;
+    previousLabel?: string | null;
+    nextLabel?: string | null;
+  };
+  categories?:
     | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
+        category?: string | null;
+        id?: string | null;
+      }[]
     | null;
+  cards?: (number | Card)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -336,8 +379,17 @@ export interface Card {
   title: string;
   heading?: string | null;
   subheading?: string | null;
+  index?: string | null;
+  value?: string | null;
   category?: string | null;
+  role?: string | null;
+  date?: string | null;
   image?: (number | null) | Media;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  icon?: string | null;
+  theme?: string | null;
+  shortDescription?: string | null;
   description?: {
     root: {
       type: string;
@@ -368,10 +420,18 @@ export interface Card {
     };
     [k: string]: unknown;
   } | null;
+  body?: string | null;
   ctaLabel?: string | null;
   ctaUrl?: string | null;
-  type?: ('grid' | 'gaint' | 'layout') | null;
-  tags?: string | null;
+  readMoreLabel?: string | null;
+  linkedinUrl?: string | null;
+  type?: string | null;
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -382,10 +442,32 @@ export interface Card {
 export interface CaseStudy {
   id: number;
   title: string;
-  slug?: string | null;
+  slug: string;
   heading?: string | null;
   subheading?: string | null;
   category?: string | null;
+  featured?: boolean | null;
+  overview?:
+    | {
+        label: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  specGroups?:
+    | {
+        heading: string;
+        rows?:
+          | {
+              label: string;
+              value?: string | null;
+              builtIn?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   body?: {
     root: {
       type: string;
@@ -469,6 +551,7 @@ export interface Blog {
   title: string;
   slug: string;
   heading?: string | null;
+  category?: string | null;
   dek?: string | null;
   byline?: string | null;
   publishedDate: string;
@@ -530,7 +613,37 @@ export interface Blog {
 export interface Checklist {
   id: number;
   title: string;
+  heading?: string | null;
+  subheading?: string | null;
+  introduction?: string | null;
   slug: string;
+  itemsHeading?: string | null;
+  items?:
+    | {
+        number: string;
+        heading: string;
+        description: string;
+        locked?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  accessGate?: {
+    heading?: string | null;
+    unlockedHeading?: string | null;
+    description?: string | null;
+    unlockedDescription?: string | null;
+    emailLabel?: string | null;
+    companyLabel?: string | null;
+    emailPlaceholder?: string | null;
+    emailHelper?: string | null;
+    companyPlaceholder?: string | null;
+    submitLabel?: string | null;
+    privacyNote?: string | null;
+    lockedActionLabel?: string | null;
+    progressConnector?: string | null;
+    progressSuffix?: string | null;
+    validationError?: string | null;
+  };
   /**
    * The first 3 checklist items shown on the page; items 4–10 are locked
    */
@@ -736,7 +849,12 @@ export interface PageSelect<T extends boolean = true> {
   subheading?: T;
   url?: T;
   body?: T;
-  constant?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
   layoutSections?: T;
   pills?:
     | T
@@ -807,12 +925,76 @@ export interface PageSelect<T extends boolean = true> {
  */
 export interface SectionSelect<T extends boolean = true> {
   title?: T;
+  sectionKey?: T;
   heading?: T;
+  headingFirstLine?: T;
+  headingSecondLine?: T;
   subheading?: T;
+  summary?: T;
+  eyebrow?: T;
+  tagLine?: T;
+  highlight?: T;
+  type?: T;
   image?: T;
+  imageUrl?: T;
+  logo?: T;
+  imageAlt?: T;
+  backgroundImage?: T;
+  backgroundVideo?: T;
+  previewAlt?: T;
+  mockup?:
+    | T
+    | {
+        assistantName?: T;
+        schedulingMessage?: T;
+        timeSlots?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        syncTitle?: T;
+        telemetryTitle?: T;
+        telemetryMetrics?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+      };
+  imageLabels?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
   body?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  controls?:
+    | T
+    | {
+        tabsLabel?: T;
+        previousLabel?: T;
+        nextLabel?: T;
+      };
+  categories?:
+    | T
+    | {
+        category?: T;
+        id?: T;
+      };
   cards?: T;
-  constant?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -824,14 +1006,31 @@ export interface CardSelect<T extends boolean = true> {
   title?: T;
   heading?: T;
   subheading?: T;
+  index?: T;
+  value?: T;
   category?: T;
+  role?: T;
+  date?: T;
   image?: T;
+  imageUrl?: T;
+  imageAlt?: T;
+  icon?: T;
+  theme?: T;
+  shortDescription?: T;
   description?: T;
   additionalDescription?: T;
+  body?: T;
   ctaLabel?: T;
   ctaUrl?: T;
+  readMoreLabel?: T;
+  linkedinUrl?: T;
   type?: T;
-  tags?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -845,6 +1044,28 @@ export interface CaseStudySelect<T extends boolean = true> {
   heading?: T;
   subheading?: T;
   category?: T;
+  featured?: T;
+  overview?:
+    | T
+    | {
+        label?: T;
+        text?: T;
+        id?: T;
+      };
+  specGroups?:
+    | T
+    | {
+        heading?: T;
+        rows?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              builtIn?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   body?: T;
   tags?: T;
   Images?:
@@ -916,6 +1137,7 @@ export interface BlogSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   heading?: T;
+  category?: T;
   dek?: T;
   byline?: T;
   publishedDate?: T;
@@ -964,7 +1186,39 @@ export interface BlogSelect<T extends boolean = true> {
  */
 export interface ChecklistSelect<T extends boolean = true> {
   title?: T;
+  heading?: T;
+  subheading?: T;
+  introduction?: T;
   slug?: T;
+  itemsHeading?: T;
+  items?:
+    | T
+    | {
+        number?: T;
+        heading?: T;
+        description?: T;
+        locked?: T;
+        id?: T;
+      };
+  accessGate?:
+    | T
+    | {
+        heading?: T;
+        unlockedHeading?: T;
+        description?: T;
+        unlockedDescription?: T;
+        emailLabel?: T;
+        companyLabel?: T;
+        emailPlaceholder?: T;
+        emailHelper?: T;
+        companyPlaceholder?: T;
+        submitLabel?: T;
+        privacyNote?: T;
+        lockedActionLabel?: T;
+        progressConnector?: T;
+        progressSuffix?: T;
+        validationError?: T;
+      };
   visibleItems?:
     | T
     | {
@@ -1054,16 +1308,14 @@ export interface Header {
   secondaryLogo?: (number | null) | Media;
   navItems?:
     | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
     | null;
   navCta?: {
     label?: string | null;
-    url?: string | null;
+    href?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1075,18 +1327,41 @@ export interface Header {
 export interface Footer {
   id: number;
   logo?: (number | null) | Media;
-  /**
-   * Free-form footer JSON (heading, subHeading, cta, linkGroups, contactInfo, copyright). Shape follows the frontend FooterContent model — new footer details need no schema change.
-   */
-  content?:
+  heading?: string | null;
+  subHeading?: string | null;
+  homeLinkLabel?: string | null;
+  cta?: {
+    label?: string | null;
+    href?: string | null;
+  };
+  socialNavLabel?: string | null;
+  linkGroups?:
     | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
+        heading?: string | null;
+        links?:
+          | {
+              label?: string | null;
+              href?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
     | null;
+  socialLinks?:
+    | {
+        label?: string | null;
+        href?: string | null;
+        icon?: ('linkedin' | 'instagram' | 'twitter') | null;
+        id?: string | null;
+      }[]
+    | null;
+  helplineNumber?: string | null;
+  techSupportEmail?: string | null;
+  requestIntro?: string | null;
+  requestLabel?: string | null;
+  requestUrl?: string | null;
+  copyright?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1098,6 +1373,7 @@ export interface SeoSetting {
   id: number;
   siteName: string;
   siteUrl: string;
+  siteIcon?: (number | null) | Media;
   siteTagline?: string | null;
   titleSeparator?: string | null;
   defaultSeoTitle?: string | null;
@@ -1202,16 +1478,6 @@ export interface SiteChrome {
     title?: string | null;
     subtitle?: string | null;
     continueCta?: string | null;
-    /**
-     * Shown if CMS categories fail to load
-     */
-    fallbackCategories?:
-      | {
-          label: string;
-          description?: string | null;
-          id?: string | null;
-        }[]
-      | null;
   };
   notFound?: {
     heading?: string | null;
@@ -1225,6 +1491,19 @@ export interface SiteChrome {
      */
     logoText?: string | null;
   };
+  pageStates: {
+    loading: string;
+    loadFailed: string;
+  };
+  accessibility: {
+    skipToMain: string;
+    primaryNavigation: string;
+    homeLink: string;
+    openNavigation: string;
+    closeNavigation: string;
+    closeDialog: string;
+    checklistAreas: string;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1235,12 +1514,18 @@ export interface SiteChrome {
 export interface HeaderSelect<T extends boolean = true> {
   primaryLogo?: T;
   secondaryLogo?: T;
-  navItems?: T;
-  navCta?:
+  navItems?:
     | T
     | {
         label?: T;
         url?: T;
+        id?: T;
+      };
+  navCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1252,7 +1537,43 @@ export interface HeaderSelect<T extends boolean = true> {
  */
 export interface FooterSelect<T extends boolean = true> {
   logo?: T;
-  content?: T;
+  heading?: T;
+  subHeading?: T;
+  homeLinkLabel?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  socialNavLabel?: T;
+  linkGroups?:
+    | T
+    | {
+        heading?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        icon?: T;
+        id?: T;
+      };
+  helplineNumber?: T;
+  techSupportEmail?: T;
+  requestIntro?: T;
+  requestLabel?: T;
+  requestUrl?: T;
+  copyright?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1264,6 +1585,7 @@ export interface FooterSelect<T extends boolean = true> {
 export interface SeoSettingsSelect<T extends boolean = true> {
   siteName?: T;
   siteUrl?: T;
+  siteIcon?: T;
   siteTagline?: T;
   titleSeparator?: T;
   defaultSeoTitle?: T;
@@ -1373,13 +1695,6 @@ export interface SiteChromeSelect<T extends boolean = true> {
         title?: T;
         subtitle?: T;
         continueCta?: T;
-        fallbackCategories?:
-          | T
-          | {
-              label?: T;
-              description?: T;
-              id?: T;
-            };
       };
   notFound?:
     | T
@@ -1393,6 +1708,23 @@ export interface SiteChromeSelect<T extends boolean = true> {
     | T
     | {
         logoText?: T;
+      };
+  pageStates?:
+    | T
+    | {
+        loading?: T;
+        loadFailed?: T;
+      };
+  accessibility?:
+    | T
+    | {
+        skipToMain?: T;
+        primaryNavigation?: T;
+        homeLink?: T;
+        openNavigation?: T;
+        closeNavigation?: T;
+        closeDialog?: T;
+        checklistAreas?: T;
       };
   updatedAt?: T;
   createdAt?: T;

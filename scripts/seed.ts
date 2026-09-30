@@ -1,6 +1,6 @@
 import path from 'path'
-import { fileURLToPath } from 'url'
-import { readFileSync } from 'fs'
+import { fileURLToPath, pathToFileURL } from 'url'
+import { existsSync, readFileSync } from 'fs'
 import { getPayload } from 'payload'
 
 const filename = fileURLToPath(import.meta.url)
@@ -9,17 +9,12 @@ const dirname = path.dirname(filename)
 // ============ Load JSON Data ============
 
 function loadJSON<T>(jsonPath: string): T {
-  try {
-    const fullPath = path.resolve(dirname, jsonPath)
-    const content = readFileSync(fullPath, 'utf-8')
-    return JSON.parse(content) as T
-  } catch (error) {
-    console.warn(`⚠ Could not load JSON at ${jsonPath}:`, error instanceof Error ? error.message : error)
-    return {} as T
-  }
+  const fullPath = path.resolve(dirname, jsonPath)
+  const content = readFileSync(fullPath, 'utf-8')
+  return JSON.parse(content) as T
 }
 
-const dataDir = '../../Canopy-Website/public/data'
+const dataDir = '../seed-data'
 const homeData = loadJSON<any>(`${dataDir}/home.json`)
 const siteData = loadJSON<any>(`${dataDir}/site.json`)
 const servicesData = loadJSON<any>(`${dataDir}/services.json`)
@@ -27,6 +22,18 @@ const projectsData = loadJSON<any>(`${dataDir}/projects.json`)
 const checklistData = loadJSON<any>(`${dataDir}/checklist.json`)
 const blogsData = loadJSON<any>(`${dataDir}/blogs.json`)
 const testimonialsData = loadJSON<any>(`${dataDir}/testimonials.json`)
+
+function getImageFields(value: any): { image?: number | string; imageUrl?: string } {
+  if (typeof value === 'string') return { imageUrl: value }
+  if (typeof value === 'number') return { image: value }
+  if (value && typeof value === 'object') {
+    const fields: { image?: number | string; imageUrl?: string } = {}
+    if (typeof value.id === 'number' || typeof value.id === 'string') fields.image = value.id
+    if (typeof value.url === 'string') fields.imageUrl = value.url
+    return fields
+  }
+  return {}
+}
 
 // ============ Markdown to Lexical Helper ============
 
@@ -36,14 +43,40 @@ const testimonialsData = loadJSON<any>(`${dataDir}/testimonials.json`)
 // Lexical editor to fail deserializing the value, and downstream consumers
 // that walk this tree (e.g. a richText-to-HTML renderer) rely on these fields.
 
-function textNode(text: string): any {
-  return { type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text, version: 1 }
+function textNode(text: string, format = 0): any {
+  return { type: 'text', detail: 0, format, mode: 'normal', style: '', text, version: 1 }
+}
+
+function inlineMarkdownNodes(text: string): any[] {
+  const tokenPattern = /(\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_|`[^`]+`)/g
+  const nodes: any[] = []
+  let offset = 0
+
+  for (const match of text.matchAll(tokenPattern)) {
+    const token = match[0]
+    const index = match.index
+    if (index > offset) nodes.push(textNode(text.slice(offset, index)))
+
+    const isBold = token.startsWith('**') || token.startsWith('__')
+    const isCode = token.startsWith('`')
+    const delimiterLength = isBold || isCode ? 2 : 1
+    nodes.push(
+      textNode(
+        token.slice(delimiterLength, token.length - delimiterLength),
+        isBold ? 1 : isCode ? 16 : 2,
+      ),
+    )
+    offset = index + token.length
+  }
+
+  if (offset < text.length) nodes.push(textNode(text.slice(offset)))
+  return nodes.length ? nodes : [textNode(text)]
 }
 
 function paragraphNode(text: string): any {
   return {
     type: 'paragraph',
-    children: text ? [textNode(text)] : [],
+    children: text ? inlineMarkdownNodes(text) : [],
     direction: null,
     format: '',
     indent: 0,
@@ -57,7 +90,7 @@ function headingNode(text: string, tag: 'h2' | 'h3'): any {
   return {
     type: 'heading',
     tag,
-    children: [textNode(text)],
+    children: inlineMarkdownNodes(text),
     direction: null,
     format: '',
     indent: 0,
@@ -69,7 +102,7 @@ function listItemNode(text: string, value: number): any {
   return {
     type: 'listitem',
     value,
-    children: [textNode(text)],
+    children: inlineMarkdownNodes(text),
     direction: null,
     format: '',
     indent: 0,
@@ -156,7 +189,8 @@ interface UpsertResult<T> {
 async function main() {
   let payload: any
   try {
-    const configModule = await import(path.resolve(dirname, '../src/payload.config.ts'))
+    const configUrl = pathToFileURL(path.resolve(dirname, '../src/payload.config.ts')).href
+    const configModule = await import(configUrl)
     payload = await getPayload({ config: configModule.default })
 
     console.log('✓ Connected to Payload')
@@ -183,25 +217,21 @@ async function main() {
     where: Record<string, any>,
     data: Record<string, any>,
   ): Promise<UpsertResult<T>> {
-    try {
-      const result = await payload.find({
-        collection,
-        where,
-        limit: 1,
-        depth: 0,
-      })
+    const result = await payload.find({
+      collection,
+      where,
+      limit: 1,
+      depth: 0,
+    })
 
-      if (result.docs.length > 0) {
-        const updated = await payload.update({
-          collection,
-          id: result.docs[0].id,
-          data,
-        })
-        console.log(`  Updated ${collection}: ${data.name || data.slug || data.title || data.heading}`)
-        return { doc: updated, created: false }
-      }
-    } catch (e) {
-      // Continue to create
+    if (result.docs.length > 0) {
+      const updated = await payload.update({
+        collection,
+        id: result.docs[0].id,
+        data,
+      })
+      console.log(`  Updated ${collection}: ${data.name || data.slug || data.title || data.heading}`)
+      return { doc: updated, created: false }
     }
 
     const created = await payload.create({
@@ -218,20 +248,41 @@ async function main() {
       { filename: 'logo-green.png', alt: 'Canopy Logo - Green' },
       { filename: 'logo-white.png', alt: 'Canopy Logo - White' },
       { filename: 'logo-grey.png', alt: 'Canopy Logo - Grey' },
+      { filename: 'favicon.png', alt: 'Canopy Browser Icon' },
     ]
 
-    for (const { alt } of logos) {
+    for (const { filename, alt } of logos) {
+      const filePath = path.resolve(dirname, '../seed-data/media', filename)
+      if (!existsSync(filePath)) {
+        throw new Error(`Required media seed file is missing: ${filePath}`)
+      }
+
       try {
-        await findOrCreate<any>(
-          'media',
-          { alt: { equals: alt } },
-          { alt },
-        )
+        const result = await payload.find({
+          collection: 'media',
+          where: { alt: { equals: alt } },
+          limit: 1,
+          depth: 0,
+        })
+        if (result.docs[0]?.id) {
+          await payload.update({
+            collection: 'media',
+            id: result.docs[0].id,
+            data: { alt },
+            filePath,
+          })
+        } else {
+          await payload.create({
+            collection: 'media',
+            data: { alt },
+            filePath,
+          })
+        }
+        console.log(`  Stored media: ${alt}`)
       } catch (error) {
-        console.warn(`  ⚠ Skipped media ${alt}: ${error instanceof Error ? error.message : error}`)
+        throw new Error(`Failed to store media ${alt}`, { cause: error })
       }
     }
-    console.log('    💡 Note: You can upload logo files via admin UI at /admin')
   }
 
   async function seedGlobals() {
@@ -274,10 +325,27 @@ async function main() {
       where: { alt: { equals: 'Canopy Logo - Green' } },
       limit: 1,
     })
+    const browserIcon = await payload.find({
+      collection: 'media',
+      where: { alt: { equals: 'Canopy Browser Icon' } },
+      limit: 1,
+    })
+    if (!browserIcon.docs[0]?.id) {
+      throw new Error('Canopy Browser Icon media record was not created')
+    }
+    await payload.updateGlobal({
+      slug: 'seo-settings',
+      data: { siteIcon: browserIcon.docs[0].id },
+    })
 
     const headerData: any = {
-      navItems: siteData.nav?.navItems || { items: [] },
-      navCta: siteData.nav?.navCta ? { label: siteData.nav.navCta.label, url: siteData.nav.navCta.href } : { label: 'Book a Consultation', url: '/engagement-model/' },
+      navItems: navItemList.map((item: any) => ({
+        label: item.label || '',
+        url: item.url || item.href || '',
+      })),
+      navCta: siteData.nav?.navCta
+        ? { label: siteData.nav.navCta.label || '', href: siteData.nav.navCta.href || '' }
+        : { label: 'Book a Consultation', href: '' },
     }
 
     // Only add logo if it exists
@@ -291,11 +359,45 @@ async function main() {
     })
     console.log('    Updated header')
 
-    // Footer — content is a free-form JSON field; seed the site.json footer
-    // block verbatim so new footer details never require a schema change.
     console.log('  Seeding Footer...')
+    const footerContent = siteData.footer || {}
     const footerData: any = {
-      content: siteData.footer || {},
+      copyright: footerContent.copyright || '',
+      heading: footerContent.heading || 'Canopy Embedded',
+      subHeading: footerContent.subHeading || 'Product engineering',
+      homeLinkLabel: footerContent.homeLinkLabel || 'Canopy home',
+      cta: {
+        label: footerContent.cta?.label || '',
+        href: footerContent.cta?.href || '',
+      },
+      socialNavLabel: footerContent.socialNavLabel || 'Social media',
+      linkGroups: Array.isArray(footerContent.linkGroups)
+        ? footerContent.linkGroups.map((group: any) => ({
+            heading: group.heading || '',
+            links: Array.isArray(group.links)
+              ? group.links.map((link: any) => ({
+                  label: link.label || '',
+                  href: link.href || '',
+                }))
+              : [],
+          }))
+        : [],
+      socialLinks: Array.isArray(footerContent.socialLinks) && footerContent.socialLinks.length > 0
+        ? footerContent.socialLinks.map((link: any) => ({
+            label: link.label || '',
+            href: link.href || '',
+            icon: ['linkedin', 'instagram', 'twitter'].includes(link.icon) ? link.icon : undefined,
+          }))
+        : [
+            { label: 'LinkedIn', href: '', icon: 'linkedin' },
+            { label: 'Instagram', href: '', icon: 'instagram' },
+            { label: 'Twitter', href: '', icon: 'twitter' },
+          ],
+      helplineNumber: footerContent.helplineNumber || '+1999 888-76-54',
+      techSupportEmail: footerContent.techSupportEmail || 'support@canopy.com',
+      requestIntro: footerContent.requestIntro || 'Raise a general',
+      requestLabel: footerContent.requestLabel || 'IT Support Requests',
+      requestUrl: footerContent.requestUrl || '',
     }
 
     // Only add logo if it exists
@@ -330,7 +432,7 @@ async function main() {
         listLabels: {
           viewProjectCta: 'View Project →',
           readArticleCta: 'Read Article →',
-          viewDetailsCta: 'View Details →',
+          viewDetailsCta: 'View Details',
         },
         checklistUi: {
           itemsHeading: 'Checklist Items',
@@ -342,11 +444,6 @@ async function main() {
           title: 'What do you need help with?',
           subtitle: 'Choose the area to continue with the appropriate checklist',
           continueCta: 'Continue',
-          // ids are checklist slugs so the modal's Continue navigates to /resources/<slug>
-          fallbackCategories: [
-            { id: 'hardware-audit-checklist', label: 'Hardware' },
-            { id: 'iot-app-cloud-readiness-checklist', label: 'UI/UX & Cloud' },
-          ],
         },
         notFound: {
           heading: 'Page Not Found',
@@ -356,6 +453,19 @@ async function main() {
         },
         navFallback: {
           logoText: 'Canopy',
+        },
+        pageStates: {
+          loading: 'Loading...',
+          loadFailed: 'Content could not be loaded.',
+        },
+        accessibility: {
+          skipToMain: 'Skip to main content',
+          primaryNavigation: 'Primary navigation',
+          homeLink: 'Canopy home',
+          openNavigation: 'Open navigation menu',
+          closeNavigation: 'Close navigation menu',
+          closeDialog: 'Close dialog',
+          checklistAreas: 'Checklist areas',
         },
       },
     })
@@ -372,22 +482,71 @@ async function main() {
     // Helper to seed a section
     const seedSection = async (title: string, data: any) => {
       const cards: any[] = []
-      const sectionCards = data.cards || data.serviceCard || data.breakPoints || data.steps || data.featured || []
+      const sourceCards = [
+        ...(Array.isArray(data.cards) ? data.cards.map((card: any) => ({ card, cardType: card.type, sourceKind: 'cards' })) : []),
+        ...(Array.isArray(data.serviceCard) ? data.serviceCard.map((card: any) => ({ card, cardType: 'service', sourceKind: 'serviceCard' })) : []),
+        ...(Array.isArray(data.breakPoints) ? data.breakPoints.map((card: any) => ({ card, cardType: 'breakpoint', sourceKind: 'breakPoints' })) : []),
+        ...(Array.isArray(data.stats) ? data.stats.map((card: any) => ({ card, cardType: 'stat', sourceKind: 'stats' })) : []),
+        ...(Array.isArray(data.teamMembers) ? data.teamMembers.map((card: any) => ({ card, cardType: 'teamMember', sourceKind: 'teamMembers' })) : []),
+        ...(Array.isArray(data.steps) ? data.steps.map((card: any) => ({ card, cardType: 'step', sourceKind: 'steps' })) : []),
+        ...(Array.isArray(data.featured) ? data.featured.map((card: any) => ({ card, cardType: 'card', sourceKind: 'featured' })) : []),
+      ]
 
-      for (const card of sectionCards) {
+      for (const { card, cardType, sourceKind } of sourceCards) {
+        const cardTitle = card.title || card.heading || card.label
+        if (typeof cardTitle !== 'string' || !cardTitle.trim()) {
+          throw new Error(`Section "${title}" contains a card without a title`)
+        }
+        let ctaUrl = card.ctaHref || card.cta?.href || card.href || ''
+        if (!ctaUrl && sourceKind === 'featured') {
+          const existingCaseStudy = await payload.find({
+            collection: 'case-study',
+            where: { title: { equals: cardTitle } },
+            limit: 1,
+            depth: 0,
+          })
+          const matchingProject = existingCaseStudy.docs[0]?.slug
+            ? existingCaseStudy.docs[0]
+            : (projectsData.projects || []).find(
+            (project: any) =>
+              project.title === cardTitle ||
+              project.heading === cardTitle ||
+              project.slug === card.id,
+            )
+          if (matchingProject?.slug) ctaUrl = `/work/${matchingProject.slug}/`
+        }
         const cardData = {
-          title: card.title || card.heading || card.label || '',
-          heading: card.heading || card.title || '',
-          description: markdownToLexical(card.description || ''),
+          title: cardTitle,
+          heading: card.heading || card.title || card.label || '',
+          ...getImageFields(card.image),
+          subheading: card.subheading || '',
+          index: card.index || card.number || '',
+          value: card.value || '',
           category: card.category || '',
+          role: card.role || '',
+          date: card.date || '',
+          imageAlt: card.imageAlt || '',
+          icon: card.icon || '',
+          theme: card.theme || '',
+          shortDescription: card.shortDescription || '',
+          description: markdownToLexical(card.description || ''),
+          additionalDescription: markdownToLexical(card.additionalDescription || ''),
+          body: card.body || '',
           ctaLabel: card.ctaLabel || '',
-          ctaUrl: card.ctaHref || card.href || '',
-          tags: card.tags ? (typeof card.tags === 'string' ? card.tags : card.tags.join(', ')) : '',
+          ctaUrl,
+          readMoreLabel: card.readMoreLabel || '',
+          linkedinUrl: card.linkedinUrl || '',
+          type: cardType || 'card',
+          tags: Array.isArray(card.tags)
+            ? card.tags.map((tag: any) => ({ tag: typeof tag === 'string' ? tag : tag.tag || '' }))
+            : typeof card.tags === 'string'
+              ? card.tags.split(',').map((tag: string) => ({ tag: tag.trim() }))
+              : [],
         }
 
         const cardResult = await findOrCreate<any>(
           'card',
-          { title: { equals: card.title || card.heading } },
+          { title: { equals: cardTitle } },
           cardData,
         )
         cards.push(cardResult.doc.id)
@@ -395,11 +554,57 @@ async function main() {
 
       const sectionData = {
         title,
+        ...getImageFields(data.image),
+        sectionKey: data.id || '',
         heading: data.heading || data.title || '',
+        headingFirstLine: data.headingFirstLine || '',
+        headingSecondLine: data.headingSecondLine || '',
         subheading: data.subHeading || data.subheading || '',
+        summary: data.summary || '',
+        eyebrow: data.eyebrow || '',
+        tagLine: data.tagLine || '',
+        highlight: data.highlight || '',
+        type: data.type || '',
+        imageAlt: data.imageAlt || data.previewAlt || '',
+        logo: data.logo || '',
+        previewAlt: data.previewAlt || '',
+        backgroundImage: data.backgroundImage || '',
+        backgroundVideo: data.backgroundVideo || '',
+        mockup: data.mockup
+          ? {
+              assistantName: data.mockup.assistantName || '',
+              schedulingMessage: data.mockup.schedulingMessage || '',
+              timeSlots: Array.isArray(data.mockup.timeSlots)
+                ? data.mockup.timeSlots.map((value: any) => ({ value: typeof value === 'string' ? value : value.value || '' }))
+                : [],
+              syncTitle: data.mockup.syncTitle || '',
+              telemetryTitle: data.mockup.telemetryTitle || '',
+              telemetryMetrics: Array.isArray(data.mockup.telemetryMetrics)
+                ? data.mockup.telemetryMetrics.map((value: any) => ({ value: typeof value === 'string' ? value : value.value || '' }))
+                : [],
+            }
+          : undefined,
+        imageLabels: Array.isArray(data.imageLabels)
+          ? data.imageLabels.map((label: any) => ({ label: typeof label === 'string' ? label : label.label || '' }))
+          : [],
         body: markdownToLexical(data.description || ''),
+        cta: data.cta ? { label: data.cta.label || '', href: data.cta.href || '' } : undefined,
+        secondaryCta: data.secondaryCta
+          ? { label: data.secondaryCta.label || '', href: data.secondaryCta.href || '' }
+          : undefined,
+        controls: data.controls
+          ? {
+              tabsLabel: data.controls.tabsLabel || '',
+              previousLabel: data.controls.previousLabel || '',
+              nextLabel: data.controls.nextLabel || '',
+            }
+          : undefined,
+        categories: Array.isArray(data.categories)
+          ? data.categories.map((category: any) => ({
+              category: typeof category === 'string' ? category : category.category || '',
+            }))
+          : [],
         cards,
-        constant: {},
       }
 
       const sectionResult = await findOrCreate<any>(
@@ -446,17 +651,28 @@ async function main() {
       homeSections.push(ctaId)
     }
 
+    const testimonialSection = testimonialsData.sections?.[0]
+    if (testimonialSection) {
+      const testimonialId = await seedSection('Testimonials', {
+        title: testimonialSection.title,
+        heading: testimonialsData.heading || testimonialSection.heading,
+        subheading: testimonialsData.subheading || testimonialSection.subheading,
+        cards: testimonialSection.cards || [],
+      })
+      homeSections.push(testimonialId)
+    }
+
     // Seed the home Page document
     const homePageData = {
       title: 'Home',
       url: '/',
-      heading: 'You Have the Idea. We\'re the Team to Build It.',
-      subheading: homeData.banner?.subheading || 'From the first sketch to the final product, we work alongside you to design, build, test.',
-      body: markdownToLexical('Welcome to Canopy Embedded Labs'),
+      heading: homeData.banner?.heading || homeData.title,
+      subheading: homeData.banner?.subheading || '',
+      body: markdownToLexical(homeData.banner?.body || ''),
       layoutSections: homeSections,
       seo: {
-        seoTitle: homeData.htmlTitle || 'Canopy Embedded | From first sketch to field-ready product',
-        metaDescription: 'Full-stack electronics product development: PCB design, firmware, enclosures, UI/UX and IoT cloud apps from one team.',
+        seoTitle: homeData.htmlTitle || homeData.title,
+        metaDescription: homeData.seo?.metaDescription || '',
         canonicalUrl: 'https://www.canopyembedded.com/',
         robots: { index: true, follow: true },
         schemaType: 'Organization',
@@ -468,6 +684,7 @@ async function main() {
     // PCB Design capability page from services.json
     if (servicesData.sections && servicesData.sections.length > 0) {
       const pcbCardIds: any[] = []
+      const serviceSectionIds: string[] = []
       const includedSection = servicesData.sections.find((s: any) => s.id === 'included')
 
       if (includedSection && includedSection.cards) {
@@ -478,7 +695,11 @@ async function main() {
             subheading: card.subheading || '',
             description: markdownToLexical(card.description || ''),
             category: 'PCB Design',
-            tags: card.tags ? (Array.isArray(card.tags) ? card.tags.join(', ') : card.tags) : '',
+            tags: Array.isArray(card.tags)
+              ? card.tags.map((tag: string) => ({ tag }))
+              : typeof card.tags === 'string'
+                ? card.tags.split(',').map((tag: string) => ({ tag: tag.trim() }))
+                : [],
             type: 'grid',
           }
 
@@ -506,12 +727,21 @@ async function main() {
         }
       }
 
+      for (const section of servicesData.sections) {
+        const sectionTitle = `PCB Design · ${section.id}`
+        serviceSectionIds.push(await seedSection(sectionTitle, section))
+      }
+
       const pcbPageData = {
         title: 'PCB Design',
         url: '/capabilities/pcb-design/',
         heading: servicesData.heading || 'PCB Design & Architecture',
         subheading: servicesData.subheading || '',
         body: markdownToLexical(servicesData.body || ''),
+        cta: servicesData.cta
+          ? { label: servicesData.cta.label || '', href: servicesData.cta.href || '' }
+          : undefined,
+        layoutSections: serviceSectionIds,
         cards: pcbCardIds,
         workflowSteps,
         seo: {
@@ -526,91 +756,64 @@ async function main() {
       await findOrCreate('page', { url: { equals: '/capabilities/pcb-design/' } }, pcbPageData)
     }
 
-    // Static pages with placeholders
-    const staticPages = [
-      {
-        title: 'About',
-        url: '/about/',
-        heading: 'About Canopy',
-        subheading: 'Electronics product development from India',
-        body: markdownToLexical('[TODO: About page body from v83]'),
-        companyFacts: {
-          name: 'Canopy Embedded Labs',
-          location: 'India',
-          sectors: [{ sector: '[TODO: Sector 1]' }],
-          contactEmail: 'contact@canopyembedded.com',
-        },
-        seo: {
-          seoTitle: 'About Canopy Embedded Labs',
-          metaDescription: '[TODO: About meta description]',
-          canonicalUrl: 'https://www.canopyembedded.com/about/',
-          robots: { index: true, follow: true },
-          schemaType: 'Organization',
-        },
-      },
-      {
-        title: 'Capabilities Overview',
-        url: '/capabilities/',
-        heading: 'Our Capabilities',
-        body: markdownToLexical('[TODO: Capabilities overview from v83]'),
-        seo: {
-          seoTitle: 'Capabilities | Canopy Embedded',
-          metaDescription: '[TODO: Capabilities meta]',
-          canonicalUrl: 'https://www.canopyembedded.com/capabilities/',
-          robots: { index: true, follow: true },
-          schemaType: 'none',
-        },
-      },
-      {
-        title: 'Engagement Model',
-        url: '/engagement-model/',
-        heading: 'How We Work Together',
-        body: markdownToLexical('[TODO: Engagement Model body from v83]'),
-        seo: {
-          seoTitle: 'Engagement Model | Canopy Embedded',
-          metaDescription: '[TODO: Engagement Model meta]',
-          canonicalUrl: 'https://www.canopyembedded.com/engagement-model/',
-          robots: { index: true, follow: true },
-          schemaType: 'none',
-        },
-      },
-    ]
-
-    for (const page of staticPages) {
-      await findOrCreate('page', { url: { equals: page.url } }, page)
+    const insightsLayoutSectionIds: string[] = []
+    for (const section of blogsData.page.sections || []) {
+      const sectionTitle = section.heading || section.title
+      if (typeof sectionTitle !== 'string' || !sectionTitle.trim()) {
+        throw new Error('Insights page section is missing a title')
+      }
+      insightsLayoutSectionIds.push(await seedSection(sectionTitle, section))
     }
 
-    // Remaining capability tracks listed on the capabilities overview page.
-    // Static JSON only covers pcb-design — seed the shells (matching the Page
-    // shape capability-detail renders) so every /capabilities/:slug resolves;
-    // content is authored in the CMS from here.
-    const capabilityTracks = [
-      { slug: 'firmware', title: 'Deep Firmware Engineering' },
-      { slug: 'mechanical-design', title: 'Mechanical Design' },
-      { slug: 'industrial-design', title: 'Industrial Design' },
-      { slug: 'hmi-ui-ux', title: 'UI/UX Architecture & Embedded HMI' },
-      { slug: 'iot-apps-cloud', title: 'App Development & Cloud Systems' },
+    const cmsPages = [
+      {
+        title: projectsData.title,
+        url: '/work/',
+        heading: projectsData.heading || projectsData.title,
+        subheading: projectsData.subtitle || '',
+      },
+      {
+        title: servicesData.title,
+        url: '/capabilities/',
+        heading: servicesData.title,
+        subheading: servicesData.subheading || '',
+        cta: servicesData.cta
+          ? { label: servicesData.cta.label || '', href: servicesData.cta.href || '' }
+          : undefined,
+      },
+      {
+        title: blogsData.page.title,
+        url: '/insights/',
+        heading: blogsData.page.heading,
+        subheading: blogsData.page.subheading || '',
+        cta: blogsData.page.cta,
+        layoutSections: insightsLayoutSectionIds,
+        seo: {
+          seoTitle: blogsData.page.htmlTitle || blogsData.page.title,
+          metaDescription: blogsData.page.seo?.metaDescription || '',
+          canonicalUrl: 'https://www.canopyembedded.com/insights/',
+          robots: { index: true, follow: true },
+          schemaType: 'none',
+        },
+      },
+      {
+        title: homeData.howWeWork.heading,
+        url: '/engagement-model/',
+        heading: [homeData.howWeWork.heading, homeData.howWeWork.highlight]
+          .filter(Boolean)
+          .join(' '),
+        subheading: homeData.howWeWork.description || '',
+        body: markdownToLexical(homeData.howWeWork.description || ''),
+        workflowSteps: (homeData.howWeWork.steps || []).map((step: any, index: number) => ({
+          stepNumber: index + 1,
+          title: step.label || '',
+          description: step.description || '',
+        })),
+      },
     ]
 
-    for (const track of capabilityTracks) {
-      await findOrCreate(
-        'page',
-        { url: { equals: `/capabilities/${track.slug}/` } },
-        {
-          title: track.title,
-          url: `/capabilities/${track.slug}/`,
-          heading: track.title,
-          subheading: `[TODO: ${track.title} subheading]`,
-          body: markdownToLexical(`[TODO: ${track.title} page body]`),
-          seo: {
-            seoTitle: `${track.title} | Canopy Embedded`,
-            metaDescription: `[TODO: ${track.title} meta description]`,
-            canonicalUrl: `https://www.canopyembedded.com/capabilities/${track.slug}/`,
-            robots: { index: true, follow: true },
-            schemaType: 'none',
-          },
-        },
-      )
+    for (const page of cmsPages) {
+      await findOrCreate('page', { url: { equals: page.url } }, page)
     }
   }
 
@@ -636,32 +839,54 @@ async function main() {
   async function seedCaseStudies() {
     console.log('\n→ Seeding Case Studies...')
 
-    const projectMap: { [key: string]: any } = {
-      'bms-platform': { slug: 'smart-bms' },
-      'dual-channel-smart-charger': { slug: 'dual-channel-charger' },
-      'ble-mesh-rs485-board': { slug: 'ble-mesh-rs485-node' },
-      'edge-compute-gateway': { slug: 'edge-compute-gateway' },
-    }
-
     for (const project of projectsData.projects || []) {
-      const mapping = projectMap[project.id]
-      const slug = mapping?.slug || project.slug || project.id
+      const slug = project.slug || project.id
+      const specificationItems = (project.specGroups || []).flatMap((group: any) =>
+        (group.rows || [])
+          .filter(
+            (row: any) =>
+              typeof row.value === 'string' &&
+              !/\[[^\]]*\]/.test(row.value),
+          )
+          .map((row: any) => ({
+            item: row.value ? `${row.label}: ${row.value}` : row.label,
+          })),
+      )
 
+      const title = project.heading || project.title || ''
       const caseStudyData = {
-        title: project.heading || project.title || '',
+        title,
         slug,
         heading: project.heading || '',
         subheading: project.description || '',
-        body: markdownToLexical(project.body || project.description || ''),
-        projectStage: project.stage || 'in-design',
-        atAGlance: project.glance || [],
-        features: project.features || (project.overview ? project.overview.map((o: any) => ({ item: o.text || '' })) : []),
-        technicalSpecifications: (project.specGroups || []).flatMap((g: any) =>
-          (g.rows || []).map((r: any) => ({ item: `${r.label}: ${r.value}` }))
+        category: project.category || '',
+        featured: project.featured === true,
+        overview: project.overview || [],
+        specGroups: project.specGroups || [],
+        body: markdownToLexical(
+          project.body ||
+            (project.overview || []).map((item: any) => item.text).filter(Boolean).join('\n\n') ||
+            project.description ||
+            '',
         ),
+        atAGlance: (project.glance || []).filter(
+          (item: any) =>
+            typeof item.value === 'string' &&
+            !/\[[^\]]*\]/.test(item.value),
+        ),
+        features: project.features || (project.overview ? project.overview.map((o: any) => ({ item: o.text || '' })) : []),
+        technicalSpecifications: specificationItems,
         tags: project.tags ? (Array.isArray(project.tags) ? project.tags.join(', ') : project.tags) : '',
+        cardCta: {
+          label: project.cardCtaLabel || 'View Project',
+          link: `/work/${slug}/`,
+        },
+        pageCta: {
+          label: project.pageCtaLabel || '',
+          link: project.pageCtaLink || '',
+        },
         seo: {
-          seoTitle: project.htmlTitle || project.heading || '',
+          seoTitle: project.htmlTitle || project.heading || project.title || '',
           metaDescription: project.description || '',
           canonicalUrl: `https://www.canopyembedded.com/work/${slug}/`,
           robots: { index: true, follow: true },
@@ -669,7 +894,11 @@ async function main() {
         },
       }
 
-      await findOrCreate('case-study', { slug: { equals: slug } }, caseStudyData)
+      await findOrCreate(
+        'case-study',
+        { or: [{ slug: { equals: slug } }, { title: { equals: title } }] },
+        caseStudyData,
+      )
     }
   }
 
@@ -677,19 +906,30 @@ async function main() {
     console.log('\n→ Seeding Blogs...')
 
     for (const blog of blogsData.posts || []) {
+      if (!blog.slug || !blog.date || !blog.richBody) {
+        console.warn(`  Skipping blog without slug, published date, or body: ${blog.heading || blog.title}`)
+        continue
+      }
+
+      const publishedDate = new Date(blog.date)
+      if (Number.isNaN(publishedDate.getTime())) {
+        console.warn(`  Skipping blog with invalid published date: ${blog.heading || blog.title}`)
+        continue
+      }
+
       const blogData = {
-        title: blog.title || '',
+        title: blog.heading || blog.title || '',
         slug: blog.slug || '',
         heading: blog.heading || '',
+        category: blog.category || '',
         dek: blog.description || blog.subheading || '',
-        byline: 'Canopy Embedded Labs engineering team',
-        publishedDate: blog.date ? new Date(blog.date) : new Date(),
-        body: markdownToLexical(blog.richBody || blog.description || 'Body content pending.'),
+        publishedDate,
+        body: markdownToLexical(blog.richBody),
         tags: (blog.tags || []).map((t: string) => ({ tag: t })),
         seo: {
           seoTitle: blog.heading || '',
           metaDescription: blog.description || '',
-          canonicalUrl: `https://www.canopyembedded.com${blog.href || `/insights/${blog.slug}/`}`,
+          canonicalUrl: `https://www.canopyembedded.com/insights/${blog.slug}/`,
           robots: { index: true, follow: true },
           schemaType: 'BlogPosting',
         },
@@ -704,6 +944,10 @@ async function main() {
 
     // Hardware Audit Checklist
     const hardwareItems = checklistData.sections?.[0]?.cards || []
+    if (hardwareItems.length === 0) {
+      throw new Error('Checklist seed data does not contain hardware audit items')
+    }
+
     const visibleItems = hardwareItems.slice(0, 3).map((item: any) => ({
       item: `${item.heading}: ${item.description}`,
     }))
@@ -712,43 +956,25 @@ async function main() {
       'checklist',
       { slug: { equals: 'hardware-audit-checklist' } },
       {
-        title: 'Hardware Audit Checklist',
+        title: checklistData.heading || checklistData.title,
         slug: 'hardware-audit-checklist',
-        visibleItems: visibleItems.length > 0 ? visibleItems : [
-          { item: 'Power architecture validation' },
-          { item: 'Component selection & lifecycle' },
-          { item: 'Thermal design review' },
-        ],
-        lockedItemsCount: 7,
-        formId: 'form_hardware_audit_checklist',
+        heading: checklistData.heading,
+        subheading: checklistData.subheading,
+        introduction: checklistData.body,
+        itemsHeading: checklistData.itemsHeading,
+        items: hardwareItems.map((item: any) => ({
+          number: item.number,
+          heading: item.heading,
+          description: item.description,
+          locked: Boolean(item.locked),
+        })),
+        accessGate: checklistData.accessGate,
+        visibleItems,
+        lockedItemsCount: Math.max(hardwareItems.length - visibleItems.length, 0),
         seo: {
-          seoTitle: 'Hardware Audit Checklist | Canopy Embedded',
-          metaDescription: 'Review ten engineering risks that lead to field returns before taking your hardware to production.',
+          seoTitle: checklistData.htmlTitle || checklistData.heading || checklistData.title,
+          metaDescription: checklistData.seo?.metaDescription || '',
           canonicalUrl: 'https://www.canopyembedded.com/resources/hardware-audit-checklist/',
-          robots: { index: true, follow: true },
-          schemaType: 'none',
-        },
-      },
-    )
-
-    // UI/UX & Cloud Readiness Checklist (placeholder, no source)
-    await findOrCreate(
-      'checklist',
-      { slug: { equals: 'iot-app-cloud-readiness-checklist' } },
-      {
-        title: 'UI/UX & Cloud Readiness Checklist',
-        slug: 'iot-app-cloud-readiness-checklist',
-        visibleItems: [
-          { item: '[TODO: UI/UX checklist item 1]' },
-          { item: '[TODO: UI/UX checklist item 2]' },
-          { item: '[TODO: UI/UX checklist item 3]' },
-        ],
-        lockedItemsCount: 7,
-        formId: 'form_iot_app_cloud_readiness_checklist',
-        seo: {
-          seoTitle: 'UI/UX & Cloud Readiness Checklist | Canopy Embedded',
-          metaDescription: '[TODO: Cloud checklist meta]',
-          canonicalUrl: 'https://www.canopyembedded.com/resources/iot-app-cloud-readiness-checklist/',
           robots: { index: true, follow: true },
           schemaType: 'none',
         },

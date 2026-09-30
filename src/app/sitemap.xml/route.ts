@@ -2,7 +2,7 @@ import { getPayload } from 'payload'
 import config from '../../payload.config'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.canopyembedded.com'
-const ITEMS_PER_PAGE = 10
+const ITEMS_PER_PAGE = 7
 
 interface SitemapEntry {
   url: string
@@ -45,9 +45,9 @@ export async function GET() {
       }
     }
 
-    // Fetch published projects
+    // Fetch published case studies
     const projectsResult = await payload.find({
-      collection: 'project',
+      collection: 'case-study',
       limit: 1000,
       depth: 0,
     })
@@ -63,9 +63,9 @@ export async function GET() {
       }
     }
 
-    // Fetch published posts
+    // Fetch published blogs
     const postsResult = await payload.find({
-      collection: 'post',
+      collection: 'blog',
       limit: 1000,
       depth: 0,
     })

@@ -38,6 +38,12 @@ export const SeoSettings: GlobalConfig = {
               },
             },
             {
+              name: 'siteIcon',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Browser Tab Icon',
+            },
+            {
               name: 'siteTagline',
               type: 'text',
               label: 'Site Tagline',

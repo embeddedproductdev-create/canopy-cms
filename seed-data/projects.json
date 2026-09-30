@@ -1,0 +1,141 @@
+{
+  "title": "Portfolio",
+  "heading": "Engineering Ideas Into Real Products.",
+  "htmlTitle": "Engineering Ideas Into Real Products | Canopy",
+  "subtitle": "Selected products, platforms, and engineering work — shipped by one team across hardware, firmware, and cloud.",
+  "projects": [
+    {
+      "id": "bms-platform",
+      "slug": "bms-platform",
+      "heading": "BMS Platform",
+      "featured": true,
+      "date": "",
+      "tags": ["Battery Management"],
+      "description": "A battery management system that doesn't need a fleet recall to fix a firmware bug.",
+      "body": "A battery management system designed around serviceability, update resilience, and reliable field operation.",
+      "highlights": "",
+      "image": "",
+      "additionalImages": [],
+      "bodyFill": "#FFFFFF",
+      "cardCtaLabel": "View Project",
+      "cardCtaLink": "/work/bms-platform/",
+      "pageCtaLabel": "Book a Scoping Call",
+      "pageCtaLink": "mailto:hello@canopyembedded.com",
+      "category": "Battery Management",
+      "overview": [
+        { "label": "The idea", "text": "A battery management system that doesn't need a fleet recall to fix a firmware bug." },
+        { "label": "The gap", "text": "No in-house team spanning circuit design, RTOS firmware, and validation." },
+        { "label": "Our role", "text": "We were that team." }
+      ],
+      "glance": [
+        { "value": "4S · Li-ion", "label": "Pack Configuration" },
+        { "value": "100W", "label": "Max Power Supported" },
+        { "value": "OTA", "label": "Dual-bank, Signed Updates" },
+        { "value": "IP[ NN ]", "label": "Enclosure Rating" }
+      ],
+      "specGroups": [
+        {
+          "heading": "Battery & Power",
+          "rows": [
+            { "label": "Pack Configuration", "value": "4S (4-cell series) Li-ion" },
+            { "label": "Max Power Supported", "value": "Up to 100W" },
+            { "label": "Operating Voltage Range", "value": "[ V min ] – [ V max ]" },
+            { "label": "Max Continuous Discharge Current", "value": "[ A ]" },
+            { "label": "Cell Balancing", "value": "[ Passive / Active balancing ]" }
+          ]
+        },
+        {
+          "heading": "Protection Features",
+          "rows": [
+            { "label": "Over-Voltage / Under-Voltage Protection", "value": "", "builtIn": true },
+            { "label": "Over-Current / Short-Circuit Protection", "value": "", "builtIn": true },
+            { "label": "Over-Temperature Protection", "value": "", "builtIn": true },
+            { "label": "Cell Imbalance Protection", "value": "", "builtIn": true }
+          ]
+        },
+        {
+          "heading": "Connectivity & Software",
+          "rows": [
+            { "label": "Communication Protocol", "value": "CAN bus" },
+            { "label": "Controller", "value": "32-bit ARM Cortex-M0 variant" },
+            { "label": "RTOS", "value": "FreeRTOS" },
+            { "label": "OTA & Bootloader", "value": "Dual-bank, signed image, automatic rollback" }
+          ]
+        },
+        {
+          "heading": "Mechanical & Environmental",
+          "rows": [
+            { "label": "Dimensions (L × W × H)", "value": "[ mm ]" },
+            { "label": "Weight", "value": "[ g / kg ]" },
+            { "label": "Operating Temperature Range", "value": "[ °C to °C ]" },
+            { "label": "Ingress Protection Rating", "value": "[ IP rating ]" },
+            { "label": "Mounting", "value": "[ mounting method ]" }
+          ]
+        },
+        {
+          "heading": "Certifications & Compliance",
+          "rows": [
+            { "label": "Safety Certification", "value": "[ e.g. UL 2580, IEC 62133 — if applicable ]" },
+            { "label": "EMC Compliance", "value": "[ standards tested against ]" },
+            { "label": "Quality Process", "value": "[ ISO 9001-aligned, if applicable ]" }
+          ]
+        }
+      ],
+      "nextProject": { "slug": "ble-mesh-rs485-board", "title": "BLE Mesh + RS485 Board" }
+    },
+    {
+      "id": "ble-mesh-rs485-board",
+      "slug": "ble-mesh-rs485-board",
+      "heading": "BLE Mesh + RS485 Board",
+      "date": "",
+      "tags": ["Industrial IoT"],
+      "description": "Mesh-networked node for energy meter retrofits — BLE Mesh upstream, RS485/Modbus downstream.",
+      "body": "",
+      "highlights": "",
+      "image": "",
+      "additionalImages": [],
+      "bodyFill": "#FFFFFF",
+      "cardCtaLabel": "View Project",
+      "cardCtaLink": "/work/ble-mesh-rs485-board/",
+      "pageCtaLabel": "Book a Scoping Call",
+      "pageCtaLink": "mailto:hello@canopyembedded.com",
+      "category": "Industrial IoT"
+    },
+    {
+      "id": "edge-compute-gateway",
+      "slug": "edge-compute-gateway",
+      "heading": "Edge Compute Gateway",
+      "date": "",
+      "tags": ["Apps & Cloud"],
+      "description": "OTA fleet management across distributed edge nodes for smart-infrastructure deployments.",
+      "body": "",
+      "highlights": "",
+      "image": "",
+      "additionalImages": [],
+      "bodyFill": "#FFFFFF",
+      "cardCtaLabel": "View Project",
+      "cardCtaLink": "/work/edge-compute-gateway/",
+      "pageCtaLabel": "Book a Scoping Call",
+      "pageCtaLink": "mailto:hello@canopyembedded.com",
+      "category": "Apps & Cloud"
+    },
+    {
+      "id": "dual-channel-smart-charger",
+      "slug": "dual-channel-smart-charger",
+      "heading": "Dual-Channel Smart Charger",
+      "date": "",
+      "tags": ["Power Electronics"],
+      "description": "Power electronics and control firmware engineered together, not bolted on.",
+      "body": "",
+      "highlights": "",
+      "image": "",
+      "additionalImages": [],
+      "bodyFill": "#FFFFFF",
+      "cardCtaLabel": "View Project",
+      "cardCtaLink": "/work/dual-channel-smart-charger/",
+      "pageCtaLabel": "Book a Scoping Call",
+      "pageCtaLink": "mailto:hello@canopyembedded.com",
+      "category": "Power Electronics"
+    }
+  ]
+}

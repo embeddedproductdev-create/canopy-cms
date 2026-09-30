@@ -1,4 +1,4 @@
-import type { GlobalConfig, Field } from 'payload'
+import type { GlobalConfig } from 'payload'
 import { revalidateGlobalOnChange } from '../hooks/revalidate'
 
 export const Header: GlobalConfig = {
@@ -29,8 +29,12 @@ export const Header: GlobalConfig = {
     },
     {
       name: 'navItems',
-      type: 'json',
+      type: 'array',
       label: 'Main Navigation Menu',
+      fields: [
+        { name: 'label', type: 'text', required: true },
+        { name: 'url', type: 'text', required: true },
+      ],
     },
     {
       name: 'navCta',
@@ -44,10 +48,10 @@ export const Header: GlobalConfig = {
           defaultValue: 'Book a Consultation',
         },
         {
-          name: 'url',
+          name: 'href',
           type: 'text',
           label: 'Button URL',
-          defaultValue: '/engagement-model/',
+          defaultValue: '',
         },
       ],
     },

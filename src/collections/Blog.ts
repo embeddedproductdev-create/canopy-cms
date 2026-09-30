@@ -42,6 +42,7 @@ export const Blog: CollectionConfig = {
       },
     },
     { name: 'heading', type: 'text' },
+    { name: 'category', type: 'text' },
     {
       name: 'dek',
       type: 'text',

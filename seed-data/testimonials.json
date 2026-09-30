@@ -1,0 +1,35 @@
+{
+  "id": "testimonials",
+  "title": "Testimonials",
+  "htmlTitle": "Client Testimonials | Canopy Embedded",
+  "url": "/testimonials",
+  "heading": "Good work is built together.",
+  "subheading": "The best product partnerships bring people, disciplines, and decisions together.",
+  "body": "A selection of the values that guide how we work with product teams.",
+  "image": "",
+  "imageAlt": "",
+  "cta": { "label": "", "href": "" },
+  "seo": { "metaTitle": "Client Testimonials | Canopy Embedded", "metaDescription": "Learn what collaborative product development feels like.", "canonicalPath": "/testimonials", "socialImage": "", "ogTitle": "", "ogDescription": "", "noIndex": false },
+  "pageType": "testimonials",
+  "raw": {},
+  "sections": [
+    {
+      "id": "partnership",
+      "type": "testimonials",
+      "title": "How we partner",
+      "heading": "Built on trust and clear communication.",
+      "subheading": "",
+      "body": "",
+      "image": "",
+      "imageAlt": "",
+      "tags": [],
+      "cta": { "label": "", "href": "" },
+      "cards": [
+        { "id": "testimonial-1", "title": "", "heading": "A collaborative product team", "subheading": "Canopy client", "description": "The value of an integrated team is being able to work through product decisions together, early, and with the full context in view.", "body": "The value of an integrated team is being able to work through product decisions together, early, and with the full context in view.", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "testimonial-2", "title": "", "heading": "A thoughtful engineering partner", "subheading": "Canopy client", "description": "We appreciate the care taken to understand the problem, share options, and keep the project moving as one team.", "body": "We appreciate the care taken to understand the problem, share options, and keep the project moving as one team.", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "testimonial-3", "title": "", "heading": "From idea toward a real product", "subheading": "Canopy client", "description": "Bringing design, electronics, and software into the same conversation helped us make more confident decisions.", "body": "Bringing design, electronics, and software into the same conversation helped us make more confident decisions.", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} }
+      ],
+      "raw": {}
+    }
+  ]
+}

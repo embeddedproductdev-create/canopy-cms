@@ -26,6 +26,7 @@ export const CaseStudy: CollectionConfig = {
       name: 'slug',
       type: 'text',
       unique: true,
+      required: true,
       hooks: {
         beforeValidate: [
           ({ value, data }) => {
@@ -39,6 +40,38 @@ export const CaseStudy: CollectionConfig = {
     { name: 'heading', type: 'text' },
     { name: 'subheading', type: 'text' },
     { name: 'category', type: 'text' },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'Featured Project',
+      defaultValue: false,
+    },
+    {
+      name: 'overview',
+      type: 'array',
+      label: 'Project Overview',
+      fields: [
+        { name: 'label', type: 'text', required: true },
+        { name: 'text', type: 'textarea' },
+      ],
+    },
+    {
+      name: 'specGroups',
+      type: 'array',
+      label: 'Technical Specification Groups',
+      fields: [
+        { name: 'heading', type: 'text', required: true },
+        {
+          name: 'rows',
+          type: 'array',
+          fields: [
+            { name: 'label', type: 'text', required: true },
+            { name: 'value', type: 'text' },
+            { name: 'builtIn', type: 'checkbox', defaultValue: false },
+          ],
+        },
+      ],
+    },
     { name: 'body', type: 'richText' },
     {
       name: 'tags',

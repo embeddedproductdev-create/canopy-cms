@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import { getPayload } from 'payload'
 
 const filename = fileURLToPath(import.meta.url)
@@ -8,7 +8,7 @@ const dirname = path.dirname(filename)
 
 interface TestResult {
   name: string
-  status: 'pass' | 'fail'
+  status: 'pass' | 'fail' | 'warn'
   count?: number
   message?: string
 }
@@ -31,7 +31,8 @@ async function main() {
 
   try {
     // Load config
-    const configModule = await import(path.resolve(dirname, '../src/payload.config.ts'))
+    const configUrl = pathToFileURL(path.resolve(dirname, '../src/payload.config.ts')).href
+    const configModule = await import(configUrl)
     payload = await getPayload({ config: configModule.default })
     console.log('✓ Connected to Payload\n')
   } catch (error) {
@@ -125,9 +126,9 @@ async function main() {
 
   // Test specific seeded content
   const contentTests = [
-    { collection: 'case-study', expectedCount: 3, name: 'Case Studies' },
-    { collection: 'blog', expectedCount: 3, name: 'Blog Posts' },
-    { collection: 'checklist', expectedCount: 2, name: 'Checklists' },
+    { collection: 'case-study', expectedCount: 4, name: 'Case Studies' },
+    { collection: 'blog', expectedCount: 7, name: 'Blog Posts' },
+    { collection: 'checklist', expectedCount: 1, name: 'Checklists' },
   ]
 
   for (const test of contentTests) {
@@ -157,6 +158,109 @@ async function main() {
         message: error instanceof Error ? error.message : String(error),
       })
     }
+  }
+
+  // ============ Route and Detail UI Contracts ============
+  console.log('\n🔗 TESTING ROUTE AND DETAIL UI CONTRACTS\n')
+
+  try {
+    const result = await payload.find({
+      collection: 'case-study',
+      where: { slug: { equals: 'bms-platform' } },
+      limit: 1,
+      depth: 0,
+    })
+    const project = result.docs[0]
+    const hasDetailData =
+      project?.featured === true &&
+      Array.isArray(project?.overview) &&
+      project.overview.length > 0 &&
+      Array.isArray(project?.specGroups) &&
+      project.specGroups.length > 0
+    results.push({
+      name: 'Case-study overview and specification groups',
+      status: hasDetailData ? 'pass' : 'fail',
+      message: hasDetailData ? undefined : 'BMS Platform is missing its featured flag, overview, or specGroups seed data',
+    })
+    console.log(
+      `${hasDetailData ? '✓' : '✗'} BMS detail content       | featured flag, overview, and specifications ${hasDetailData ? 'present' : 'missing'}`,
+    )
+  } catch (error) {
+    results.push({
+      name: 'Case-study overview and specification groups',
+      status: 'fail',
+      message: error instanceof Error ? error.message : String(error),
+    })
+    console.log(`✗ BMS detail content       | ${error instanceof Error ? error.message : error}`)
+  }
+
+  try {
+    const result = await payload.find({
+      collection: 'section',
+      where: { title: { equals: 'PCB Design · shipped-products' } },
+      limit: 1,
+      depth: 1,
+    })
+    const section = result.docs[0]
+    const cards = section?.cards
+    const hasProjectRoutes =
+      Array.isArray(cards) &&
+      cards.length > 0 &&
+      cards.every((card: any) => typeof card.ctaUrl === 'string' && card.ctaUrl.startsWith('/work/'))
+    results.push({
+      name: 'Capability project-card routes',
+      status: hasProjectRoutes ? 'pass' : 'fail',
+      message: hasProjectRoutes ? undefined : 'Shipped-product cards are missing canonical /work/ hrefs',
+    })
+    console.log(
+      `${hasProjectRoutes ? '✓' : '✗'} Capability card routes   | canonical /work/ hrefs ${hasProjectRoutes ? 'present' : 'missing'}`,
+    )
+  } catch (error) {
+    results.push({
+      name: 'Capability project-card routes',
+      status: 'fail',
+      message: error instanceof Error ? error.message : String(error),
+    })
+    console.log(`✗ Capability card routes   | ${error instanceof Error ? error.message : error}`)
+  }
+
+  try {
+    const footer = await payload.findGlobal({ slug: 'footer', depth: 0 })
+    const hasCopyright = typeof footer.copyright === 'string' && footer.copyright.trim().length > 0
+    const hasSupportDetails =
+      footer.helplineNumber === '+1999 888-76-54' &&
+      footer.techSupportEmail === 'support@canopy.com' &&
+      footer.requestIntro === 'Raise a general' &&
+      footer.requestLabel === 'IT Support Requests' &&
+      footer.requestUrl === ''
+    results.push({
+      name: 'Footer top-level copyright',
+      status: hasCopyright ? 'pass' : 'fail',
+      message: hasCopyright ? undefined : 'Footer global has no top-level copyright value',
+    })
+    console.log(
+      `${hasCopyright ? '✓' : '✗'} Footer copyright        | top-level value ${hasCopyright ? 'present' : 'missing'}`,
+    )
+    results.push({
+      name: 'Footer typed support details',
+      status: hasSupportDetails ? 'pass' : 'fail',
+      message: hasSupportDetails ? undefined : 'Footer support defaults are missing or have unexpected destinations',
+    })
+    console.log(
+      `${hasSupportDetails ? '✓' : '✗'} Footer support details  | typed defaults ${hasSupportDetails ? 'present' : 'missing'}`,
+    )
+  } catch (error) {
+    results.push({
+      name: 'Footer top-level copyright',
+      status: 'fail',
+      message: error instanceof Error ? error.message : String(error),
+    })
+    results.push({
+      name: 'Footer typed support details',
+      status: 'fail',
+      message: error instanceof Error ? error.message : String(error),
+    })
+    console.log(`✗ Footer copyright        | ${error instanceof Error ? error.message : error}`)
   }
 
   // ============ Field Coverage Table ============
@@ -259,10 +363,9 @@ async function main() {
   if (failed === 0) {
     console.log('✅ ALL TESTS PASSED\n')
     console.log('Next steps:')
-    console.log('  1. Start dev server: npm run dev')
+    console.log('  1. Start the CMS: pnpm run dev')
     console.log('  2. Open admin UI: http://localhost:3000/admin')
-    console.log('  3. Review and edit [TODO:] placeholders')
-    console.log('  4. Proceed to frontend migration (see FRONTEND.md)\n')
+    console.log('  3. Start the Angular SPA from canopy-Website: npm run start\n')
     process.exit(0)
   } else {
     console.log('❌ SOME TESTS FAILED\n')

@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "primaryLogo": "/logo-green.png",
+    "secondaryLogo": "/logo-green.png",
+    "navItems": [
+      { "label": "Services", "href": "/capabilities" },
+      { "label": "Portfolio", "href": "/work" },
+      { "label": "Engagement Models", "href": "/engagement-model" },
+      { "label": "Insights", "href": "/insights" }
+    ],
+    "navCta": { "label": "Book a Consultation", "href": "mailto:hello@canopyembedded.com" }
+  },
+  "footer": {
+    "heading": "Canopy Embedded",
+    "subHeading": "Product engineering",
+    "homeLinkLabel": "Canopy home",
+    "cta": { "label": "", "href": "" },
+    "socialNavLabel": "Social media",
+    "socialLinks": [],
+    "copyright": "© 2026 Canopy, Inc.",
+    "linkGroups": []
+  }
+}

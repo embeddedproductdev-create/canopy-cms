@@ -46,7 +46,15 @@ export const Page: CollectionConfig = {
       },
     },
     { name: 'body', type: 'richText' },
-    { name: 'constant', type: 'json' },
+    {
+      name: 'cta',
+      type: 'group',
+      label: 'Page Call to Action',
+      fields: [
+        { name: 'label', type: 'text' },
+        { name: 'href', type: 'text' },
+      ],
+    },
     {
       name: 'layoutSections',
       type: 'relationship',

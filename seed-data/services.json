@@ -1,0 +1,100 @@
+{
+  "id": "services",
+  "title": "Services",
+  "htmlTitle": "Hardware Design & PCB Architecture | Canopy",
+  "url": "/services",
+  "heading": "Hardware Design & PCB Architecture",
+  "subheading": "PCB engineered for signal integrity and manufacturability — from the first placement pass, not patched before a certification deadline.",
+  "body": "",
+  "image": "",
+  "imageAlt": "",
+  "cta": { "label": "Book a consultation", "href": "mailto:hello@canopyembedded.com" },
+  "seo": {
+    "metaTitle": "Hardware Design & PCB Architecture | Canopy",
+    "metaDescription": "Canopy hardware design and PCB architecture services, from first placement to validation and manufacturing readiness.",
+    "canonicalPath": "/services",
+    "socialImage": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "noIndex": false
+  },
+  "pageType": "service",
+  "raw": {},
+  "sections": [
+    {
+      "id": "included",
+      "type": "service",
+      "title": "",
+      "heading": "What's Included",
+      "subheading": "Seven engineering tracks inside one discipline — scoped together so the board, stack-up, and silicon around it are decided by the same team.",
+      "body": "",
+      "image": "",
+      "imageAlt": "",
+      "tags": [],
+      "cta": { "label": "Discuss your board", "href": "mailto:hello@canopyembedded.com" },
+      "cards": [
+        { "id": "multilayer-pcb", "title": "", "heading": "Multilayer PCB Design", "subheading": "", "description": "Stack-up planning, impedance control, and DFM review on boards from single-sided prototypes to dense high-layer production builds.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["1 Layer", "2 Layer", "4+ Layer", "8+ Layer"], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "analog-design", "title": "", "heading": "Analog Design", "subheading": "", "description": "Low-noise front ends, precision references, and sensor conditioning designed against the real measurement budget.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["Sensor Front Ends", "Precision Ref", "Low Noise"], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "rf-design", "title": "", "heading": "RF Design", "subheading": "", "description": "Antenna placement, matching networks, and pre-compliance work for sub-GHz, BLE, Wi-Fi, and cellular radios.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["Sub-GHz", "BLE", "Wi-Fi", "Cellular"], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "power-electronics", "title": "", "heading": "Power Electronics", "subheading": "", "description": "Converters, battery management, and thermal budgets sized for the duty cycle the product actually sees in the field.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["DC-DC", "BMS", "Thermal", "Efficiency"], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "hf-design", "title": "", "heading": "HF Design", "subheading": "", "description": "High-frequency routing with controlled impedance, careful budgeting, and signal integrity simulation before the first layout.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["SI/PI", "Controlled Impedance", "Crosstalk"], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "fpga-design", "title": "", "heading": "FPGA Design", "subheading": "", "description": "RTL, timing closure, and board-level integration for deterministic acquisition and low-latency control paths.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["RTL", "Timing Closure", "Verification"], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "soc-design", "title": "", "heading": "SoC Design", "subheading": "", "description": "Silicon selection, bring-up, and board support packages — chosen alongside the firmware team that will live on the part.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["Silicon Selection", "Bring-up", "BSP", "Secure Boot"], "cta": { "label": "", "href": "" }, "href": "", "raw": {} }
+      ],
+      "raw": {}
+    },
+    {
+      "id": "solutions",
+      "type": "service",
+      "title": "",
+      "heading": "Solutions We Build",
+      "subheading": "The same hardware discipline, pointed at the product categories our clients ship.",
+      "body": "",
+      "image": "",
+      "imageAlt": "",
+      "tags": ["IoT Devices", "Industrial Electronics", "Consumer Electronics", "Embedded Systems", "Edge Devices", "Smart Devices", "Connected Products", "Automation Systems", "Medical Electronics", "Automotive Electronics"],
+      "cta": { "label": "", "href": "" },
+      "cards": [],
+      "raw": {}
+    },
+    {
+      "id": "workflow",
+      "type": "workflow",
+      "title": "",
+      "heading": "Workflow",
+      "subheading": "Six stages from requirements to manufacturing handover — one team owns every one of them.",
+      "body": "",
+      "image": "",
+      "imageAlt": "",
+      "tags": [],
+      "cta": { "label": "", "href": "" },
+      "cards": [
+        { "id": "requirements", "title": "01", "heading": "Requirements & Architecture", "subheading": "", "description": "Define product requirements, constraints, interfaces, and system architecture.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "circuit-design", "title": "02", "heading": "Circuit & Component Design", "subheading": "", "description": "Develop the circuit architecture and select appropriate components.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "pcb-layout", "title": "03", "heading": "PCB Design & Layout", "subheading": "", "description": "Build the board layout with attention to signal integrity, power distribution, manufacturability, and reliability.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "prototype", "title": "04", "heading": "Prototype & Validation", "subheading": "", "description": "Manufacture prototypes and validate functional and environmental requirements.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "testing", "title": "05", "heading": "Testing & Optimization", "subheading": "", "description": "Identify issues, optimize the design, and prepare the system for production.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} },
+        { "id": "production-readiness", "title": "06", "heading": "Production Readiness", "subheading": "", "description": "Deliver production-ready documentation and support the transition into manufacturing.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": [], "cta": { "label": "", "href": "" }, "href": "", "raw": {} }
+      ],
+      "raw": {}
+    },
+    {
+      "id": "shipped-products",
+      "type": "projects",
+      "title": "",
+      "heading": "Not a pitch. Products we've actually shipped.",
+      "subheading": "We take a personalized approach to each project, working closely with our clients to understand their goals and requirements.",
+      "body": "",
+      "image": "",
+      "imageAlt": "",
+      "tags": [],
+      "cta": { "label": "View projects", "href": "/work/" },
+      "cards": [
+        { "id": "charger", "title": "", "heading": "Dual-Channel Smart Charger", "subheading": "", "description": "Power electronics and control firmware engineered together, not bolted on.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["Power Electronics"], "cta": { "label": "View Project", "href": "/work/dual-channel-smart-charger/" }, "href": "/work/dual-channel-smart-charger/", "raw": {} },
+        { "id": "ble-board", "title": "", "heading": "BLE Mesh + RS485 Board", "subheading": "", "description": "Mesh-networked node for energy meter retrofits — BLE Mesh upstream, RS485/Modbus downstream.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["Industrial IoT"], "cta": { "label": "View Project", "href": "/work/ble-mesh-rs485-board/" }, "href": "/work/ble-mesh-rs485-board/", "raw": {} },
+        { "id": "gateway", "title": "", "heading": "Edge Compute Gateway", "subheading": "", "description": "OTA fleet management across distributed edge nodes for smart-infrastructure deployments.", "body": "", "image": "", "imageAlt": "", "category": "", "tags": ["Apps & Cloud"], "cta": { "label": "View Project", "href": "/work/edge-compute-gateway/" }, "href": "/work/edge-compute-gateway/", "raw": {} }
+      ],
+      "raw": {}
+    }
+  ]
+}
