@@ -1,0 +1,33 @@
+#!/usr/bin/expect -f
+# Run a command under a pty and auto-answer drizzle-kit push/migrate prompts:
+#  - "created or renamed?"  -> accept default (create table/column)
+#  - "[y/N]" data-loss confirms -> yes (we intentionally dropped old footer fields)
+#  - "blank migration file?" -> no
+set timeout 600
+log_user 1
+spawn /usr/bin/env PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin {*}$argv
+expect {
+    -re {created or renamed from another (table|column)} {
+        after 800
+        send "\r"
+        exp_continue
+    }
+    -re {blank migration file} {
+        after 500
+        send "n\r"
+        exp_continue
+    }
+    -re {Accept warnings and push schema} {
+        after 800
+        send "y\r"
+        exp_continue
+    }
+    -re {y/N} {
+        after 800
+        send "y\r"
+        exp_continue
+    }
+    eof
+}
+catch wait result
+exit [lindex $result 3]

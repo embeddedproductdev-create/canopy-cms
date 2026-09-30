@@ -72,7 +72,10 @@ export interface Config {
     page: Page;
     section: Section;
     card: Card;
-    project: Project;
+    'case-study': CaseStudy;
+    blog: Blog;
+    checklist: Checklist;
+    testimonial: Testimonial;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -85,7 +88,10 @@ export interface Config {
     page: PageSelect<false> | PageSelect<true>;
     section: SectionSelect<false> | SectionSelect<true>;
     card: CardSelect<false> | CardSelect<true>;
-    project: ProjectSelect<false> | ProjectSelect<true>;
+    'case-study': CaseStudySelect<false> | CaseStudySelect<true>;
+    blog: BlogSelect<false> | BlogSelect<true>;
+    checklist: ChecklistSelect<false> | ChecklistSelect<true>;
+    testimonial: TestimonialSelect<false> | TestimonialSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -98,10 +104,14 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'seo-settings': SeoSetting;
+    'site-chrome': SiteChrome;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'seo-settings': SeoSettingsSelect<false> | SeoSettingsSelect<true>;
+    'site-chrome': SiteChromeSelect<false> | SiteChromeSelect<true>;
   };
   locale: null;
   widgets: {
@@ -176,6 +186,8 @@ export interface Media {
   height?: number | null;
 }
 /**
+ * Core website pages with custom layouts and sections
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "page".
  */
@@ -210,8 +222,72 @@ export interface Page {
     | boolean
     | null;
   layoutSections?: (number | Section)[] | null;
+  /**
+   * Pill-shaped tags above the main heading
+   */
+  pills?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Discipline cards, feature cards, or other card types
+   */
+  cards?: (number | Card)[] | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  workflowSteps?:
+    | {
+        stepNumber: number;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  relatedCaseStudies?: (number | CaseStudy)[] | null;
+  /**
+   * For About page team grid
+   */
+  teamMembers?:
+    | {
+        name: string;
+        role: string;
+        bio?: string | null;
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  companyFacts?: {
+    name?: string | null;
+    location?: string | null;
+    sectors?:
+      | {
+          sector: string;
+          id?: string | null;
+        }[]
+      | null;
+    contactEmail?: string | null;
+  };
+  seo?: {
+    seoTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+    };
+    schemaType?:
+      ('none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle') | null;
+  };
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -222,6 +298,7 @@ export interface Section {
   title: string;
   heading?: string | null;
   subheading?: string | null;
+  image?: (number | null) | Media;
   body?: {
     root: {
       type: string;
@@ -300,9 +377,9 @@ export interface Card {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "project".
+ * via the `definition` "case-study".
  */
-export interface Project {
+export interface CaseStudy {
   id: number;
   title: string;
   slug?: string | null;
@@ -342,6 +419,168 @@ export interface Project {
     label?: string | null;
     link?: string | null;
   };
+  /**
+   * Visual badge displayed on the project
+   */
+  projectStage?: ('in-design' | 'proto-built' | 'shipped') | null;
+  /**
+   * Quick specs/highlights (e.g., "20A/30A burst", "100W/channel")
+   */
+  atAGlance?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  features?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  technicalSpecifications?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    seoTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+    };
+    schemaType?:
+      ('none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog".
+ */
+export interface Blog {
+  id: number;
+  title: string;
+  slug: string;
+  heading?: string | null;
+  dek?: string | null;
+  byline?: string | null;
+  publishedDate: string;
+  updatedDate?: string | null;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Category-like tags for filtering/organization
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  relatedLinks?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  contentUpgrade?: {
+    label?: string | null;
+    checklistLink?: (number | null) | Checklist;
+  };
+  seo?: {
+    seoTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+    };
+    schemaType?:
+      ('none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "checklist".
+ */
+export interface Checklist {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * The first 3 checklist items shown on the page; items 4–10 are locked
+   */
+  visibleItems: {
+    item: string;
+    id?: string | null;
+  }[];
+  /**
+   * How many items are hidden behind the form submission (usually 7 for a 10-item checklist)
+   */
+  lockedItemsCount?: number | null;
+  /**
+   * PDF file for download (optional until the real PDF is ready)
+   */
+  pdfAsset?: (number | null) | Media;
+  /**
+   * Form system ID for email capture + delivery
+   */
+  formId?: string | null;
+  seo?: {
+    seoTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+    };
+    schemaType?:
+      ('none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonial".
+ */
+export interface Testimonial {
+  id: number;
+  heading: string;
+  /**
+   * e.g. "Canopy client" or "CTO, Acme Corp"
+   */
+  clientLabel?: string | null;
+  quote: string;
+  /**
+   * Display order on the site (ascending)
+   */
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -390,8 +629,20 @@ export interface PayloadLockedDocument {
         value: number | Card;
       } | null)
     | ({
-        relationTo: 'project';
-        value: number | Project;
+        relationTo: 'case-study';
+        value: number | CaseStudy;
+      } | null)
+    | ({
+        relationTo: 'blog';
+        value: number | Blog;
+      } | null)
+    | ({
+        relationTo: 'checklist';
+        value: number | Checklist;
+      } | null)
+    | ({
+        relationTo: 'testimonial';
+        value: number | Testimonial;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -487,8 +738,68 @@ export interface PageSelect<T extends boolean = true> {
   body?: T;
   constant?: T;
   layoutSections?: T;
+  pills?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  cards?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  workflowSteps?:
+    | T
+    | {
+        stepNumber?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  relatedCaseStudies?: T;
+  teamMembers?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        bio?: T;
+        photo?: T;
+        id?: T;
+      };
+  companyFacts?:
+    | T
+    | {
+        name?: T;
+        location?: T;
+        sectors?:
+          | T
+          | {
+              sector?: T;
+              id?: T;
+            };
+        contactEmail?: T;
+      };
+  seo?:
+    | T
+    | {
+        seoTitle?: T;
+        metaDescription?: T;
+        canonicalUrl?: T;
+        robots?:
+          | T
+          | {
+              index?: T;
+              follow?: T;
+            };
+        schemaType?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -498,6 +809,7 @@ export interface SectionSelect<T extends boolean = true> {
   title?: T;
   heading?: T;
   subheading?: T;
+  image?: T;
   body?: T;
   cards?: T;
   constant?: T;
@@ -525,9 +837,9 @@ export interface CardSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "project_select".
+ * via the `definition` "case-study_select".
  */
-export interface ProjectSelect<T extends boolean = true> {
+export interface CaseStudySelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   heading?: T;
@@ -558,6 +870,137 @@ export interface ProjectSelect<T extends boolean = true> {
         label?: T;
         link?: T;
       };
+  projectStage?: T;
+  atAGlance?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  features?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  technicalSpecifications?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        seoTitle?: T;
+        metaDescription?: T;
+        canonicalUrl?: T;
+        robots?:
+          | T
+          | {
+              index?: T;
+              follow?: T;
+            };
+        schemaType?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog_select".
+ */
+export interface BlogSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  heading?: T;
+  dek?: T;
+  byline?: T;
+  publishedDate?: T;
+  updatedDate?: T;
+  body?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  relatedLinks?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  contentUpgrade?:
+    | T
+    | {
+        label?: T;
+        checklistLink?: T;
+      };
+  seo?:
+    | T
+    | {
+        seoTitle?: T;
+        metaDescription?: T;
+        canonicalUrl?: T;
+        robots?:
+          | T
+          | {
+              index?: T;
+              follow?: T;
+            };
+        schemaType?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "checklist_select".
+ */
+export interface ChecklistSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  visibleItems?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  lockedItemsCount?: T;
+  pdfAsset?: T;
+  formId?: T;
+  seo?:
+    | T
+    | {
+        seoTitle?: T;
+        metaDescription?: T;
+        canonicalUrl?: T;
+        robots?:
+          | T
+          | {
+              index?: T;
+              follow?: T;
+            };
+        schemaType?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonial_select".
+ */
+export interface TestimonialSelect<T extends boolean = true> {
+  heading?: T;
+  clientLabel?: T;
+  quote?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -607,35 +1050,21 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: number;
-  primaryLogo: number | Media;
+  primaryLogo?: (number | null) | Media;
   secondaryLogo?: (number | null) | Media;
   navItems?:
     | {
-        type: 'internal' | 'anchor' | 'external';
-        label: string;
-        url: string;
-        newTab?: boolean | null;
-        subMenuItems?:
-          | {
-              type: 'internal' | 'anchor' | 'external';
-              label: string;
-              url: string;
-              newTab?: boolean | null;
-              nestedMenuItems?:
-                | {
-                    type: 'internal' | 'anchor' | 'external';
-                    label: string;
-                    url: string;
-                    newTab?: boolean | null;
-                    id?: string | null;
-                  }[]
-                | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
     | null;
+  navCta?: {
+    label?: string | null;
+    url?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -645,38 +1074,157 @@ export interface Header {
  */
 export interface Footer {
   id: number;
-  logo: number | Media;
-  categories?:
+  logo?: (number | null) | Media;
+  /**
+   * Free-form footer JSON (heading, subHeading, cta, linkGroups, contactInfo, copyright). Shape follows the frontend FooterContent model — new footer details need no schema change.
+   */
+  content?:
     | {
-        title: string;
-        links?:
-          | {
-              type: 'internal' | 'anchor' | 'external';
-              label: string;
-              url: string;
-              newTab?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seo-settings".
+ */
+export interface SeoSetting {
+  id: number;
+  siteName: string;
+  siteUrl: string;
+  siteTagline?: string | null;
+  titleSeparator?: string | null;
+  defaultSeoTitle?: string | null;
+  defaultMetaDescription?: string | null;
+  /**
+   * Keywords to use across the site when page-specific ones are not provided
+   */
+  defaultKeywords?:
+    | {
+        keyword: string;
         id?: string | null;
       }[]
     | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
+  organization?: {
+    organizationName?: string | null;
+    legalName?: string | null;
+    organizationType?: ('Organization' | 'LocalBusiness' | 'Corporation') | null;
+    logo?: (number | null) | Media;
+    telephone?: string | null;
+    email?: string | null;
+    address?: {
+      streetAddress?: string | null;
+      addressLocality?: string | null;
+      addressRegion?: string | null;
+      postalCode?: string | null;
+      addressCountry?: string | null;
     };
-    [k: string]: unknown;
-  } | null;
-  copyright: string;
+  };
+  socialProfiles?: {
+    linkedin?: string | null;
+    facebook?: string | null;
+    twitter?: string | null;
+    youtube?: string | null;
+    instagram?: string | null;
+  };
+  openGraphDefaults?: {
+    ogType?: ('website' | 'article' | 'business.business') | null;
+    ogImage?: (number | null) | Media;
+    ogImageAlt?: string | null;
+  };
+  twitterDefaults?: {
+    cardType?: ('summary' | 'summary_large_image') | null;
+    siteHandle?: string | null;
+    creatorHandle?: string | null;
+  };
+  /**
+   * Uncheck to globally noindex the site (e.g., for non-prod environments)
+   */
+  allowIndexing?: boolean | null;
+  /**
+   * Full URL to the sitemap.xml (used in robots.txt)
+   */
+  sitemapUrl?: string | null;
+  /**
+   * Paths blocked from all search engines
+   */
+  disallowPaths?:
+    | {
+        path: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Global UI strings and chrome text used across the site
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-chrome".
+ */
+export interface SiteChrome {
+  id: number;
+  /**
+   * Default site-wide CTA button — pages can override
+   */
+  primaryCta: {
+    label: string;
+    url: string;
+  };
+  backLinks?: {
+    portfolio?: string | null;
+    insights?: string | null;
+    capabilities?: string | null;
+  };
+  emptyStates?: {
+    noProjects?: string | null;
+    noInsights?: string | null;
+  };
+  listLabels?: {
+    viewProjectCta?: string | null;
+    readArticleCta?: string | null;
+    viewDetailsCta?: string | null;
+  };
+  checklistUi?: {
+    itemsHeading?: string | null;
+    lockedItemsSuffixTemplate?: string | null;
+    downloadPrompt?: string | null;
+    getFullChecklistCta?: string | null;
+  };
+  checklistModal?: {
+    title?: string | null;
+    subtitle?: string | null;
+    continueCta?: string | null;
+    /**
+     * Shown if CMS categories fail to load
+     */
+    fallbackCategories?:
+      | {
+          label: string;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  notFound?: {
+    heading?: string | null;
+    body?: string | null;
+    ctaLabel?: string | null;
+    ctaUrl?: string | null;
+  };
+  navFallback?: {
+    /**
+     * Shown if logo image fails to load
+     */
+    logoText?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -687,32 +1235,12 @@ export interface Footer {
 export interface HeaderSelect<T extends boolean = true> {
   primaryLogo?: T;
   secondaryLogo?: T;
-  navItems?:
+  navItems?: T;
+  navCta?:
     | T
     | {
-        type?: T;
         label?: T;
         url?: T;
-        newTab?: T;
-        subMenuItems?:
-          | T
-          | {
-              type?: T;
-              label?: T;
-              url?: T;
-              newTab?: T;
-              nestedMenuItems?:
-                | T
-                | {
-                    type?: T;
-                    label?: T;
-                    url?: T;
-                    newTab?: T;
-                    id?: T;
-                  };
-              id?: T;
-            };
-        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -724,23 +1252,148 @@ export interface HeaderSelect<T extends boolean = true> {
  */
 export interface FooterSelect<T extends boolean = true> {
   logo?: T;
-  categories?:
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "seo-settings_select".
+ */
+export interface SeoSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  siteUrl?: T;
+  siteTagline?: T;
+  titleSeparator?: T;
+  defaultSeoTitle?: T;
+  defaultMetaDescription?: T;
+  defaultKeywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  organization?:
+    | T
+    | {
+        organizationName?: T;
+        legalName?: T;
+        organizationType?: T;
+        logo?: T;
+        telephone?: T;
+        email?: T;
+        address?:
+          | T
+          | {
+              streetAddress?: T;
+              addressLocality?: T;
+              addressRegion?: T;
+              postalCode?: T;
+              addressCountry?: T;
+            };
+      };
+  socialProfiles?:
+    | T
+    | {
+        linkedin?: T;
+        facebook?: T;
+        twitter?: T;
+        youtube?: T;
+        instagram?: T;
+      };
+  openGraphDefaults?:
+    | T
+    | {
+        ogType?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+      };
+  twitterDefaults?:
+    | T
+    | {
+        cardType?: T;
+        siteHandle?: T;
+        creatorHandle?: T;
+      };
+  allowIndexing?: T;
+  sitemapUrl?: T;
+  disallowPaths?:
+    | T
+    | {
+        path?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-chrome_select".
+ */
+export interface SiteChromeSelect<T extends boolean = true> {
+  primaryCta?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  backLinks?:
+    | T
+    | {
+        portfolio?: T;
+        insights?: T;
+        capabilities?: T;
+      };
+  emptyStates?:
+    | T
+    | {
+        noProjects?: T;
+        noInsights?: T;
+      };
+  listLabels?:
+    | T
+    | {
+        viewProjectCta?: T;
+        readArticleCta?: T;
+        viewDetailsCta?: T;
+      };
+  checklistUi?:
+    | T
+    | {
+        itemsHeading?: T;
+        lockedItemsSuffixTemplate?: T;
+        downloadPrompt?: T;
+        getFullChecklistCta?: T;
+      };
+  checklistModal?:
     | T
     | {
         title?: T;
-        links?:
+        subtitle?: T;
+        continueCta?: T;
+        fallbackCategories?:
           | T
           | {
-              type?: T;
               label?: T;
-              url?: T;
-              newTab?: T;
+              description?: T;
               id?: T;
             };
-        id?: T;
       };
-  content?: T;
-  copyright?: T;
+  notFound?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+        ctaLabel?: T;
+        ctaUrl?: T;
+      };
+  navFallback?:
+    | T
+    | {
+        logoText?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

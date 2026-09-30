@@ -1,119 +1,132 @@
-# Payload Cloudflare Template
+# Canopy CMS Backend — Content Seeding & Testing
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/payloadcms/payload/tree/main/templates/with-cloudflare-d1)
+This guide covers testing the CMS schema extensions and running the seed script to populate Payload CMS with content.
 
-**This can only be deployed on Paid Workers right now due to size limits.** This template comes configured with the bare minimum to get started on anything you need.
+## Quick Start
 
-## Quick start
-
-This template can be deployed directly to Cloudflare Workers by clicking the button to take you to the setup screen.
-
-From there you can connect your code to a git provider such Github or Gitlab, name your Workers, D1 Database and R2 Bucket as well as attach any additional environment variables or services you need.
-
-## Quick Start - local setup
-
-To spin up this template locally, follow these steps:
-
-### Clone
-
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. Cloudflare will connect your app to a git provider such as Github and you can access your code from there.
-
-### Local Development
-
-## How it works
-
-Out of the box, using [`Wrangler`](https://developers.cloudflare.com/workers/wrangler/) will automatically create local bindings for you to connect to the remote services and it can even create a local mock of the services you're using with Cloudflare.
-
-We've pre-configured Payload for you with the following:
-
-### Collections
-
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
-
-- #### Users (Authentication)
-
-  Users are auth-enabled collections that have access to the admin panel.
-
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
-
-- #### Media
-
-  This is the uploads enabled collection.
-
-### Image Storage (R2)
-
-Images will be served from an R2 bucket which you can then further configure to use a CDN to serve for your frontend directly.
-
-### D1 Database
-
-The Worker will have direct access to a D1 SQLite database which Wrangler can connect locally to, just note that you won't have a connection string as you would typically with other providers.
-
-You can enable read replicas by adding `readReplicas: 'first-primary'` in the DB adapter and then enabling it on your D1 Cloudflare dashboard. Read more about this feature on [our docs](https://payloadcms.com/docs/database/sqlite#d1-read-replicas).
-
-## Working with Cloudflare
-
-Firstly, after installing dependencies locally you need to authenticate with Wrangler by running:
+### 1. Generate Types (Local Only)
+The sandbox blocks local port binding, so run this locally:
 
 ```bash
-pnpm wrangler login
+npm run generate:types:payload
 ```
 
-This will take you to Cloudflare to login and then you can use the Wrangler CLI locally for anything, use `pnpm wrangler help` to see all available options.
+This regenerates `src/payload-types.ts` with new globals and collection fields.
 
-Wrangler is pretty smart so it will automatically bind your services for local development just by running `pnpm dev`.
-
-## Deployments
-
-When you're ready to deploy, first make sure you have created your migrations:
+### 2. Create & Apply Migration
 
 ```bash
-pnpm payload migrate:create
+payload migrate:create
+npm run deploy:database
 ```
 
-Then run the following command:
+### 3. Start Dev Server
+In one terminal:
 
 ```bash
-pnpm run deploy
+npm run dev
 ```
 
-This will spin up Wrangler in `production` mode, run any created migrations, build the app and then deploy the bundle up to Cloudflare.
+Wait for: `✓ Admin UI available at http://localhost:3000/admin`
 
-That's it! You can if you wish move these steps into your CI pipeline as well.
+### 4. Run Seed Script
+In a second terminal:
 
-## Enabling logs
+```bash
+npm run seed
+```
 
-By default logs are not enabled for your API, we've made this decision because it does run against your quota so we've left it opt-in. But you can easily enable logs in one click in the Cloudflare panel, [see docs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs).
+Expected output:
+```
+✓ Connected to Payload
+→ Seeding Media...
+→ Seeding Globals...
+→ Seeding Pages...
+✓ Seeding complete!
+```
 
-### Logger Configuration
+### 5. Run Test & Coverage Report
 
-This template includes a custom console-based logger compatible with Cloudflare Workers. Payload's default logger uses `pino-pretty`, which relies on Node.js APIs not available in Workers and would cause `fs.write is not implemented` errors.
+```bash
+npm run test:seed
+```
 
-The custom logger in `payload.config.ts`:
+This will output a comprehensive CLI report with:
+- ✅ Global coverage table
+- 📚 Collection count validation
+- 📊 Seeded data coverage table
+- 🟡 Placeholder detection ([TODO:] markers)
+- 📝 Test summary with pass/fail/warn counts
 
-- Routes logs through `console.*` methods which Workers handles correctly
-- Outputs JSON-formatted logs for Cloudflare observability
-- Only active in production (development uses the default `pino-pretty` for better DX)
+### 6. Verify in Admin UI
 
-You can control the log level via the `PAYLOAD_LOG_LEVEL` environment variable (e.g., `debug`, `info`, `warn`, `error`).
+Open `http://localhost:3000/admin` and check:
 
-### Diagnostic Channel Errors
+**Globals:**
+- ✅ **SiteChrome** — 8 tabs (Primary CTA, Back Links, Empty States, Checklist UI, Checklist Modal, 404 Page, Nav Fallback)
+- ✅ **Header** — navCta group added
+- ✅ **Footer** — linkGroups array, contactInfo group, subHeading, cta
 
-If you see "Failed to publish diagnostic channel message" errors in your observability logs, these typically come from the `undici` HTTP client library. The template includes `skipSafeFetch: true` in the Media collection to use native fetch instead of undici for file uploads, which helps reduce these errors.
+**Collections:**
+- **Page** — 3 docs (About, Capabilities, Engagement Model) with new field groups: pills, cards, faqs, workflowSteps, relatedCaseStudies, teamMembers, companyFacts
+- **Case Study** — 3 docs (Smart BMS, Charger, BLE Mesh Node) with projectStage, atAGlance, features, technicalSpecifications
+- **Blog** — 3 posts with tags array
+- **Checklist** — 2 checklists
 
-Cloudflare Workers runs in an [isolated environment that cannot access private IP ranges](https://developers.cloudflare.com/workers-vpc/examples/route-across-private-services/) by default, providing built-in SSRF protection. This makes `skipSafeFetch` safe to use.
+## What Was Extended
 
-## Known issues
+### New Globals (1)
+- **SiteChrome** — All UI chrome strings (CTAs, labels, modals, fallbacks)
 
-### GraphQL
+### Extended Globals (2)
+- **Header** — Added navCta group
+- **Footer** — Replaced JSON categories with structured linkGroups, contactInfo, cta
 
-We are currently waiting on some issues with GraphQL to be [fixed upstream in Workers](https://github.com/cloudflare/workerd/issues/5175) so full support for GraphQL is not currently guaranteed when deployed.
+### Extended Collections (3)
+- **Page** — Added pills, cards, faqs, workflowSteps, relatedCaseStudies, teamMembers, companyFacts
+- **CaseStudy** — Added projectStage, atAGlance, features, technicalSpecifications
+- **Blog** — Added tags array
 
-### Worker size limits
+### Files Modified
+- ✅ `src/globals/SiteChrome.ts` (215 lines)
+- ✅ `src/globals/Header.tsx` (+11 lines)
+- ✅ `src/globals/Footer.tsx` (+40 lines)
+- ✅ `src/collections/Page.ts` (+60 lines)
+- ✅ `src/collections/CaseStudy.ts` (+50 lines)
+- ✅ `src/collections/Blog.ts` (+8 lines)
+- ✅ `src/payload.config.ts` (registered SiteChrome global)
+- ✅ `scripts/seed.ts` (completely rewritten)
 
-We currently recommend deploying this template to the Paid Workers plan due to bundle [size limits](https://developers.cloudflare.com/workers/platform/limits/#worker-size) of 3mb. We're actively trying to reduce our bundle footprint over time to better meet this metric.
+## Seed Script Details
 
-This also applies to your own code, in the case of importing a lot of libraries you may find yourself limited by the bundle.
+Uses upsert-by-natural-key pattern — safe to run multiple times.
 
-## Questions
+**Seeds in order:**
+1. Media (logos from Canopy-Website/public/)
+2. Globals (SeoSettings, Header, Footer, SiteChrome, Home)
+3. Pages (About, Capabilities, Engagement Model)
+4. Case Studies (3 projects with specs)
+5. Blogs (3 articles)
+6. Checklists (2 checklists)
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+**Known Placeholders:** All content marked "unchanged from v83" in source uses `[TODO: ...]` markers. Edit these via admin UI later or leave for content team.
+
+## Idempotency Check
+
+```bash
+npm run seed      # First run
+npm run seed      # Second run — should show "Updated" instead of "Created"
+```
+
+## Test Failure Debugging
+
+If `npm run test:seed` fails:
+
+1. Ensure migration was applied: `payload migrate:status`
+2. Check dev server is running on port 3000
+3. Verify seed script completed without errors
+4. Check for [TODO:] content in admin UI
+
+## Next: Frontend Integration
+
+Once backend testing passes, proceed to `../Canopy-Website/README.md` for frontend rewiring.

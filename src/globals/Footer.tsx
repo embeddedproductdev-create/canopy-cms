@@ -1,79 +1,34 @@
 import type { GlobalConfig, Field } from 'payload'
-
-const footerLinkFields: Field[] = [
-  {
-    name: 'type',
-    type: 'select',
-    required: true,
-    defaultValue: 'internal',
-    options: [
-      { label: 'Internal Navigation', value: 'internal' },
-      { label: 'Anchor Section (#)', value: 'anchor' },
-      { label: 'External URL', value: 'external' },
-    ],
-  },
-  {
-    name: 'label',
-    type: 'text',
-    required: true,
-  },
-  {
-    name: 'url',
-    type: 'text',
-    required: true,
-  },
-  {
-    name: 'newTab',
-    type: 'checkbox',
-    label: 'Open in new tab',
-    defaultValue: false,
-    admin: {
-      condition: (_, siblingData) => siblingData?.type === 'external',
-    },
-  },
-]
+import { revalidateGlobalOnChange } from '../hooks/revalidate'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
+  label: 'Footer',
+  admin: {
+    group: 'Globals',
+  },
   access: {
-    read: ({ req: { user } }) => !!user,
+    read: () => true,
     update: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'editor',
+  },
+  hooks: {
+    afterChange: [revalidateGlobalOnChange],
   },
   fields: [
     {
       name: 'logo',
       type: 'upload',
       relationTo: 'media',
-      required: true,
-    },
-    {
-      name: 'categories',
-      type: 'array',
-      label: 'Footer Columns / Categories',
-      fields: [
-        {
-          name: 'title',
-          type: 'text',
-          required: true,
-          label: 'Column Category Title',
-        },
-        {
-          name: 'links',
-          type: 'array',
-          fields: footerLinkFields,
-        },
-      ],
+      required: false,
     },
     {
       name: 'content',
-      type: 'richText',
-      label: 'Footer Rich Text Content',
-    },
-    {
-      name: 'copyright',
-      type: 'text',
-      label: 'Copyright One-Liner Text',
-      required: true,
+      type: 'json',
+      label: 'Footer Content',
+      admin: {
+        description:
+          'Free-form footer JSON (heading, subHeading, cta, linkGroups, contactInfo, copyright). Shape follows the frontend FooterContent model — new footer details need no schema change.',
+      },
     },
   ],
 }
