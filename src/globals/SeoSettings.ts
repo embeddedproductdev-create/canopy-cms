@@ -1,7 +1,9 @@
 import type { GlobalConfig } from 'payload'
+import { revalidateGlobalOnChange } from '../hooks/revalidate'
 
 export const SeoSettings: GlobalConfig = {
   slug: 'seo-settings',
+  hooks: { afterChange: [revalidateGlobalOnChange] },
   label: 'SEO Settings',
   admin: {
     group: 'Globals',
@@ -78,17 +80,11 @@ export const SeoSettings: GlobalConfig = {
             },
             {
               name: 'defaultKeywords',
-              type: 'array',
-              label: 'Default Keywords',
-              fields: [
-                {
-                  name: 'keyword',
-                  type: 'text',
-                  required: true,
-                },
-              ],
+              type: 'text',
+              label: 'Default Keywords (Comma Separated)',
               admin: {
                 description: 'Keywords to use across the site when page-specific ones are not provided',
+                placeholder: 'e.g. embedded systems, electronics product development, IoT',
               },
             },
           ],

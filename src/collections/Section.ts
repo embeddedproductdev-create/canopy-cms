@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { urlField } from '../hooks/normalizeUrl'
 
 export const Section: CollectionConfig = {
   slug: 'section',
@@ -23,21 +24,93 @@ export const Section: CollectionConfig = {
     { name: 'eyebrow', type: 'text' },
     { name: 'tagLine', type: 'text' },
     { name: 'highlight', type: 'text' },
-    { name: 'type', type: 'text' },
+    {
+      name: 'type',
+      type: 'text',
+      admin: {
+        description:
+          'How the website renders this section: hero, text, cards, chips, table, steps, stats, faq, marquee, cta-band, media, tabs, pinned',
+      },
+    },
+    {
+      name: 'variant',
+      type: 'text',
+      admin: { description: 'Optional layout / tone hint, e.g. olive, surface, dark, nodes, columns' },
+    },
+    {
+      name: 'columns',
+      type: 'text',
+      label: 'Columns (Comma Separated)',
+      admin: {
+        description: 'Table header labels, e.g. Specification, Details. Each linked card is one row.',
+      },
+    },
+    {
+      name: 'tags',
+      type: 'text',
+      label: 'Tags / Items (Comma Separated)',
+      admin: { description: 'Chip list, marquee items or tab labels, e.g. Zigbee, Bluetooth, Wi-Fi' },
+    },
+    { name: 'anchor', type: 'text', admin: { description: 'Optional HTML id for in-page links' } },
+    {
+      name: 'hidden',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: 'Tick to hide this section on the website without deleting it' },
+    },
     {
       name: 'image',
       type: 'upload',
       relationTo: 'media',
       label: 'Section Image / Card Illustration',
     },
-    { name: 'imageUrl', type: 'text', label: 'Section Image URL / Path' },
-    { name: 'logo', type: 'text' },
+    {
+      name: 'imageUrl',
+      type: 'text',
+      label: 'Legacy Section Image URL / Path',
+      admin: { hidden: true },
+    },
+    {
+      name: 'logoMedia',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Logo Image',
+    },
+    {
+      name: 'logo',
+      type: 'text',
+      label: 'Legacy Logo URL',
+      admin: { hidden: true },
+    },
     { name: 'imageAlt', type: 'text' },
-    { name: 'backgroundImage', type: 'text' },
-    { name: 'backgroundVideo', type: 'text' },
-    { name: 'previewAlt', type: 'text' },
+    {
+      name: 'backgroundImageMedia',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Background Image',
+    },
+    {
+      name: 'backgroundImage',
+      type: 'text',
+      label: 'Legacy Background Image URL',
+      admin: { hidden: true },
+    },
+    {
+      name: 'backgroundVideoMedia',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Background Video',
+    },
+    {
+      name: 'backgroundVideo',
+      type: 'text',
+      label: 'Legacy Background Video URL',
+      admin: { hidden: true },
+    },
+    { name: 'previewAlt', type: 'text', admin: { hidden: true } },
     {
       name: 'mockup',
+      admin: { hidden: true },
       type: 'group',
       fields: [
         { name: 'assistantName', type: 'text' },
@@ -58,6 +131,7 @@ export const Section: CollectionConfig = {
     },
     {
       name: 'imageLabels',
+      admin: { hidden: true },
       type: 'array',
       fields: [{ name: 'label', type: 'text' }],
     },
@@ -67,7 +141,7 @@ export const Section: CollectionConfig = {
       type: 'group',
       fields: [
         { name: 'label', type: 'text' },
-        { name: 'href', type: 'text' },
+        { name: 'href', type: 'text', label: 'URL', ...urlField },
       ],
     },
     {
@@ -75,11 +149,12 @@ export const Section: CollectionConfig = {
       type: 'group',
       fields: [
         { name: 'label', type: 'text' },
-        { name: 'href', type: 'text' },
+        { name: 'href', type: 'text', label: 'URL', ...urlField },
       ],
     },
     {
       name: 'controls',
+      admin: { hidden: true },
       type: 'group',
       fields: [
         { name: 'tabsLabel', type: 'text' },
@@ -89,6 +164,7 @@ export const Section: CollectionConfig = {
     },
     {
       name: 'categories',
+      admin: { hidden: true },
       type: 'array',
       fields: [{ name: 'category', type: 'text' }],
     },

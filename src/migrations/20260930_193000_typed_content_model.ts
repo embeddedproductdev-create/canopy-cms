@@ -130,10 +130,10 @@ async function normalizeLegacyCard(
     linkedinUrl: text(value.linkedinUrl) || '',
     type: preserveSourceType ? text(value.type) || normalizedType : normalizedType,
     tags: Array.isArray(tags)
-      ? tags.map((tag) => ({ tag: typeof tag === 'object' && tag !== null ? text((tag as JsonRecord).tag) || '' : text(tag) || '' }))
+      ? tags.map((tag) => typeof tag === 'object' && tag !== null ? text((tag as JsonRecord).tag) || '' : text(tag) || '').join(', ')
       : typeof tags === 'string'
-        ? tags.split(',').map((tag) => ({ tag: tag.trim() }))
-        : [],
+        ? tags
+        : '',
   }
 }
 

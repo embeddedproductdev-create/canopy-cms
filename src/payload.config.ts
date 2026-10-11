@@ -14,12 +14,15 @@ import { Footer } from './globals/Footer'
 import { SeoSettings } from './globals/SeoSettings'
 import { SiteChrome } from './globals/SiteChrome'
 import { Page } from './collections/Page'
+import { Capability } from './collections/Capability'
+import { Industry } from './collections/Industry'
 import { Section } from './collections/Section'
 import { Card } from './collections/Card'
 import { CaseStudy } from './collections/CaseStudy'
 import { Blog } from './collections/Blog'
 import { Checklist } from './collections/Checklist'
 import { Testimonial } from './collections/Testimonial'
+import { FormSubmission } from './collections/FormSubmission'
 import { User } from './collections/User'
 
 const filename = fileURLToPath(import.meta.url)
@@ -93,25 +96,53 @@ const cloudflare =
     ? await getCloudflareContextFromWrangler()
     : await getCloudflareContext({ async: true })
 
+const allowedOrigins = [
+  'http://localhost:4200',
+  'http://localhost:3000',
+  ...(process.env.FRONTEND_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+]
+
 export default buildConfig({
   admin: {
     user: User.slug,
+    meta: {
+      titleSuffix: ' – Canopy CMS',
+      icons: [
+        { rel: 'icon', type: 'image/x-icon', url: '/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '180x180', url: '/brand/icon.png' },
+        { rel: 'apple-touch-icon', url: '/brand/icon.png' },
+      ],
+    },
+    components: {
+      // Same logo / icon as the website (files in public/brand).
+      graphics: { Logo: '/components/admin/Logo', Icon: '/components/admin/Icon' },
+      // Bell icon in the header: form submissions as notifications (right-hand drawer, archive, 60-day purge).
+      actions: ['/components/admin/NotificationBell'],
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  cors: ['http://localhost:4200', 'http://localhost:3000'],
-  csrf: ['http://localhost:4200', 'http://localhost:3000'],
+  // Website + CMS origins; add the production site with FRONTEND_ORIGINS=https://www.example.com,https://other
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   globals: [Header, Footer, SeoSettings, SiteChrome],
-  collections: [User, Media, Page, Section, Card, CaseStudy, Blog, Checklist, Testimonial],
+  collections: [User, Media, Page, Section, Card, Capability, Industry, CaseStudy, Blog, Checklist, FormSubmission, Testimonial],
   editor: lexicalEditor(),
   secret: payloadSecret,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // Dev schema push can wedge on drizzle-kit SQLite rebuild quirks; set
-  // PAYLOAD_PUSH=false to skip pushing when the local D1 is already in sync.
-  db: sqliteD1Adapter({ binding: cloudflare.env.D1, push: process.env.PAYLOAD_PUSH !== 'false' }),
+  // Schema changes are applied through migrations so development never drops
+  // populated legacy tables as part of an interactive schema push.
+  db: sqliteD1Adapter({
+    binding: cloudflare.env.D1,
+    migrationDir: path.resolve(dirname, 'migrations'),
+    push: process.env.PAYLOAD_PUSH === 'true',
+  }),
   logger: isProduction ? cloudflareLogger : undefined,
   // storage: [
   //   r2Storage({

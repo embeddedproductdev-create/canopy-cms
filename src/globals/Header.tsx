@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { revalidateGlobalOnChange } from '../hooks/revalidate'
+import { urlField } from '../hooks/normalizeUrl'
 
 export const Header: GlobalConfig = {
   slug: 'header',
@@ -33,7 +34,18 @@ export const Header: GlobalConfig = {
       label: 'Main Navigation Menu',
       fields: [
         { name: 'label', type: 'text', required: true },
-        { name: 'url', type: 'text', required: true },
+        { name: 'url', type: 'text', required: true, label: 'URL', ...urlField },
+        {
+          name: 'children',
+          type: 'array',
+          label: 'Dropdown Items',
+          admin: { description: 'Optional: shows these links in a dropdown under this item' },
+          fields: [
+            { name: 'label', type: 'text', required: true },
+            { name: 'url', type: 'text', required: true, label: 'URL', ...urlField },
+            { name: 'description', type: 'text' },
+          ],
+        },
       ],
     },
     {
@@ -51,6 +63,7 @@ export const Header: GlobalConfig = {
           name: 'href',
           type: 'text',
           label: 'Button URL',
+          ...urlField,
           defaultValue: '',
         },
       ],

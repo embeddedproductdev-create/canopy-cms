@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { formatSlug } from '../utilities/formatSlug'
 import { seoGroupField } from '../fields/seo'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
+import { redactLockedItem } from '../hooks/redactLockedChecklist'
 
 export const Checklist: CollectionConfig = {
   slug: 'checklist',
@@ -17,6 +18,16 @@ export const Checklist: CollectionConfig = {
     delete: ({ req: { user } }) => user?.role === 'admin',
   },
   hooks: {
+    // Derived from the items list so writers never maintain these by hand.
+    beforeValidate: [
+      ({ data }) => {
+        if (!data || !Array.isArray(data.items)) return data;
+        const open = data.items.filter((item: { locked?: boolean }) => !item?.locked);
+        data.visibleItems = open.slice(0, 3).map((item: { heading?: string }) => ({ item: item?.heading || "" }));
+        data.lockedItemsCount = data.items.length - open.length;
+        return data;
+      },
+    ],
     afterChange: [revalidateOnChange],
     afterDelete: [revalidateOnDelete],
   },
@@ -25,7 +36,12 @@ export const Checklist: CollectionConfig = {
     maxPerDoc: 3,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+      label: 'Title (shown as a Checklist Modal option)',
+    },
     { name: 'heading', type: 'text' },
     { name: 'subheading', type: 'textarea' },
     { name: 'introduction', type: 'textarea' },
@@ -55,8 +71,13 @@ export const Checklist: CollectionConfig = {
       label: 'Checklist Items',
       fields: [
         { name: 'number', type: 'text', required: true },
-        { name: 'heading', type: 'text', required: true },
-        { name: 'description', type: 'textarea', required: true },
+        {
+          name: 'heading',
+          type: 'text',
+          admin: { description: 'Locked items are stored here but never sent to the public website.' },
+          hooks: { afterRead: [redactLockedItem] },
+        },
+        { name: 'description', type: 'textarea', hooks: { afterRead: [redactLockedItem] } },
         { name: 'locked', type: 'checkbox', defaultValue: false },
       ],
     },
@@ -77,6 +98,12 @@ export const Checklist: CollectionConfig = {
         { name: 'submitLabel', type: 'text' },
         { name: 'privacyNote', type: 'textarea' },
         { name: 'lockedActionLabel', type: 'text' },
+        {
+          name: 'formAnchor',
+          type: 'text',
+          defaultValue: 'checklist-access',
+          admin: { description: 'Id of the form section the locked-items banner scrolls to.' },
+        },
         { name: 'progressConnector', type: 'text' },
         { name: 'progressSuffix', type: 'text' },
         { name: 'validationError', type: 'text' },
@@ -86,12 +113,11 @@ export const Checklist: CollectionConfig = {
       name: 'visibleItems',
       type: 'array',
       label: 'Visible Items (1–3)',
-      required: true,
-      minRows: 1,
       maxRows: 3,
       fields: [{ name: 'item', type: 'text', required: true }],
       admin: {
-        description: 'The first 3 checklist items shown on the page; items 4–10 are locked',
+        hidden: true,
+        description: 'Filled automatically from the first 3 unlocked items.',
       },
     },
     {
@@ -100,7 +126,8 @@ export const Checklist: CollectionConfig = {
       label: 'Total Locked Items (4–10)',
       defaultValue: 7,
       admin: {
-        description: 'How many items are hidden behind the form submission (usually 7 for a 10-item checklist)',
+        hidden: true,
+        description: 'Filled automatically from the locked items.',
       },
     },
     {

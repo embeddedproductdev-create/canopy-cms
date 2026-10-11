@@ -1,7 +1,9 @@
 import type { GlobalConfig } from 'payload'
+import { revalidateGlobalOnChange } from '../hooks/revalidate'
 
 export const SiteChrome: GlobalConfig = {
   slug: 'site-chrome',
+  hooks: { afterChange: [revalidateGlobalOnChange] },
   label: 'Site Chrome & UI Text',
   admin: {
     group: 'Globals',
@@ -15,6 +17,24 @@ export const SiteChrome: GlobalConfig = {
     {
       type: 'tabs',
       tabs: [
+        {
+          label: 'UI Labels',
+          fields: [
+            {
+              name: 'uiLabels',
+              type: 'array',
+              label: 'UI Label Registry',
+              admin: {
+                description:
+                  'Every generic label the website shows (badges, buttons, table headers, form labels, aria text). Key = identifier used by the site, e.g. work.featuredBadge; Value = the text.',
+              },
+              fields: [
+                { name: 'key', type: 'text', required: true },
+                { name: 'value', type: 'text' },
+              ],
+            },
+          ],
+        },
         {
           label: 'Primary CTA',
           fields: [
@@ -166,6 +186,10 @@ export const SiteChrome: GlobalConfig = {
             {
               name: 'checklistModal',
               type: 'group',
+              label: 'Checklist Modal Content',
+              admin: {
+                description: 'Controls the modal copy. Its selectable options come from Checklist records.',
+              },
               fields: [
                 {
                   name: 'title',
@@ -247,7 +271,6 @@ export const SiteChrome: GlobalConfig = {
               type: 'group',
               label: 'Status Messages',
               fields: [
-                { name: 'loading', type: 'text', required: true, defaultValue: 'Loading...' },
                 {
                   name: 'loadFailed',
                   type: 'text',

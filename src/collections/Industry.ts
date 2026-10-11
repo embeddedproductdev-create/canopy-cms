@@ -1,0 +1,42 @@
+import type { CollectionConfig } from 'payload'
+import { detailAccess, detailHooks, faqsField, heroFields, seoGroupField, stacksField } from '../fields/serviceDetail'
+
+/**
+ * Industry detail page template (/industries/<slug>/). Lists are plain text, one item per
+ * line ("Title | text"); the "other industries" block is generated from the other documents.
+ */
+export const Industry: CollectionConfig = {
+  slug: 'industry',
+  labels: { singular: 'Industry', plural: 'Industries' },
+  admin: {
+    useAsTitle: 'title',
+    group: 'Content Management',
+    defaultColumns: ['title', 'slug', 'updatedAt'],
+  },
+  access: detailAccess,
+  hooks: detailHooks,
+  fields: [
+    ...heroFields,
+    { name: 'summary', type: 'text', admin: { description: 'One line shown on the "other industries" cards.' } },
+    { name: 'challengesHeading', type: 'text' },
+    { name: 'challenges', type: 'textarea', admin: { description: 'One per line:  Title | text' } },
+    { name: 'disciplinesHeading', type: 'text' },
+    { name: 'disciplines', type: 'textarea', admin: { description: 'One per line:  Title | text | /capabilities/slug/' } },
+    { name: 'calloutHeading', type: 'text', label: 'Callout band heading (optional)' },
+    { name: 'calloutText', type: 'text' },
+    { name: 'productsHeading', type: 'text' },
+    { name: 'products', type: 'textarea', admin: { description: 'One per line:  Title | text' } },
+    stacksField,
+    { name: 'projectsHeading', type: 'text' },
+    { name: 'relatedProjects', type: 'relationship', relationTo: 'case-study', hasMany: true, label: 'Related projects' },
+    { name: 'processHeading', type: 'text', label: 'Process heading' },
+    { name: 'processHighlight', type: 'text', label: 'Process heading highlight (green words)' },
+    { name: 'processCtaLabel', type: 'text' },
+    { name: 'processCtaHref', type: 'text', label: 'Process button URL' },
+    { name: 'process', type: 'textarea', admin: { description: 'One step per line:  Title | text' } },
+    { name: 'faqHeading', type: 'text' },
+    faqsField,
+    { name: 'othersHeading', type: 'text', label: 'Other industries: heading' },
+    seoGroupField,
+  ],
+}

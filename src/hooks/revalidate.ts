@@ -57,11 +57,7 @@ export const revalidateOnChange: CollectionAfterChangeHook = async ({ doc, req }
   // Purge API routes and sitemap/robots from Cloudflare cache
   const baseUrl = process.env.PAYLOAD_PUBLIC_URL || 'https://www.canopyembedded.com'
   const urlsToPurge = [
-    `${baseUrl}/api/pages*`,
-    `${baseUrl}/api/posts*`,
-    `${baseUrl}/api/projects*`,
-    `${baseUrl}/api/checklists*`,
-    `${baseUrl}/api/categories*`,
+    ...['page', 'capability', 'industry', 'case-study', 'blog', 'checklist', 'globals'].map((route) => `${baseUrl}/api/${route}*`),
     `${baseUrl}/sitemap.xml`,
     `${baseUrl}/robots.txt`,
   ]
@@ -77,11 +73,7 @@ export const revalidateOnChange: CollectionAfterChangeHook = async ({ doc, req }
 export const revalidateOnDelete: CollectionAfterDeleteHook = async ({ doc }) => {
   const baseUrl = process.env.PAYLOAD_PUBLIC_URL || 'https://www.canopyembedded.com'
   const urlsToPurge = [
-    `${baseUrl}/api/pages*`,
-    `${baseUrl}/api/posts*`,
-    `${baseUrl}/api/projects*`,
-    `${baseUrl}/api/checklists*`,
-    `${baseUrl}/api/categories*`,
+    ...['page', 'capability', 'industry', 'case-study', 'blog', 'checklist', 'globals'].map((route) => `${baseUrl}/api/${route}*`),
     `${baseUrl}/sitemap.xml`,
     `${baseUrl}/robots.txt`,
   ]

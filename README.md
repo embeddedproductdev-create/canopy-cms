@@ -27,6 +27,8 @@ In one terminal:
 npm run dev
 ```
 
+The dev command applies the additive tag migration before starting Next.js. It does not run the older, untracked migration history or drop populated legacy tables. Schema push is disabled by default, so destructive changes require a deliberate migration rather than an interactive confirmation.
+
 Wait for: `✓ Admin UI available at http://localhost:3000/admin`
 
 ### 4. Run Seed Script

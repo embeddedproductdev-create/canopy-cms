@@ -1,11 +1,12 @@
 import type { CollectionConfig } from 'payload'
+import { urlField } from '../hooks/normalizeUrl'
 import { formatSlug } from '../utilities/formatSlug'
 import { seoGroupField } from '../fields/seo'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
 
 export const CaseStudy: CollectionConfig = {
   slug: 'case-study',
-  labels: { singular: 'Case Study', plural: 'Case Studies' },
+  labels: { singular: 'Portfolio project', plural: 'Portfolio' },
   admin: { useAsTitle: 'title', group: 'Content Management' },
   access: {
     create: ({ req: { user } }) => !!user,
@@ -124,7 +125,8 @@ export const CaseStudy: CollectionConfig = {
         {
           name: 'link',
           type: 'text',
-          label: 'CTA Link',
+          label: 'CTA URL',
+          ...urlField,
         },
       ],
     },
@@ -141,7 +143,8 @@ export const CaseStudy: CollectionConfig = {
         {
           name: 'link',
           type: 'text',
-          label: 'CTA Link',
+          label: 'CTA URL',
+          ...urlField,
         },
       ],
     },
@@ -171,16 +174,14 @@ export const CaseStudy: CollectionConfig = {
       ],
     },
     {
-      name: 'features',
-      type: 'array',
-      label: 'Features',
-      fields: [{ name: 'item', type: 'text', label: 'Feature', required: true }],
-    },
-    {
-      name: 'technicalSpecifications',
-      type: 'array',
-      label: 'Technical Specifications',
-      fields: [{ name: 'item', type: 'text', label: 'Spec', required: true }],
+      name: 'layoutSections',
+      type: 'relationship',
+      relationTo: 'section',
+      hasMany: true,
+      label: 'Extra Layout Sections',
+      admin: {
+        description: 'Optional reusable blocks (cards, table, steps, FAQ, chips…) shown below the main content',
+      },
     },
     seoGroupField,
   ],

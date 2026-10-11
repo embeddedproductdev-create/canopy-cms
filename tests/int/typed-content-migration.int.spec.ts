@@ -232,8 +232,8 @@ describe('typed content-model migration', () => {
     expect(sqlite.prepare('SELECT image_id FROM card WHERE id = 101').get()).toMatchObject({ image_id: 42 })
     expect(sqlite.prepare('SELECT COUNT(*) AS count FROM media').get()).toMatchObject({ count: 1 })
     expect(createdCards[4].data.value).toBe('20x')
-    expect(createdCards[0].data.tags).toEqual([{ tag: 'Telemetry' }])
-    expect(createdCards[7].data.tags).toEqual([{ tag: 'Shipped' }])
+    expect(createdCards[0].data.tags).toBe('Telemetry')
+    expect(createdCards[7].data.tags).toBe('Shipped')
     expect(
       (sqlite.prepare('SELECT image_url, mockup_assistant_name, mockup_scheduling_message, mockup_sync_title, mockup_telemetry_title FROM section WHERE id = 8').get() as Record<string, string>),
     ).toMatchObject({

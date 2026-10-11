@@ -21,7 +21,7 @@ export const Footer: GlobalConfig = {
       relationTo: 'media',
       required: false,
     },
-    { name: 'heading', type: 'text', defaultValue: 'Canopy Embedded' },
+    { name: 'heading', type: 'text', defaultValue: 'Canopy Embedded Labs' },
     { name: 'subHeading', type: 'text', defaultValue: 'Product engineering' },
     { name: 'homeLinkLabel', type: 'text', defaultValue: 'Canopy home' },
     {
@@ -66,7 +66,7 @@ export const Footer: GlobalConfig = {
       ],
     },
     { name: 'helplineNumber', type: 'text', defaultValue: '+1999 888-76-54' },
-    { name: 'techSupportEmail', type: 'text', defaultValue: 'support@canopy.com' },
+    { name: 'techSupportEmail', type: 'text', defaultValue: 'contact@canopyembedded.com' },
     { name: 'requestIntro', type: 'text', defaultValue: 'Raise a general' },
     { name: 'requestLabel', type: 'text', defaultValue: 'IT Support Requests' },
     { name: 'requestUrl', type: 'text', defaultValue: '' },

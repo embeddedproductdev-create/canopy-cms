@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { formatSlug, formatUrlPath } from '../utilities/formatSlug'
 import { seoGroupField } from '../fields/seo'
+import { urlField } from '../hooks/normalizeUrl'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
 
 export const Page: CollectionConfig = {
@@ -29,6 +30,12 @@ export const Page: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     { name: 'heading', type: 'text' },
     { name: 'subheading', type: 'text' },
+    { name: 'eyebrow', type: 'text', admin: { description: 'Small label above the page heading' } },
+    {
+      name: 'pageType',
+      type: 'text',
+      admin: { description: 'landing, capability, industry … add the word left for a left-aligned header (free text)' },
+    },
     {
       name: 'url',
       type: 'text',
@@ -45,6 +52,7 @@ export const Page: CollectionConfig = {
         ],
       },
     },
+    { name: 'heroImage', type: 'upload', relationTo: 'media', admin: { description: 'Wide picture under the page heading (About page). Leave empty to keep an empty frame.' } },
     { name: 'body', type: 'richText' },
     {
       name: 'cta',
@@ -52,7 +60,7 @@ export const Page: CollectionConfig = {
       label: 'Page Call to Action',
       fields: [
         { name: 'label', type: 'text' },
-        { name: 'href', type: 'text' },
+        { name: 'href', type: 'text', label: 'URL', ...urlField },
       ],
     },
     {
@@ -78,11 +86,13 @@ export const Page: CollectionConfig = {
       hasMany: true,
       label: 'Page Cards',
       admin: {
+        hidden: true,
         description: 'Discipline cards, feature cards, or other card types',
       },
     },
     {
       name: 'faqs',
+      admin: { hidden: true },
       type: 'array',
       label: 'FAQ Section',
       fields: [
@@ -92,6 +102,7 @@ export const Page: CollectionConfig = {
     },
     {
       name: 'workflowSteps',
+      admin: { hidden: true },
       type: 'array',
       label: 'Workflow / Process Steps',
       fields: [
@@ -117,6 +128,7 @@ export const Page: CollectionConfig = {
       type: 'array',
       label: 'Team Members',
       admin: {
+        hidden: true,
         description: 'For About page team grid',
       },
       fields: [
@@ -128,6 +140,7 @@ export const Page: CollectionConfig = {
     },
     {
       name: 'companyFacts',
+      admin: { hidden: true },
       type: 'group',
       label: 'Company Facts',
       fields: [

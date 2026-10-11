@@ -5,7 +5,7 @@ import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
 
 export const Blog: CollectionConfig = {
   slug: 'blog',
-  labels: { singular: 'Blog', plural: 'Blogs' },
+  labels: { singular: 'Insight', plural: 'Insights' },
   admin: {
     useAsTitle: 'title',
     group: 'Content Management',
@@ -44,12 +44,27 @@ export const Blog: CollectionConfig = {
     { name: 'heading', type: 'text' },
     { name: 'category', type: 'text' },
     {
+      name: 'featured',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Featured article',
+      admin: {
+        description: 'Shown in the Featured Article block on the Insights page. Optional — when no post is featured the block is hidden.',
+      },
+    },
+    {
       name: 'dek',
       type: 'text',
       label: 'Teaser/Description',
       admin: {
         placeholder: 'One-line summary for index pages and cards',
       },
+    },
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Article Image',
     },
     {
       name: 'byline',
@@ -63,21 +78,12 @@ export const Blog: CollectionConfig = {
     { name: 'body', type: 'richText', required: true },
     {
       name: 'tags',
-      type: 'array',
-      label: 'Tags',
+      type: 'text',
+      label: 'Tags (Comma Separated)',
       admin: {
-        description: 'Category-like tags for filtering/organization',
+        description: 'Enter article tags separated by commas.',
+        placeholder: 'e.g. BMS, Firmware, IoT',
       },
-      fields: [{ name: 'tag', type: 'text', label: 'Tag', required: true }],
-    },
-    {
-      name: 'relatedLinks',
-      type: 'array',
-      label: 'Related Links (in article body)',
-      fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'url', type: 'text', required: true },
-      ],
     },
     {
       name: 'contentUpgrade',
@@ -98,6 +104,16 @@ export const Blog: CollectionConfig = {
           label: 'Link to Checklist',
         },
       ],
+    },
+    {
+      name: 'layoutSections',
+      type: 'relationship',
+      relationTo: 'section',
+      hasMany: true,
+      label: 'Extra Layout Sections',
+      admin: {
+        description: 'Optional reusable blocks (cards, table, steps, FAQ, chips…) shown below the main content',
+      },
     },
     seoGroupField,
   ],

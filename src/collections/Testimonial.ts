@@ -6,7 +6,7 @@ export const Testimonial: CollectionConfig = {
   labels: { singular: 'Testimonial', plural: 'Testimonials' },
   admin: {
     useAsTitle: 'heading',
-    group: 'Content Management',
+    group: 'Testimonials',
     defaultColumns: ['heading', 'clientLabel', 'order'],
   },
   access: {
