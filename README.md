@@ -77,7 +77,7 @@ Content model: landing, capability and industry pages are built from `Page` -> `
 2. Add an idempotent migration in `src/migrations/` and register it in `src/migrations/index.ts`.
 3. `npm run generate:types:payload`.
 4. `npm run lint`, `npx tsc --noEmit`, `npm run test:int`.
-5. Commit and run the deploy workflow; it applies the migration to the remote D1 before the Worker is replaced.
+5. Apply the migration to the remote D1 yourself (`npm run deploy:database` with Cloudflare credentials in your shell), then commit and run the deploy workflow. The workflow does not run migrations: `payload migrate` needs a Cloudflare remote preview session that the GitHub runner could not create, and the verify step stops the deploy if a migration is still unapplied.
 
 Never rely on schema push in production, and never accept a prompt that drops populated tables.
 
@@ -113,8 +113,7 @@ Everything is manual: **Actions -> choose the workflow -> Run workflow**. Each w
 | Verify credentials | all required secrets present, `wrangler whoami` |
 | Lint, type check, integration tests | a broken commit never reaches production |
 | Record D1 bookmark | logs the Time Travel bookmark taken before the migrations |
-| Apply migrations | `npm run deploy:database` (`payload migrate` on the remote D1) |
-| Verify remote | every migration applied; pages and admin user exist |
+| Verify remote | every migration in the code is already applied to the remote D1 (the seed marks all current ones applied); pages and admin user exist. The workflow fails here if you add a migration without applying it |
 | Build | `npm run build:cf` (`PAYLOAD_USE_LOCAL_BINDINGS=true`, so the build never opens a Cloudflare session) |
 | Worker size | gzipped `handler.mjs` must stay under 10 MB |
 | Deploy | `wrangler deploy` (bindings come from `wrangler.jsonc`) |

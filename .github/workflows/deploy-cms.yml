@@ -68,9 +68,6 @@ jobs:
           npx wrangler d1 time-travel info canopy-cms-db
           echo "To roll the database back: npx wrangler d1 time-travel restore canopy-cms-db --timestamp=<ISO time from above>"
 
-      - name: Apply pending D1 migrations
-        run: npm run deploy:database
-
       - name: Verify remote migrations and content
         run: npm run verify:remote
 
