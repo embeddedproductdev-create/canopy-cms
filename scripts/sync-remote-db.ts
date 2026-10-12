@@ -44,9 +44,46 @@ const tables = objects.filter((o) => o.type === 'table')
 const lines: string[] = ['PRAGMA defer_foreign_keys = ON;']
 for (const t of tables) lines.push(`${t.sql};`)
 let rowCount = 0
-for (const t of tables) {
-  if (SKIP_DATA.has(t.name)) continue
-  const rows = db.prepare(`SELECT * FROM "${t.name}"`).all() as Record<string, unknown>[]
+type Fk = { table: string; from: string; to: string | null }
+const fks = new Map<string, Fk[]>(tables.map((t) => [t.name, db.prepare(`PRAGMA foreign_key_list("${t.name}")`).all() as Fk[]]))
+const pending = new Set(tables.map((t) => t.name))
+const ordered: string[] = []
+while (pending.size) {
+  const ready = [...pending].filter((n) => (fks.get(n) ?? []).every((f) => f.table === n || !pending.has(f.table)))
+  const batch = ready.length ? ready : [...pending]
+  for (const n of batch) {
+    pending.delete(n)
+    ordered.push(n)
+  }
+}
+const orderRows = (name: string, rows: Record<string, unknown>[]): Record<string, unknown>[] => {
+  const self = (fks.get(name) ?? []).filter((f) => f.table === name)
+  if (!self.length || !rows.length) return rows
+  const pk = 'id'
+  const done = new Set<unknown>()
+  const left = [...rows]
+  const out: Record<string, unknown>[] = []
+  while (left.length) {
+    const before = left.length
+    for (let i = 0; i < left.length; ) {
+      const row = left[i]
+      if (self.every((f) => row[f.from] == null || done.has(row[f.to ?? pk]) || row[f.from] === row[pk])) {
+        out.push(row)
+        done.add(row[pk])
+        left.splice(i, 1)
+      } else i++
+    }
+    if (left.length === before) {
+      out.push(...left)
+      break
+    }
+  }
+  return out
+}
+for (const name of ordered) {
+  if (SKIP_DATA.has(name)) continue
+  const rows = orderRows(name, db.prepare(`SELECT * FROM "${name}"`).all() as Record<string, unknown>[])
+  const t = { name }
   for (const row of rows) {
     const cols = Object.keys(row)
     lines.push(`INSERT INTO "${t.name}" (${cols.map((c) => `"${c}"`).join(', ')}) VALUES (${cols.map((c) => q(row[c])).join(', ')});`)
