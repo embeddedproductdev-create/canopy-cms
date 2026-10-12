@@ -1,6 +1,20 @@
 import { APIError, type CollectionConfig } from 'payload'
+import { notifyOnSubmission } from '../hooks/notifySubmission'
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/** Fields every form must supply (the website enforces the same rules before sending). */
+const REQUIRED: Record<string, string[]> = {
+  engagement: ['name', 'company', 'message'],
+  consultation: ['name', 'company', 'message'],
+  checklist: ['company'],
+  subscribe: [],
+}
+const MAX = { name: 120, company: 160, scope: 200, message: 4000, email: 254, source: 300, checklist: 120 } as const
+const RATE_LIMIT_MS = 30_000
+
+// eslint-disable-next-line no-control-regex
+const clean = (value: unknown, max: number): string => String(value ?? '').replace(/[\u0000-\u001f\u007f]+/g, ' ').trim().slice(0, max)
 
 /**
  * Leads collected from the website forms (engagement enquiry, checklist gate,
@@ -41,8 +55,9 @@ export const FormSubmission: CollectionConfig = {
     },
   ],
   hooks: {
+    afterChange: [notifyOnSubmission],
     beforeValidate: [
-      ({ data, operation }) => {
+      async ({ data, operation, req }) => {
         if (operation !== 'create' || !data) return data
         // Honeypot: real visitors never see or fill this field.
         if (typeof data['website'] === 'string' && data['website'].trim() !== '') {
@@ -51,7 +66,32 @@ export const FormSubmission: CollectionConfig = {
         if (typeof data['email'] !== 'string' || !EMAIL.test(data['email'].trim())) {
           throw new APIError('A valid email address is required', 400)
         }
-        return { ...data, email: data['email'].trim(), website: undefined, status: 'new' }
+        const form = clean(data['form'], 40).toLowerCase()
+        const next = {
+          ...data,
+          form,
+          email: clean(data['email'], MAX.email),
+          name: clean(data['name'], MAX.name),
+          company: clean(data['company'], MAX.company),
+          scope: clean(data['scope'], MAX.scope),
+          message: String(data['message'] ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').trim().slice(0, MAX.message),
+          checklist: clean(data['checklist'], MAX.checklist),
+          source: clean(data['source'], MAX.source),
+          website: undefined as string | undefined,
+          status: 'new',
+        }
+        // Mandatory fields per form (server-side twin of the website validation).
+        const missing = (REQUIRED[form] ?? []).filter((field) => !(next as Record<string, unknown>)[field])
+        if (missing.length) throw new APIError(`Missing required field(s): ${missing.join(', ')}`, 400)
+        // Same email + form within 30 s is treated as an accidental repeat.
+        const since = new Date(Date.now() - RATE_LIMIT_MS).toISOString()
+        const recent = await req.payload.count({
+          collection: 'form-submission',
+          overrideAccess: true,
+          where: { and: [{ email: { equals: next.email } }, { form: { equals: form } }, { createdAt: { greater_than: since } }] },
+        })
+        if (recent.totalDocs > 0) throw new APIError('Please wait a moment before submitting again', 429)
+        return next
       },
     ],
   },
