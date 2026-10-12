@@ -50,6 +50,11 @@ jobs:
           echo "--- Token identity and scopes ---"
           npx wrangler whoami
 
+      - name: Check the admin import map is up to date
+        run: |
+          npm run generate:importmap
+          git diff --exit-code -- 'src/app/(payload)/admin/importMap.js'
+
       - name: Lint
         run: npm run lint
 

@@ -137,7 +137,7 @@ export default buildConfig({
   }),
   logger: isProduction ? cloudflareLogger : undefined,
   plugins: [
-    ...(isProduction && !isCLI
+    ...(isProduction || isCLI
       ? [
           r2Storage({
             bucket: cloudflare.env.R2,
