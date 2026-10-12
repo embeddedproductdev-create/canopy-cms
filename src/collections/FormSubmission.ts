@@ -3,7 +3,6 @@ import { notifyOnSubmission } from '../hooks/notifySubmission'
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-/** Fields every form must supply (the website enforces the same rules before sending). */
 const REQUIRED: Record<string, string[]> = {
   engagement: ['name', 'company', 'message'],
   consultation: ['name', 'company', 'message'],
@@ -13,13 +12,8 @@ const REQUIRED: Record<string, string[]> = {
 const MAX = { name: 120, company: 160, scope: 200, message: 4000, email: 254, source: 300, checklist: 120 } as const
 const RATE_LIMIT_MS = 30_000
 
-// eslint-disable-next-line no-control-regex
 const clean = (value: unknown, max: number): string => String(value ?? '').replace(/[\u0000-\u001f\u007f]+/g, ' ').trim().slice(0, max)
 
-/**
- * Leads collected from the website forms (engagement enquiry, checklist gate,
- * subscribe). Anyone can create a row; only signed-in CMS users can read them.
- */
 export const FormSubmission: CollectionConfig = {
   slug: 'form-submission',
   labels: { singular: 'Form Submission', plural: 'Form Submissions' },
@@ -39,7 +33,6 @@ export const FormSubmission: CollectionConfig = {
   },
   endpoints: [
     {
-      // Permanently deletes submissions archived more than 60 days ago (called by the notification bell).
       path: '/purge-archive',
       method: 'post',
       handler: async (req) => {
@@ -59,7 +52,6 @@ export const FormSubmission: CollectionConfig = {
     beforeValidate: [
       async ({ data, operation, req }) => {
         if (operation !== 'create' || !data) return data
-        // Honeypot: real visitors never see or fill this field.
         if (typeof data['website'] === 'string' && data['website'].trim() !== '') {
           throw new APIError('Invalid submission', 400)
         }
@@ -80,10 +72,8 @@ export const FormSubmission: CollectionConfig = {
           website: undefined as string | undefined,
           status: 'new',
         }
-        // Mandatory fields per form (server-side twin of the website validation).
         const missing = (REQUIRED[form] ?? []).filter((field) => !(next as Record<string, unknown>)[field])
         if (missing.length) throw new APIError(`Missing required field(s): ${missing.join(', ')}`, 400)
-        // Same email + form within 30 s is treated as an accidental repeat.
         const since = new Date(Date.now() - RATE_LIMIT_MS).toISOString()
         const recent = await req.payload.count({
           collection: 'form-submission',
@@ -117,7 +107,6 @@ export const FormSubmission: CollectionConfig = {
       admin: { position: 'sidebar' },
     },
     { name: 'archivedAt', type: 'date', admin: { position: 'sidebar', readOnly: true, description: 'Set when archived; archived submissions are deleted permanently after 60 days.' } },
-    // Honeypot (never stored; rejected in the hook when filled).
     { name: 'website', type: 'text', admin: { hidden: true } },
   ],
 }

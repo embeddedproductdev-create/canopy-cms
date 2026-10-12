@@ -166,9 +166,6 @@ async function requireColumn(db: unknown, table: string, column: string): Promis
 }
 
 export async function up({ db, payload }: MigrateUpArgs): Promise<void> {
-  // Read the old representation through SQL before making any schema changes.
-  // Payload's runtime config describes the new schema and cannot be used to
-  // read fields that have already been removed from that config.
   await requireColumn(db, 'page', 'constant')
   await requireColumn(db, 'section', 'constant')
   await requireColumn(db, 'header', 'nav_items')
@@ -203,8 +200,6 @@ export async function up({ db, payload }: MigrateUpArgs): Promise<void> {
   )
   const footerRows = await rows(db, sql`SELECT id, content FROM footer WHERE content IS NOT NULL`)
 
-  // Add the destination columns/tables first so Payload writes below can run
-  // while the legacy JSON columns are still available for reading.
   for (const [table, column, definition] of [
     ['section', 'eyebrow', 'text'], ['section', 'tag_line', 'text'], ['section', 'highlight', 'text'],
     ['section', 'type', 'text'], ['section', 'image_alt', 'text'], ['section', 'background_image', 'text'],
@@ -237,7 +232,6 @@ export async function up({ db, payload }: MigrateUpArgs): Promise<void> {
   await prepare('CREATE TABLE IF NOT EXISTS footer_link_groups_links (_order integer NOT NULL, _parent_id integer NOT NULL, id text PRIMARY KEY NOT NULL, label text, href text, FOREIGN KEY (_parent_id) REFERENCES footer_link_groups(id) ON DELETE cascade)')
   await prepare('CREATE TABLE IF NOT EXISTS footer_social_links (_order integer NOT NULL, _parent_id integer NOT NULL, id text PRIMARY KEY NOT NULL, label text, href text, icon text, FOREIGN KEY (_parent_id) REFERENCES footer(id) ON DELETE cascade)')
 
-  // Copy the source snapshots above while the legacy columns still exist.
   for (const row of pageRows) {
     const value = JSON.parse(String(row.constant))
     const data = asRecord(value, `Page ${row.id}.constant`)
@@ -468,8 +462,6 @@ export async function up({ db, payload }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
-  // This migration is intentionally forward-only: restoring removed JSON would
-  // reintroduce the data-loss path it replaces.
   void db
   throw new Error('The typed content-model migration is irreversible; restore the database backup instead.')
 }

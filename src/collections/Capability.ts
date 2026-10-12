@@ -1,11 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { detailAccess, detailHooks, faqsField, heroFields, seoGroupField, stacksField } from '../fields/serviceDetail'
 
-/**
- * Capability detail page template (/capabilities/<slug>/): hero, what's included,
- * technical stacks, workflow, related projects / insights and FAQ. Fixed, simple fields —
- * no sections or cards to assemble.
- */
 export const Capability: CollectionConfig = {
   slug: 'capability',
   labels: { singular: 'Capability', plural: 'Capabilities' },

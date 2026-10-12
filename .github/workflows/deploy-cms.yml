@@ -1,0 +1,142 @@
+name: Deploy CMS to Cloudflare
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cms
+  cancel-in-progress: false
+
+env:
+  MAX_WORKER_MB: 10.0
+
+jobs:
+  deploy:
+    name: Build & Deploy Worker
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+      FRONTEND_ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
+      CMS_URL: ${{ secrets.CMS_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Cloudflare credentials
+        run: |
+          set -euo pipefail
+          fail=0
+          for name in CMS_URL CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID PAYLOAD_SECRET FRONTEND_ORIGINS; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is not set."
+              fail=1
+            fi
+          done
+          [ "$fail" = 0 ] || exit 1
+
+          echo "--- Token identity and scopes ---"
+          npx wrangler whoami
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Integration tests
+        run: npm run test:int
+
+      - name: Record D1 point-in-time restore bookmark
+        run: |
+          set -euo pipefail
+          npx wrangler d1 time-travel info canopy-cms-db
+          echo "To roll the database back: npx wrangler d1 time-travel restore canopy-cms-db --timestamp=<ISO time from above>"
+
+      - name: Apply pending D1 migrations
+        run: npm run deploy:database
+
+      - name: Verify remote migrations and content
+        run: npm run verify:remote
+
+      - name: Build application for Cloudflare
+        run: npm run build:cf
+
+      - name: Check compressed Worker size
+        run: |
+          set -euo pipefail
+          HANDLER_PATH=".open-next/server-functions/default/handler.mjs"
+
+          if [ ! -f "$HANDLER_PATH" ]; then
+            echo "::error::Build output not found at $HANDLER_PATH."
+            exit 1
+          fi
+
+          BYTES=$(gzip -c "$HANDLER_PATH" | wc -c)
+          RAW_BYTES=$(stat -c%s "$HANDLER_PATH")
+          SIZE_MB=$(awk -v b="$BYTES" 'BEGIN { printf "%.2f", b / 1048576 }')
+          RAW_MB=$(awk -v b="$RAW_BYTES" 'BEGIN { printf "%.2f", b / 1048576 }')
+
+          echo "Raw size     : $RAW_MB MB"
+          echo "Gzipped size : $SIZE_MB MB ($BYTES bytes)"
+          echo "Limit        : $MAX_WORKER_MB MB (Workers Paid; the free plan caps at 3 MB)"
+
+          if awk -v s="$SIZE_MB" -v m="$MAX_WORKER_MB" 'BEGIN { exit !(s >= m) }'; then
+            echo "::error::Worker exceeds the $MAX_WORKER_MB MB gzipped limit and will be rejected by Cloudflare."
+            exit 1
+          fi
+          echo "Within limit."
+
+      - name: Deploy Worker to Cloudflare
+        run: npx wrangler deploy
+
+      - name: Set Worker runtime secrets
+        run: |
+          set -euo pipefail
+          printf '%s' "${PAYLOAD_SECRET}" | npx wrangler secret put PAYLOAD_SECRET
+          printf '%s' "${FRONTEND_ORIGINS}" | npx wrangler secret put FRONTEND_ORIGINS
+      - name: Smoke-check the deployed CMS
+        run: |
+          set -euo pipefail
+          if [ -z "${CMS_URL:-}" ]; then
+            echo "::notice::Set the CMS_URL secret to enable the post-deploy smoke check."
+            exit 0
+          fi
+
+          fail=0
+          for path in /admin "/api/globals/header" "/api/page?limit=1" "/api/capability?limit=1"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 5 --retry-delay 5 --retry-all-errors "$CMS_URL$path")
+            echo "GET $path -> $code"
+            if [ "$code" -ge 500 ] || [ "$code" = "000" ]; then
+              echo "::error::$path returned $code."
+              fail=1
+            fi
+          done
+          [ "$fail" = 0 ] || exit 1
+
+          pages=$(curl -s --retry 3 "$CMS_URL/api/page?limit=1&depth=0" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).totalDocs||0)}catch{console.log(0)}})')
+          echo "Pages in production: $pages"
+          if [ "$pages" = "0" ]; then
+            echo "::error::The deployed CMS has no pages. Run npm run sync:db -- --yes locally first."
+            exit 1
+          fi
+
+          media=$(curl -s --retry 3 "$CMS_URL/api/media?limit=1&depth=0" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log((JSON.parse(s).docs[0]||{}).url||"")}catch{console.log("")}})')
+          if [ -n "$media" ]; then
+            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 3 "$CMS_URL$media")
+            echo "GET $media -> $code"
+            [ "$code" = "200" ] || { echo "::error::Media is not served from R2. Run npm run sync:media -- --yes locally."; exit 1; }
+          fi
+          echo "CMS content and media are live."

@@ -89,10 +89,6 @@ const SEO = `
   "seo_og_image_id" integer REFERENCES "media"("id") ON DELETE set null,
   "seo_schema_type" text DEFAULT 'auto'`
 
-/**
- * Additive, idempotent schema for the dedicated Capability / Industry templates and the
- * extra per-document SEO fields. Safe from the migration, `prepare-dev-schema.ts`, or repeatedly.
- */
 export async function applyDetailCollections(db: Db): Promise<void> {
   await db.run(
     sql.raw(`CREATE TABLE IF NOT EXISTS "capability" (
@@ -169,7 +165,6 @@ export async function applyDetailCollections(db: Db): Promise<void> {
     )
   }
 
-  // Extra per-document SEO fields on the existing templates (and their draft copies)
   const withSeo: [string, string][] = [
     ['page', 'seo_'],
     ['_page_v', 'version_seo_'],
@@ -186,10 +181,8 @@ export async function applyDetailCollections(db: Db): Promise<void> {
     await addColumn(db, table, `${prefix}og_description`, 'text')
     await addColumn(db, table, `${prefix}og_image_id`, 'integer REFERENCES "media"("id") ON DELETE set null')
   }
-  // Page: optional hero image
   await addColumn(db, 'page', 'hero_image_id', 'integer REFERENCES "media"("id") ON DELETE set null')
   await addColumn(db, '_page_v', 'version_hero_image_id', 'integer REFERENCES "media"("id") ON DELETE set null')
-  // Form submissions: archive (soft delete, purged after 60 days)
   await addColumn(db, 'form_submission', 'archived_at', 'text')
   await index(db, 'form_submission', 'archived_at')
 }
@@ -199,6 +192,5 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
-  // Additive migration: nothing is dropped.
   void db
 }

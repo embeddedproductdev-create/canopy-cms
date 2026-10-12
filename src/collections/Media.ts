@@ -17,7 +17,6 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    // These are not supported on Workers yet due to lack of sharp
     crop: false,
     focalPoint: false,
   },

@@ -1,10 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { detailAccess, detailHooks, faqsField, heroFields, seoGroupField, stacksField } from '../fields/serviceDetail'
 
-/**
- * Industry detail page template (/industries/<slug>/). Lists are plain text, one item per
- * line ("Title | text"); the "other industries" block is generated from the other documents.
- */
 export const Industry: CollectionConfig = {
   slug: 'industry',
   labels: { singular: 'Industry', plural: 'Industries' },

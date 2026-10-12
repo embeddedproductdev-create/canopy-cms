@@ -1,6 +1,6 @@
 import type { Field } from 'payload'
 
-export const seoFields: Field[] = [
+const seoFields: Field[] = [
   {
     name: 'seoTitle',
     type: 'text',

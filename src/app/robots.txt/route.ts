@@ -5,7 +5,6 @@ export async function GET() {
   try {
     const payload = await getPayload({ config })
 
-    // Fetch SEO settings
     const seoSettings = await payload.findGlobal({
       slug: 'seo-settings',
       depth: 0,
@@ -15,13 +14,11 @@ export async function GET() {
 
     let robotsContent = ''
 
-    // User-Agent for all bots
     robotsContent += 'User-Agent: *\n'
 
     if (!allowIndexing) {
       robotsContent += 'Disallow: /\n'
     } else {
-      // Add disallowed paths if indexing is allowed
       if (Array.isArray(disallowPaths) && disallowPaths.length > 0) {
         for (const pathObj of disallowPaths) {
           if (pathObj && 'path' in pathObj) {
@@ -31,7 +28,6 @@ export async function GET() {
       }
     }
 
-    // Add sitemap
     if (sitemapUrl) {
       robotsContent += `\nSitemap: ${sitemapUrl}\n`
     }
@@ -45,7 +41,6 @@ export async function GET() {
   } catch (error) {
     console.error('[robots.txt] Generation failed:', error)
 
-    // Return a default robots.txt on error
     const defaultRobots = `User-Agent: *
 Allow: /
 Sitemap: https://www.canopyembedded.com/sitemap.xml

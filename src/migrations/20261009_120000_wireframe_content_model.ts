@@ -17,7 +17,6 @@ async function addColumn(db: Db, table: string, column: string, definition: stri
   }
 }
 
-/** `<owner>_rels` table holding a hasMany relationship to `section`. */
 async function createSectionRels(db: Db, owner: string): Promise<void> {
   if (!(await tableExists(db, owner))) return
   const rels = `${owner}_rels`
@@ -37,7 +36,6 @@ async function createSectionRels(db: Db, owner: string): Promise<void> {
       sql.raw(`CREATE INDEX IF NOT EXISTS "${rels}_${column}_idx" ON "${rels}" ("${column}")`),
     )
   }
-  // Tables created by an earlier push may lack the section_id column.
   await addColumn(db, rels, 'section_id', 'integer REFERENCES "section"("id") ON DELETE cascade')
 }
 
@@ -65,38 +63,28 @@ async function createArrayTable(
   )
 }
 
-/**
- * Additive, idempotent schema for the wireframe content model. Safe to run from
- * the migration, from `scripts/prepare-dev-schema.ts`, or repeatedly.
- */
 export async function applyWireframeContentModel(db: Db): Promise<void> {
-  // Section: generic rendering hints
   await addColumn(db, 'section', 'variant', 'text')
   await addColumn(db, 'section', 'columns', 'text')
   await addColumn(db, 'section', 'anchor', 'text')
   await addColumn(db, 'section', 'tags', 'text')
   await addColumn(db, 'section', 'hidden', 'integer DEFAULT 0')
 
-  // Page: eyebrow + pageType (and their draft-version copies)
   await addColumn(db, 'page', 'eyebrow', 'text')
   await addColumn(db, 'page', 'page_type', 'text')
   await addColumn(db, '_page_v', 'version_eyebrow', 'text')
   await addColumn(db, '_page_v', 'version_page_type', 'text')
 
-  // Blog + Case study: extra reusable layout sections
   for (const owner of ['blog', '_blog_v', 'case_study', '_case_study_v']) {
     await createSectionRels(db, owner)
   }
 
-  // Blog: optional featured flag (and its draft-version copy)
   await addColumn(db, 'blog', 'featured', 'integer DEFAULT 0')
   await addColumn(db, '_blog_v', 'version_featured', 'integer DEFAULT 0')
 
-  // Checklist: CMS-controlled scroll target for the locked-items banner
   await addColumn(db, 'checklist', 'access_gate_form_anchor', 'text')
   await addColumn(db, '_checklist_v', 'version_access_gate_form_anchor', 'text')
 
-  // Form submissions (leads collected from the website forms)
   await db.run(
     sql.raw(`CREATE TABLE IF NOT EXISTS "form_submission" (
       "id" integer PRIMARY KEY NOT NULL,
@@ -124,14 +112,12 @@ export async function applyWireframeContentModel(db: Db): Promise<void> {
     'integer REFERENCES "form_submission"("id") ON DELETE cascade',
   )
 
-  // Header: dropdown children under a nav item
   await createArrayTable(db, 'header_nav_items_children', 'header_nav_items', 'text', [
     'label',
     'url',
     'description',
   ])
 
-  // Site chrome: UI label registry
   await createArrayTable(db, 'site_chrome_ui_labels', 'site_chrome', 'integer', ['key', 'value'])
 }
 
@@ -140,7 +126,6 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
-  // Additive migration: dropping populated content is intentionally not automated.
   await db.run(sql.raw('DROP TABLE IF EXISTS "site_chrome_ui_labels"'))
   await db.run(sql.raw('DROP TABLE IF EXISTS "header_nav_items_children"'))
   for (const rels of ['blog_rels', '_blog_v_rels', 'case_study_rels', '_case_study_v_rels']) {

@@ -1,134 +1,151 @@
-# Canopy CMS Backend — Content Seeding & Testing
+# Canopy CMS
 
-This guide covers testing the CMS schema extensions and running the seed script to populate Payload CMS with content.
+Content management for the Canopy Embedded Labs website. Payload CMS v3 on Next.js 15, deployed as a Cloudflare Worker (OpenNext) with a D1 (SQLite) database and an R2 bucket for media. The Angular website lives in a separate repository (`canopy-Website`) and reads content from this CMS over its REST API.
 
-## Quick Start
+| Layer | Technology |
+|---|---|
+| CMS / admin | Payload 3.82, Lexical rich text |
+| Runtime | Next.js 15 on Cloudflare Workers via `@opennextjs/cloudflare` |
+| Database | Cloudflare D1 (`canopy-cms-db`), SQLite locally |
+| Media | Cloudflare R2 (`canopy-cms-r2-bucket`) in production, `./media` locally |
+| Tooling | Node.js >= 24.15, npm, Vitest, ESLint, Wrangler 4 |
 
-### 1. Generate Types (Local Only)
-The sandbox blocks local port binding, so run this locally:
+## 1. Run it locally
 
+### Prerequisites
+- Node.js 24.15 or newer and npm.
+- Git. No Cloudflare account is needed for local work.
+
+### Steps
 ```bash
-npm run generate:types:payload
+git clone <this-repo-url> canopy-cms
+cd canopy-cms
+npm ci
+cp .env.example .env            # then set PAYLOAD_SECRET to any long random string
+npm run seed:local              # loads seed/db-dump.sql into the local D1 and copies seed/media to ./media
+npm run dev                     # http://localhost:3000
 ```
 
-This regenerates `src/payload-types.ts` with new globals and collection fields.
+- Admin panel: http://localhost:3000/admin. Log in with the admin account stored in the seed. If the database has no users, Payload shows the "create first user" screen instead.
+- Run `npm run seed:local` **before** the first `npm run dev`. To start over, delete `.wrangler/state` and `media/`, then run it again.
+- Open the site and admin through `localhost`, not `127.0.0.1`. CORS and CSRF only allow `http://localhost:3000` and `http://localhost:4200` (plus whatever `FRONTEND_ORIGINS` lists in production).
+- `npm run dev` first runs `scripts/prepare-dev-schema.ts`, which adds any columns the code expects but the local database lacks. It never drops anything.
+- The website (port 4200) expects this CMS on port 3000. See the website repository's README.
 
-### 2. Create & Apply Migration
+### Environment variables
+| Variable | Where | Purpose |
+|---|---|---|
+| `PAYLOAD_SECRET` | `.env` locally, Worker secret in production | Signs logins. Required. Never change it after go-live, or every session and API key stops working. |
+| `FRONTEND_ORIGINS` | Worker secret (production) | Comma-separated website origins allowed by CORS and CSRF, e.g. `https://canopy.pages.dev`. |
+| `PAYLOAD_PUSH` | optional, local only | `true` lets Payload push schema changes. Leave it off; use migrations. |
+| `NOTIFY_*`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_AUTH_TOKEN`, `DEPLOY_HOOK_URL` | optional | Form-submission notifications and cache purge. Not configured by the deploy workflow today. See `NOTIFICATIONS.md`. |
 
+### Commands
+| Command | What it does |
+|---|---|
+| `npm run dev` | Prepare the local schema, then `next dev` on :3000 |
+| `npm run seed:local` | Import `seed/` (database and media) into the local environment |
+| `npm run lint` | ESLint |
+| `npx tsc --noEmit` | Type check |
+| `npm run test:int` | Vitest integration tests (migrations, URL normaliser, ...) |
+| `npm run generate:types:payload` | Regenerate `src/payload-types.ts` after changing collections or globals |
+| `npm run generate:importmap` | Regenerate the admin import map after adding or changing admin components |
+| `npm run build:cf` | Production Worker build (what the deploy workflow runs) |
+| `npm run deploy:database` | `payload migrate` against the remote D1 (needs Cloudflare credentials) |
+| `npm run verify:remote` | Fails if a migration is unapplied or the remote has no pages or admin user |
+| `npm run sync:db`, `npm run sync:media` | Export your local database or media to the remote from your own machine (advanced; the seed workflow normally does this) |
+| `npm run notify:test` | Send a test notification |
+
+## 2. Project layout
+```
+src/collections/   Page, Section, Card, Capability, Industry, CaseStudy (Portfolio), Blog (Insights), Checklist,
+                   Testimonial, FormSubmission, Media, User
+src/globals/       Header, Footer, SeoSettings, SiteChrome (UI labels)
+src/migrations/    Idempotent migrations, registered in index.ts
+src/hooks/         URL normaliser, checklist redaction, cache revalidation
+src/components/admin/   Admin logo, icon, notification bell
+scripts/           prepare-dev-schema, verify-remote-migrations, sync-*, notify-test
+seed/              db-dump.sql and media/ used to fill a fresh database and bucket
+wrangler.jsonc     Worker name, D1 and R2 bindings
+.github/workflows/ seed-cms.yml and deploy-cms.yml
+```
+
+Content model: landing, capability and industry pages are built from `Page` -> `Section` -> `Card`. A section's `type` picks the layout and `variant` refines it. Tags, chips, columns and marquee items are comma-separated text; CTAs are plain `label` + `url` pairs. Bare emails and phone numbers are stored as `mailto:` and `tel:`.
+
+### Changing the schema
+1. Edit the collection or global.
+2. Add an idempotent migration in `src/migrations/` and register it in `src/migrations/index.ts`.
+3. `npm run generate:types:payload`.
+4. `npm run lint`, `npx tsc --noEmit`, `npm run test:int`.
+5. Commit and run the deploy workflow; it applies the migration to the remote D1 before the Worker is replaced.
+
+Never rely on schema push in production, and never accept a prompt that drops populated tables.
+
+## 3. Deploy to Cloudflare (GitHub Actions)
+
+Everything is manual: **Actions -> choose the workflow -> Run workflow**. Each workflow is one job in the `production` environment and uses no artifacts.
+
+### One-time setup
+1. **Cloudflare API token** (My Profile -> API Tokens -> Custom) with: Account / Workers Scripts: Edit, Account / D1: Edit, Account / Workers R2 Storage: Edit. Note your **Account ID**.
+2. The D1 database (`canopy-cms-db`, id in `wrangler.jsonc`) must exist. The R2 bucket is created by the seed workflow if missing.
+3. **GitHub secrets** (Settings -> Secrets and variables -> Actions -> Secrets):
+
+| Secret | Value |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | token from step 1 |
+| `CLOUDFLARE_ACCOUNT_ID` | account id |
+| `PAYLOAD_SECRET` | long random string (`openssl rand -hex 32`); keep it forever |
+| `FRONTEND_ORIGINS` | website origin(s), comma separated. Before the site exists, use `https://canopy.pages.dev` (the default Pages address for project `canopy`) and update it later |
+| `CMS_URL` | `https://canopy-cms.<your-workers-subdomain>.workers.dev`. The subdomain is shown under Cloudflare -> Workers & Pages -> Account details |
+
+4. Optionally add required reviewers to the `production` environment for an approval gate.
+5. Keep this repository **private**: `seed/db-dump.sql` contains the admin password hash.
+
+### First deploy, in this order
+1. **Seed CMS Database and Media** (`seed-cms.yml`): imports `seed/db-dump.sql` into the remote D1 (skipped with a warning if the database already has tables), creates the R2 bucket if missing, uploads `seed/media/*` to it, and runs the remote verification. Both steps are selectable when you run it.
+2. **Deploy CMS to Cloudflare** (`deploy-cms.yml`).
+3. Deploy the website (its own repository and README).
+4. Update the `FRONTEND_ORIGINS` secret to the real website origin if it changed, and rerun **Deploy CMS to Cloudflare**.
+
+### What the deploy workflow does
+| Step | Purpose |
+|---|---|
+| Verify credentials | all required secrets present, `wrangler whoami` |
+| Lint, type check, integration tests | a broken commit never reaches production |
+| Record D1 bookmark | logs the Time Travel bookmark taken before the migrations |
+| Apply migrations | `npm run deploy:database` (`payload migrate` on the remote D1) |
+| Verify remote | every migration applied; pages and admin user exist |
+| Build | `npm run build:cf` (`PAYLOAD_USE_LOCAL_BINDINGS=true`, so the build never opens a Cloudflare session) |
+| Worker size | gzipped `handler.mjs` must stay under 10 MB |
+| Deploy | `wrangler deploy` (bindings come from `wrangler.jsonc`) |
+| Runtime secrets | sets `PAYLOAD_SECRET` and `FRONTEND_ORIGINS` on the Worker |
+| Smoke check | `/admin`, `/api/globals/header`, `/api/page`, `/api/capability` respond; pages exist; first media file returns 200 |
+
+Later deploys: just run **Deploy CMS to Cloudflare** again.
+
+### Media and the repository
+`seed/media/` is in git only so the seed workflow can fill an empty R2 bucket without running Wrangler on your machine. After the first seed you can stop caring about it: files uploaded through the production admin go straight to R2 and are never written back to git. Do not re-run the seed to "sync" production content; it skips a database that already has tables and would only re-upload old media.
+
+To refresh the seed from your local content (rarely needed):
 ```bash
-payload migrate:create
-npm run deploy:database
+SYNC_EXCLUDE=form_submission npm run sync:db      # writes .sync/db-dump.sql (dry run); copy it to seed/db-dump.sql
+cp -r media/. seed/media/
 ```
 
-### 3. Start Dev Server
-In one terminal:
+### Rollback
+- Worker: `npx wrangler rollback`, or Cloudflare dashboard -> Workers -> canopy-cms -> Deployments -> Rollback.
+- Database: use the bookmark printed in the workflow log: `npx wrangler d1 time-travel restore canopy-cms-db --bookmark=<bookmark>` (or `--timestamp=<ISO time>`), then redeploy the previous commit.
 
-```bash
-npm run dev
-```
+### Troubleshooting
+| Symptom | Likely cause |
+|---|---|
+| *Verify credentials* fails | a required secret is missing |
+| migrate cannot reach D1 | token lacks D1: Edit, or wrong account id |
+| *Verify remote* fails | seed workflow not run yet, or a migration did not apply |
+| images 404 | media not uploaded: rerun the seed workflow with only `upload_media` |
+| browser CORS/CSRF errors from the site | website origin missing from `FRONTEND_ORIGINS`; update and redeploy |
+| local dev: "no such table" or missing columns | start from a clean state: delete `.wrangler/state`, run `npm run seed:local` |
+| build asks for Cloudflare login | use `npm run build:cf`, not a bare `opennextjs-cloudflare build` |
 
-The dev command applies the additive tag migration before starting Next.js. It does not run the older, untracked migration history or drop populated legacy tables. Schema push is disabled by default, so destructive changes require a deliberate migration rather than an interactive confirmation.
-
-Wait for: `✓ Admin UI available at http://localhost:3000/admin`
-
-### 4. Run Seed Script
-In a second terminal:
-
-```bash
-npm run seed
-```
-
-Expected output:
-```
-✓ Connected to Payload
-→ Seeding Media...
-→ Seeding Globals...
-→ Seeding Pages...
-✓ Seeding complete!
-```
-
-### 5. Run Test & Coverage Report
-
-```bash
-npm run test:seed
-```
-
-This will output a comprehensive CLI report with:
-- ✅ Global coverage table
-- 📚 Collection count validation
-- 📊 Seeded data coverage table
-- 🟡 Placeholder detection ([TODO:] markers)
-- 📝 Test summary with pass/fail/warn counts
-
-### 6. Verify in Admin UI
-
-Open `http://localhost:3000/admin` and check:
-
-**Globals:**
-- ✅ **SiteChrome** — 8 tabs (Primary CTA, Back Links, Empty States, Checklist UI, Checklist Modal, 404 Page, Nav Fallback)
-- ✅ **Header** — navCta group added
-- ✅ **Footer** — linkGroups array, contactInfo group, subHeading, cta
-
-**Collections:**
-- **Page** — 3 docs (About, Capabilities, Engagement Model) with new field groups: pills, cards, faqs, workflowSteps, relatedCaseStudies, teamMembers, companyFacts
-- **Case Study** — 3 docs (Smart BMS, Charger, BLE Mesh Node) with projectStage, atAGlance, features, technicalSpecifications
-- **Blog** — 3 posts with tags array
-- **Checklist** — 2 checklists
-
-## What Was Extended
-
-### New Globals (1)
-- **SiteChrome** — All UI chrome strings (CTAs, labels, modals, fallbacks)
-
-### Extended Globals (2)
-- **Header** — Added navCta group
-- **Footer** — Replaced JSON categories with structured linkGroups, contactInfo, cta
-
-### Extended Collections (3)
-- **Page** — Added pills, cards, faqs, workflowSteps, relatedCaseStudies, teamMembers, companyFacts
-- **CaseStudy** — Added projectStage, atAGlance, features, technicalSpecifications
-- **Blog** — Added tags array
-
-### Files Modified
-- ✅ `src/globals/SiteChrome.ts` (215 lines)
-- ✅ `src/globals/Header.tsx` (+11 lines)
-- ✅ `src/globals/Footer.tsx` (+40 lines)
-- ✅ `src/collections/Page.ts` (+60 lines)
-- ✅ `src/collections/CaseStudy.ts` (+50 lines)
-- ✅ `src/collections/Blog.ts` (+8 lines)
-- ✅ `src/payload.config.ts` (registered SiteChrome global)
-- ✅ `scripts/seed.ts` (completely rewritten)
-
-## Seed Script Details
-
-Uses upsert-by-natural-key pattern — safe to run multiple times.
-
-**Seeds in order:**
-1. Media (logos from Canopy-Website/public/)
-2. Globals (SeoSettings, Header, Footer, SiteChrome, Home)
-3. Pages (About, Capabilities, Engagement Model)
-4. Case Studies (3 projects with specs)
-5. Blogs (3 articles)
-6. Checklists (2 checklists)
-
-**Known Placeholders:** All content marked "unchanged from v83" in source uses `[TODO: ...]` markers. Edit these via admin UI later or leave for content team.
-
-## Idempotency Check
-
-```bash
-npm run seed      # First run
-npm run seed      # Second run — should show "Updated" instead of "Created"
-```
-
-## Test Failure Debugging
-
-If `npm run test:seed` fails:
-
-1. Ensure migration was applied: `payload migrate:status`
-2. Check dev server is running on port 3000
-3. Verify seed script completed without errors
-4. Check for [TODO:] content in admin UI
-
-## Next: Frontend Integration
-
-Once backend testing passes, proceed to `../Canopy-Website/README.md` for frontend rewiring.
+## 4. Optional: form notifications and cache purge
+New form submissions can notify Telegram, email (Resend) or a Discord/Slack webhook, and content changes can purge the Cloudflare cache or call a deploy hook. These are driven by environment variables (`NOTIFICATIONS.md`) and are **not** set by the deploy workflow yet. To enable them, add the secrets and extend the *Set Worker runtime secrets* step in `deploy-cms.yml` with a `wrangler secret put` for each.

@@ -18,7 +18,6 @@ export const Checklist: CollectionConfig = {
     delete: ({ req: { user } }) => user?.role === 'admin',
   },
   hooks: {
-    // Derived from the items list so writers never maintain these by hand.
     beforeValidate: [
       ({ data }) => {
         if (!data || !Array.isArray(data.items)) return data;

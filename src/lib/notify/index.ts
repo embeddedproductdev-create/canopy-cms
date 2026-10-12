@@ -1,9 +1,3 @@
-/**
- * Zero-cost "new form submission" notifications. Every channel is OFF until its env vars are set
- * (see NOTIFICATIONS.md): Telegram bot, Resend email, Discord/Slack webhook. All calls are plain
- * `fetch` (works on Cloudflare Workers), time out after 5 s and never throw to the caller.
- */
-
 export interface SubmissionSummary {
   id: number | string
   form: string
@@ -28,7 +22,7 @@ const adminUrl = (id: number | string): string => {
   return base ? `${base}/admin/collections/form-submission/${id}` : ''
 }
 
-export function formatText(s: SubmissionSummary): string {
+function formatText(s: SubmissionSummary): string {
   const lines = [
     `New website submission — ${s.form}`,
     s.name ? `Name: ${s.name}` : '',
@@ -83,7 +77,6 @@ const channels: Channel[] = [
     name: 'webhook',
     enabled: () => !!env('NOTIFY_WEBHOOK_URL'),
     send: async (_s, text) => {
-      // Discord expects { content }, Slack (and Mattermost etc.) expect { text }.
       const body = env('NOTIFY_WEBHOOK_TYPE').toLowerCase() === 'discord' ? { content: text.slice(0, 1900) } : { text }
       const res = await fetch(env('NOTIFY_WEBHOOK_URL'), {
         method: 'POST',
@@ -98,7 +91,6 @@ const channels: Channel[] = [
 
 export const enabledChannels = (): string[] => channels.filter((c) => c.enabled()).map((c) => c.name)
 
-/** Sends to every enabled channel; resolves with per-channel results and never rejects. */
 export async function notifySubmission(summary: SubmissionSummary): Promise<{ channel: string; ok: boolean; error?: string }[]> {
   const text = formatText(summary)
   const active = channels.filter((c) => c.enabled())

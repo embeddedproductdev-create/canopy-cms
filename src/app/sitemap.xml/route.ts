@@ -6,7 +6,6 @@ interface Entry {
   lastmod?: string
 }
 
-/** Sitemap of every published, indexable page. The host comes from SEO Settings (Site URL). */
 export async function GET() {
   try {
     const payload = await getPayload({ config })

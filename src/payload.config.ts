@@ -29,15 +29,12 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const realpath = (value: string) => (fs.existsSync(value) ? fs.realpathSync(value) : undefined)
 
-// Load PAYLOAD_SECRET from multiple sources
 const getPayloadSecret = (): string => {
-  // Try environment variable first
   if (process.env.PAYLOAD_SECRET) {
     const val = process.env.PAYLOAD_SECRET.trim()
     if (val) return val
   }
 
-  // Try .env file
   try {
     const envPath = path.resolve(dirname, '../.env')
     const content = fs.readFileSync(envPath, 'utf-8')
@@ -50,7 +47,6 @@ const getPayloadSecret = (): string => {
     // Continue to next source
   }
 
-  // Try .env.local file
   try {
     const envLocalPath = path.resolve(dirname, '../.env.local')
     const content = fs.readFileSync(envLocalPath, 'utf-8')
@@ -70,6 +66,7 @@ const payloadSecret = getPayloadSecret()
 
 const isCLI = process.argv.some((value) => realpath(value).endsWith(path.join('payload', 'bin.js')))
 const isProduction = process.env.NODE_ENV === 'production'
+const useLocalBindings = process.env.PAYLOAD_USE_LOCAL_BINDINGS === 'true'
 
 const createLog =
   (level: string, fn: typeof console.log) => (objOrMsg: object | string, msg?: string) => {
@@ -89,10 +86,10 @@ const cloudflareLogger = {
   error: createLog('error', console.error),
   fatal: createLog('fatal', console.error),
   silent: () => {},
-} as any // Use PayloadLogger type when it's exported
+} as any
 
 const cloudflare =
-  isCLI || !isProduction
+  isCLI || useLocalBindings || !isProduction
     ? await getCloudflareContextFromWrangler()
     : await getCloudflareContext({ async: true })
 
@@ -117,16 +114,13 @@ export default buildConfig({
       ],
     },
     components: {
-      // Same logo / icon as the website (files in public/brand).
       graphics: { Logo: '/components/admin/Logo', Icon: '/components/admin/Icon' },
-      // Bell icon in the header: form submissions as notifications (right-hand drawer, archive, 60-day purge).
       actions: ['/components/admin/NotificationBell'],
     },
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  // Website + CMS origins; add the production site with FRONTEND_ORIGINS=https://www.example.com,https://other
   cors: allowedOrigins,
   csrf: allowedOrigins,
   globals: [Header, Footer, SeoSettings, SiteChrome],
@@ -136,29 +130,30 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // Schema changes are applied through migrations so development never drops
-  // populated legacy tables as part of an interactive schema push.
   db: sqliteD1Adapter({
     binding: cloudflare.env.D1,
     migrationDir: path.resolve(dirname, 'migrations'),
     push: process.env.PAYLOAD_PUSH === 'true',
   }),
   logger: isProduction ? cloudflareLogger : undefined,
-  // storage: [
-  //   r2Storage({
-  //     bucket: cloudflare.env.R2,
-  //     collections: { media: true },
-  //   }),
-  // ],
+  plugins: [
+    ...(isProduction && !isCLI
+      ? [
+          r2Storage({
+            bucket: cloudflare.env.R2,
+            collections: { media: true },
+          }),
+        ]
+      : []),
+  ],
 })
 
-// Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
 function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
   return import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then(
     ({ getPlatformProxy }) =>
       getPlatformProxy({
         environment: process.env.CLOUDFLARE_ENV,
-        remoteBindings: isProduction,
+        remoteBindings: isProduction && !useLocalBindings,
       } satisfies GetPlatformProxyOptions),
   )
 }

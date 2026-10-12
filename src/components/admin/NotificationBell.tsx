@@ -33,11 +33,6 @@ const btn: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-/**
- * Header bell: website form submissions as notifications. Opens a drawer on the right.
- * "Delete" archives a notification; deleting from the Archive removes it permanently;
- * archived items are purged automatically after 60 days.
- */
 export default function NotificationBell() {
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<'inbox' | 'archive'>('inbox')
@@ -63,9 +58,12 @@ export default function NotificationBell() {
     api('/purge-archive', { method: 'POST' }).catch((): void => undefined)
   }, [])
   useEffect(() => {
-    void load()
-    const timer = setInterval(load, 60000)
-    return () => clearInterval(timer)
+    const first = setTimeout(() => void load(), 0)
+    const timer = setInterval(() => void load(), 60000)
+    return () => {
+      clearTimeout(first)
+      clearInterval(timer)
+    }
   }, [load])
 
   const patch = async (row: Row, body: Partial<Row>) => {

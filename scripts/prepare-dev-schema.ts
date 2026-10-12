@@ -10,7 +10,6 @@ try {
   await applyWireframeContentModel(payload.db.drizzle)
   await applyDetailCollections(payload.db.drizzle)
   console.info('Prepared CMS tag and wireframe content fields without dropping legacy data.')
-  // The local D1 simulator flushes asynchronously; exiting immediately can drop the writes.
   await new Promise((resolve) => setTimeout(resolve, 3000))
   process.exit(0)
 } catch (error) {

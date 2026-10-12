@@ -28,7 +28,6 @@ const ctaGroup = (name: string, label: string): Field => ({
   ],
 })
 
-/** Title, slug and the hero block shared by capability and industry pages. */
 export const heroFields: Field[] = [
   { name: 'title', type: 'text', required: true, admin: { description: 'Internal name (also used in menus and breadcrumbs).' } },
   {
@@ -56,13 +55,6 @@ export const heroFields: Field[] = [
   { name: 'imageAlt', type: 'text' },
 ]
 
-/**
- * Ordered "technical stack" blocks. One entry per block; the kind decides how `items` are written:
- *   logos  - comma separated names (a scrolling logo strip; "Name|MARK" overrides the logo initials)
- *   chips  - comma separated tags
- *   rows   - one line per row:  Label: item, item, item
- *   cards  - one line per card:  Title | short text
- */
 export const stacksField: Field = {
   name: 'stacks',
   type: 'array',

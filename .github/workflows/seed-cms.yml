@@ -1,0 +1,89 @@
+name: Seed CMS Database and Media
+
+on:
+  workflow_dispatch:
+    inputs:
+      import_database:
+        description: Import seed/db-dump.sql into the remote D1 (skipped when the database already has tables)
+        required: true
+        default: true
+        type: boolean
+      upload_media:
+        description: Upload seed/media/* to the R2 bucket
+        required: true
+        default: true
+        type: boolean
+
+concurrency:
+  group: deploy-cms
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    name: Seed D1 and R2
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Cloudflare credentials
+        run: |
+          set -euo pipefail
+          fail=0
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is not set."
+              fail=1
+            fi
+          done
+          [ "$fail" = 0 ] || exit 1
+          npx wrangler whoami
+
+      - name: Import database
+        if: ${{ inputs.import_database }}
+        run: |
+          set -euo pipefail
+          test -f seed/db-dump.sql
+          existing=$(npx wrangler d1 execute D1 --remote --json --command "SELECT count(*) AS n FROM sqlite_master WHERE type='table' AND name NOT LIKE '_cf_%' AND name NOT LIKE 'sqlite_%'" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{console.log(JSON.parse(s.slice(s.indexOf("[")))[0].results[0].n)})')
+          echo "Tables already in remote D1: $existing"
+          if [ "$existing" != "0" ]; then
+            echo "::warning::The remote database already has tables, so the import was skipped to protect existing content."
+            exit 0
+          fi
+          npx wrangler d1 execute D1 --remote --file seed/db-dump.sql -y
+          echo "Database imported."
+
+      - name: Create R2 bucket if missing
+        if: ${{ inputs.upload_media }}
+        run: |
+          set -euo pipefail
+          bucket=$(node -e 'const c=require("fs").readFileSync("wrangler.jsonc","utf8");console.log(JSON.parse(c).r2_buckets[0].bucket_name)')
+          if npx wrangler r2 bucket list | grep -q "$bucket"; then
+            echo "Bucket $bucket exists."
+          else
+            npx wrangler r2 bucket create "$bucket"
+          fi
+
+      - name: Upload media to R2
+        if: ${{ inputs.upload_media }}
+        env:
+          SYNC_MEDIA_DIR: seed/media
+        run: npm run sync:media -- --yes
+
+      - name: Verify remote migrations and content
+        if: ${{ inputs.import_database }}
+        run: npm run verify:remote

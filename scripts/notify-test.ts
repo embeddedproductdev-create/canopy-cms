@@ -1,8 +1,3 @@
-/**
- * Sends one sample notification through every enabled channel (see NOTIFICATIONS.md).
- *   pnpm run notify:test
- * Reads NOTIFY_* from .env (or the shell). Exits non-zero when no channel is configured or one fails.
- */
 import { enabledChannels, notifySubmission } from '../src/lib/notify'
 
 const active = enabledChannels()

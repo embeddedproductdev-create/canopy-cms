@@ -1,6 +1,5 @@
 import React from 'react'
 
-/** Canopy wordmark for the admin login / forgot-password screens (same logo as the website). */
 export default function Logo() {
   return (
     <img

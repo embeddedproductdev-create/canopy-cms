@@ -54,7 +54,6 @@ async function triggerDeployHook(): Promise<void> {
 }
 
 export const revalidateOnChange: CollectionAfterChangeHook = async ({ doc, req }) => {
-  // Purge API routes and sitemap/robots from Cloudflare cache
   const baseUrl = process.env.PAYLOAD_PUBLIC_URL || 'https://www.canopyembedded.com'
   const urlsToPurge = [
     ...['page', 'capability', 'industry', 'case-study', 'blog', 'checklist', 'globals'].map((route) => `${baseUrl}/api/${route}*`),
@@ -64,7 +63,6 @@ export const revalidateOnChange: CollectionAfterChangeHook = async ({ doc, req }
 
   await purgeCloudflareCache(urlsToPurge)
 
-  // Trigger the website rebuild
   await triggerDeployHook()
 
   return doc
