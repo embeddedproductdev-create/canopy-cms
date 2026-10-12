@@ -120,6 +120,8 @@ jobs:
             exit 0
           fi
 
+          CMS_URL="$(printf '%s' "$CMS_URL" | tr -d '[:space:]')"
+          CMS_URL="${CMS_URL%%,*}"
           CMS_URL="${CMS_URL%/}"
           fail=0
           for path in /admin "/api/globals/header" "/api/page?limit=1" "/api/capability?limit=1"; do

@@ -97,8 +97,8 @@ const allowedOrigins = [
   'http://localhost:4200',
   'http://localhost:3000',
   ...(process.env.FRONTEND_ORIGINS ?? '')
-    .split(',')
-    .map((origin) => origin.trim())
+    .split(/[,\s]+/)
+    .map((origin) => origin.replace(/^["']+|["']+$/g, '').replace(/\/+$/, ''))
     .filter(Boolean),
 ]
 
