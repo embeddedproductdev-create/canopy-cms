@@ -115,9 +115,10 @@ jobs:
             exit 0
           fi
 
+          CMS_URL="${CMS_URL%/}"
           fail=0
           for path in /admin "/api/globals/header" "/api/page?limit=1" "/api/capability?limit=1"; do
-            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 5 --retry-delay 5 --retry-all-errors "$CMS_URL$path")
+            code=$(curl -sL -o /dev/null -w '%{http_code}' --retry 5 --retry-delay 5 --retry-all-errors "$CMS_URL$path")
             echo "GET $path -> $code"
             if [ "$code" -ge 500 ] || [ "$code" = "000" ]; then
               echo "::error::$path returned $code."
@@ -126,16 +127,16 @@ jobs:
           done
           [ "$fail" = 0 ] || exit 1
 
-          pages=$(curl -s --retry 3 "$CMS_URL/api/page?limit=1&depth=0" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).totalDocs||0)}catch{console.log(0)}})')
+          pages=$(curl -sL --retry 3 "$CMS_URL/api/page?limit=1&depth=0" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).totalDocs||0)}catch{console.log(0)}})')
           echo "Pages in production: $pages"
           if [ "$pages" = "0" ]; then
             echo "::error::The deployed CMS has no pages. Run npm run sync:db -- --yes locally first."
             exit 1
           fi
 
-          media=$(curl -s --retry 3 "$CMS_URL/api/media?limit=1&depth=0" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log((JSON.parse(s).docs[0]||{}).url||"")}catch{console.log("")}})')
+          media=$(curl -sL --retry 3 "$CMS_URL/api/media?limit=1&depth=0" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log((JSON.parse(s).docs[0]||{}).url||"")}catch{console.log("")}})')
           if [ -n "$media" ]; then
-            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 3 "$CMS_URL$media")
+            code=$(curl -sL -o /dev/null -w '%{http_code}' --retry 3 "$CMS_URL$media")
             echo "GET $media -> $code"
             [ "$code" = "200" ] || { echo "::error::Media is not served from R2. Run npm run sync:media -- --yes locally."; exit 1; }
           fi
