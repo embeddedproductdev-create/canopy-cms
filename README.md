@@ -28,7 +28,7 @@ npm run dev                     # http://localhost:3000
 
 - Admin panel: http://localhost:3000/admin. Log in with the admin account stored in the seed. If the database has no users, Payload shows the "create first user" screen instead.
 - Run `npm run seed:local` **before** the first `npm run dev`. To start over, delete `.wrangler/state` and `media/`, then run it again.
-- Open the site and admin through `localhost`, not `127.0.0.1`. CORS and CSRF only allow `http://localhost:3000` and `http://localhost:4200` (plus whatever `FRONTEND_ORIGINS` lists in production).
+- Open the site and admin through `localhost`, not `127.0.0.1`. CORS and CSRF only allow `http://localhost:3000` and `http://localhost:4200` (plus the production addresses listed in `allowedOrigins` in `src/payload.config.ts`).
 - `npm run dev` first runs `scripts/prepare-dev-schema.ts`, which adds any columns the code expects but the local database lacks. It never drops anything.
 - The website (port 4200) expects this CMS on port 3000. See the website repository's README.
 
@@ -36,7 +36,6 @@ npm run dev                     # http://localhost:3000
 | Variable | Where | Purpose |
 |---|---|---|
 | `PAYLOAD_SECRET` | `.env` locally, Worker secret in production | Signs logins. Required. Never change it after go-live, or every session and API key stops working. |
-| `FRONTEND_ORIGINS` | Worker secret (production) | Comma-separated website origins allowed by CORS and CSRF, e.g. `https://canopy.pages.dev`. |
 | `PAYLOAD_PUSH` | optional, local only | `true` lets Payload push schema changes. Leave it off; use migrations. |
 | `NOTIFY_*`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_AUTH_TOKEN`, `DEPLOY_HOOK_URL` | optional | Form-submission notifications and cache purge. Not configured by the deploy workflow today. See `NOTIFICATIONS.md`. |
 
@@ -95,7 +94,6 @@ Everything is manual: **Actions -> choose the workflow -> Run workflow**. Each w
 | `CLOUDFLARE_API_TOKEN` | token from step 1 |
 | `CLOUDFLARE_ACCOUNT_ID` | account id |
 | `PAYLOAD_SECRET` | long random string (`openssl rand -hex 32`); keep it forever |
-| `FRONTEND_ORIGINS` | website origin(s), comma separated. Before the site exists, use `https://canopy.pages.dev` (the default Pages address for project `canopy`) and update it later |
 | `CMS_URL` | `https://canopy-cms.<your-workers-subdomain>.workers.dev`. The subdomain is shown under Cloudflare -> Workers & Pages -> Account details |
 
 4. Optionally add required reviewers to the `production` environment for an approval gate.
@@ -105,7 +103,7 @@ Everything is manual: **Actions -> choose the workflow -> Run workflow**. Each w
 1. **Seed CMS Database and Media** (`seed-cms.yml`): imports `seed/db-dump.sql` into the remote D1 (skipped with a warning if the database already has tables), creates the R2 bucket if missing, uploads `seed/media/*` to it, and runs the remote verification. Both steps are selectable when you run it.
 2. **Deploy CMS to Cloudflare** (`deploy-cms.yml`).
 3. Deploy the website (its own repository and README).
-4. Update the `FRONTEND_ORIGINS` secret to the real website origin if it changed, and rerun **Deploy CMS to Cloudflare**.
+4. If the website gets a new address, add it to `allowedOrigins` in `src/payload.config.ts` and rerun **Deploy CMS to Cloudflare**.
 
 ### What the deploy workflow does
 | Step | Purpose |
@@ -117,7 +115,7 @@ Everything is manual: **Actions -> choose the workflow -> Run workflow**. Each w
 | Build | `npm run build:cf` (`PAYLOAD_USE_LOCAL_BINDINGS=true`, so the build never opens a Cloudflare session) |
 | Worker size | gzipped `handler.mjs` must stay under 10 MB |
 | Deploy | `wrangler deploy` (bindings come from `wrangler.jsonc`) |
-| Runtime secrets | sets `PAYLOAD_SECRET` and `FRONTEND_ORIGINS` on the Worker |
+| Runtime secrets | sets `PAYLOAD_SECRET` on the Worker |
 | Smoke check | `/admin`, `/api/globals/header`, `/api/page`, `/api/capability` respond; pages exist; first media file returns 200 |
 
 Later deploys: just run **Deploy CMS to Cloudflare** again.
@@ -142,7 +140,8 @@ cp -r media/. seed/media/
 | migrate cannot reach D1 | token lacks D1: Edit, or wrong account id |
 | *Verify remote* fails | seed workflow not run yet, or a migration did not apply |
 | images 404 | media not uploaded: rerun the seed workflow with only `upload_media` |
-| browser CORS/CSRF errors from the site | website origin missing from `FRONTEND_ORIGINS`; update and redeploy |
+| browser CORS/CSRF errors from the site | website origin missing from `allowedOrigins` in `src/payload.config.ts`; add it and redeploy |
+| production admin: collections show a 500 error, the bell request returns 401 | the CMS's own origin (`https://canopy-cms.<subdomain>.workers.dev`) must stay in `allowedOrigins` in `src/payload.config.ts`. Payload ignores the login cookie on any request whose `Origin` is not in the CSRF list, so the admin's own saves and list loads fail. A test (`tests/int/origins.int.spec.ts`) guards this |
 | local dev: "no such table" or missing columns | start from a clean state: delete `.wrangler/state`, run `npm run seed:local` |
 | build asks for Cloudflare login | use `npm run build:cf`, not a bare `opennextjs-cloudflare build` |
 

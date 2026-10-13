@@ -96,13 +96,10 @@ const cloudflare =
 const allowedOrigins = [
   'http://localhost:4200',
   'http://localhost:3000',
+  'https://canopy-cms.embeddedproductdev.workers.dev',
   'https://canopyembedded.com',
   'https://www.canopyembedded.com',
   'https://canopy-d28.pages.dev',
-  ...(process.env.FRONTEND_ORIGINS ?? '')
-    .split(/[,\s]+/)
-    .map((origin) => origin.replace(/^["']+|["']+$/g, '').replace(/\/+$/, ''))
-    .filter(Boolean),
 ]
 
 export default buildConfig({

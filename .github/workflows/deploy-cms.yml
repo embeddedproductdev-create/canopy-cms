@@ -19,7 +19,6 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
-      FRONTEND_ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
       CMS_URL: ${{ secrets.CMS_URL }}
 
     steps:
@@ -39,7 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           fail=0
-          for name in CMS_URL CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID PAYLOAD_SECRET FRONTEND_ORIGINS; do
+          for name in CMS_URL CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID PAYLOAD_SECRET; do
             if [ -z "${!name:-}" ]; then
               echo "::error::$name is not set."
               fail=1
@@ -111,7 +110,6 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "${PAYLOAD_SECRET}" | npx wrangler secret put PAYLOAD_SECRET
-          printf '%s' "${FRONTEND_ORIGINS}" | npx wrangler secret put FRONTEND_ORIGINS
       - name: Smoke-check the deployed CMS
         run: |
           set -euo pipefail
