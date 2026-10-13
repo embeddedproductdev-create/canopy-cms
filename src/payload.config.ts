@@ -64,7 +64,7 @@ const getPayloadSecret = (): string => {
 
 const payloadSecret = getPayloadSecret()
 
-const isCLI = process.argv.some((value) => realpath(value).endsWith(path.join('payload', 'bin.js')))
+const isCLI = process.argv.some((value) => realpath(value).replaceAll('\\', '/').endsWith('payload/bin.js'))
 const isProduction = process.env.NODE_ENV === 'production'
 const useLocalBindings = process.env.PAYLOAD_USE_LOCAL_BINDINGS === 'true'
 
@@ -119,6 +119,9 @@ export default buildConfig({
     },
     importMap: {
       baseDir: path.resolve(dirname),
+      // Only `npm run generate:importmap` writes the map: the dev server and tests load the config without the
+      // R2 plugin and would otherwise rewrite the committed file without its R2 entry.
+      autoGenerate: false,
     },
   },
   cors: allowedOrigins,

@@ -34,8 +34,12 @@ describe('collections restructure', () => {
       sqlite = new DatabaseSync(':memory:')
       sqlite.exec(fs.readFileSync(path.resolve('seed/db-dump.sql'), 'utf8'))
     }
-    const withUpgrade = Number(all(sqlite, `SELECT count(*) AS n FROM blog WHERE coalesce(content_upgrade_label, '') <> '' AND content_upgrade_checklist_link_id IS NOT NULL`)[0].n)
-    await run(sqlite)
+    // Before the migration shipped, HEAD holds the old content and the builders are exercised on it; once the
+    // committed seed is already migrated, the same assertions check the migrated result.
+    const migrated = all(sqlite, `SELECT name FROM payload_migrations WHERE name = '20261014_120000_restructure_collections'`).length > 0
+    const legacyUpgrades = Number(all(sqlite, `SELECT count(*) AS n FROM blog WHERE coalesce(content_upgrade_label, '') <> '' AND content_upgrade_checklist_link_id IS NOT NULL`)[0].n)
+    if (!migrated) await run(sqlite)
+    const withUpgrade = migrated ? Number(all(sqlite, `SELECT count(*) AS n FROM blog_rels r JOIN section s ON s.id = r.section_id WHERE s.section_key = 'upgrade'`)[0].n) : legacyUpgrades
 
     for (const owner of ['capability', 'industry']) {
       for (const doc of all(sqlite, `SELECT id, title FROM ${owner}`)) {
