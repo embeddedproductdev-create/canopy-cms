@@ -81,34 +81,6 @@ export const Checklist: CollectionConfig = {
       ],
     },
     {
-      name: 'accessGate',
-      type: 'group',
-      label: 'Checklist Access Gate',
-      fields: [
-        { name: 'heading', type: 'text' },
-        { name: 'unlockedHeading', type: 'text' },
-        { name: 'description', type: 'textarea' },
-        { name: 'unlockedDescription', type: 'textarea' },
-        { name: 'emailLabel', type: 'text' },
-        { name: 'companyLabel', type: 'text' },
-        { name: 'emailPlaceholder', type: 'text' },
-        { name: 'emailHelper', type: 'text' },
-        { name: 'companyPlaceholder', type: 'text' },
-        { name: 'submitLabel', type: 'text' },
-        { name: 'privacyNote', type: 'textarea' },
-        { name: 'lockedActionLabel', type: 'text' },
-        {
-          name: 'formAnchor',
-          type: 'text',
-          defaultValue: 'checklist-access',
-          admin: { description: 'Id of the form section the locked-items banner scrolls to.' },
-        },
-        { name: 'progressConnector', type: 'text' },
-        { name: 'progressSuffix', type: 'text' },
-        { name: 'validationError', type: 'text' },
-      ],
-    },
-    {
       name: 'visibleItems',
       type: 'array',
       label: 'Visible Items (1–3)',
@@ -116,7 +88,6 @@ export const Checklist: CollectionConfig = {
       fields: [{ name: 'item', type: 'text', required: true }],
       admin: {
         hidden: true,
-        description: 'Filled automatically from the first 3 unlocked items.',
       },
     },
     {
@@ -126,7 +97,6 @@ export const Checklist: CollectionConfig = {
       defaultValue: 7,
       admin: {
         hidden: true,
-        description: 'Filled automatically from the locked items.',
       },
     },
     {
@@ -134,18 +104,13 @@ export const Checklist: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
       label: 'PDF Download Link',
-      admin: {
-        description: 'PDF file for download (optional until the real PDF is ready)',
-      },
     },
     {
-      name: 'formId',
-      type: 'text',
-      label: 'Form ID',
-      admin: {
-        placeholder: 'e.g., form_hardware_audit_checklist',
-        description: 'Form system ID for email capture + delivery',
-      },
+      name: 'layoutSections',
+      type: 'relationship',
+      relationTo: 'section',
+      hasMany: true,
+      label: 'Layout Sections',
     },
     seoGroupField,
   ],

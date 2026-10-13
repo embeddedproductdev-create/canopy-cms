@@ -7,7 +7,6 @@ export const SiteChrome: GlobalConfig = {
   label: 'Site Chrome & UI Text',
   admin: {
     group: 'Globals',
-    description: 'Global UI strings and chrome text used across the site',
   },
   access: {
     read: () => true,
@@ -24,10 +23,6 @@ export const SiteChrome: GlobalConfig = {
               name: 'uiLabels',
               type: 'array',
               label: 'UI Label Registry',
-              admin: {
-                description:
-                  'Every generic label the website shows (badges, buttons, table headers, form labels, aria text). Key = identifier used by the site, e.g. work.featuredBadge; Value = the text.',
-              },
               fields: [
                 { name: 'key', type: 'text', required: true },
                 { name: 'value', type: 'text' },
@@ -42,9 +37,6 @@ export const SiteChrome: GlobalConfig = {
               name: 'primaryCta',
               type: 'group',
               label: 'Primary CTA (Fallback)',
-              admin: {
-                description: 'Default site-wide CTA button — pages can override',
-              },
               fields: [
                 {
                   name: 'label',
@@ -187,9 +179,6 @@ export const SiteChrome: GlobalConfig = {
               name: 'checklistModal',
               type: 'group',
               label: 'Checklist Modal Content',
-              admin: {
-                description: 'Controls the modal copy. Its selectable options come from Checklist records.',
-              },
               fields: [
                 {
                   name: 'title',
@@ -260,9 +249,6 @@ export const SiteChrome: GlobalConfig = {
                   type: 'text',
                   label: 'Logo Fallback Text',
                   defaultValue: 'Canopy',
-                  admin: {
-                    description: 'Shown if logo image fails to load',
-                  },
                 },
               ],
             },

@@ -260,7 +260,7 @@ export async function up({ db, payload }: MigrateUpArgs): Promise<void> {
           limit: 1,
           depth: 0,
         })
-        const existingCard = existing.docs[0] as (typeof cardData & { id: string | number }) | undefined
+        const existingCard = existing.docs[0] as unknown as (typeof cardData & { id: string | number }) | undefined
         const migrated = existingCard
           ? await payload.update({
               collection: 'card',

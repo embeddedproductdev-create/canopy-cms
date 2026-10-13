@@ -18,7 +18,4 @@ export const normalizeUrl: FieldHook = ({ value }) => normalizeUrlValue(value)
 
 export const urlField = {
   hooks: { beforeValidate: [normalizeUrl] },
-  admin: {
-    description: 'https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:',
-  },
 }

@@ -22,7 +22,6 @@ export const FormSubmission: CollectionConfig = {
     group: 'Form Submissions',
     defaultColumns: ['email', 'form', 'name', 'company', 'status', 'createdAt'],
     listSearchableFields: ['email', 'name', 'company', 'form'],
-    description: 'Submissions from the website forms. New ones are counted on the dashboard.',
   },
   defaultSort: '-createdAt',
   access: {
@@ -86,15 +85,15 @@ export const FormSubmission: CollectionConfig = {
     ],
   },
   fields: [
-    { name: 'form', type: 'text', required: true, admin: { description: 'Which form: engagement, checklist, subscribe or consultation (filter the list by this)' } },
-    { name: 'source', type: 'text', admin: { description: 'Page the form was submitted from' } },
+    { name: 'form', type: 'text', required: true },
+    { name: 'source', type: 'text' },
     { name: 'name', type: 'text' },
     { name: 'email', type: 'email', required: true },
     { name: 'company', type: 'text' },
     { name: 'scope', type: 'text' },
     { name: 'message', type: 'textarea' },
-    { name: 'checklist', type: 'text', admin: { description: 'Checklist slug (checklist gate only)' } },
-    { name: 'data', type: 'json', admin: { description: 'Every submitted field, as sent' } },
+    { name: 'checklist', type: 'text' },
+    { name: 'data', type: 'json' },
     {
       name: 'status',
       type: 'select',
@@ -106,7 +105,7 @@ export const FormSubmission: CollectionConfig = {
       ],
       admin: { position: 'sidebar' },
     },
-    { name: 'archivedAt', type: 'date', admin: { position: 'sidebar', readOnly: true, description: 'Set when archived; archived submissions are deleted permanently after 60 days.' } },
+    { name: 'archivedAt', type: 'date', admin: { position: 'sidebar', readOnly: true } },
     { name: 'website', type: 'text', admin: { hidden: true } },
   ],
 }

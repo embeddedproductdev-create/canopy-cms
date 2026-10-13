@@ -2,6 +2,17 @@ name: Deploy CMS to Cloudflare
 
 on:
   workflow_dispatch:
+    inputs:
+      replace_database:
+        description: Replace the remote D1 content with seed/db-dump.sql (admin users and form submissions are kept)
+        required: true
+        default: true
+        type: boolean
+      upload_media:
+        description: Upload seed/media/* to the R2 bucket
+        required: true
+        default: true
+        type: boolean
 
 concurrency:
   group: deploy-cms
@@ -71,6 +82,37 @@ jobs:
           set -euo pipefail
           npx wrangler d1 time-travel info canopy-cms-db
           echo "To roll the database back: npx wrangler d1 time-travel restore canopy-cms-db --timestamp=<ISO time from above>"
+
+      - name: Replace remote database content with the seed
+        if: ${{ inputs.replace_database }}
+        run: npm run replace:db -- --yes
+
+      - name: Create R2 bucket if missing
+        if: ${{ inputs.upload_media }}
+        run: |
+          set -euo pipefail
+          bucket=$(node -e 'const c=require("fs").readFileSync("wrangler.jsonc","utf8");console.log(JSON.parse(c).r2_buckets[0].bucket_name)')
+          if npx wrangler r2 bucket list | grep -q "$bucket"; then
+            echo "Bucket $bucket exists."
+          else
+            npx wrangler r2 bucket create "$bucket"
+          fi
+
+      - name: Upload media to R2
+        if: ${{ inputs.upload_media }}
+        env:
+          SYNC_MEDIA_DIR: seed/media
+        run: npm run sync:media -- --yes
+
+      - name: Apply pending content migrations to the remote database
+        run: npm run apply:cleanup
+
+      - name: Check the CMS guide is up to date
+        run: |
+          npm run docs:cms
+          git diff --exit-code -- CMS-GUIDE.md
+          npm run docs:content
+          git diff --exit-code -- CONTENT-MAP.md
 
       - name: Verify remote migrations and content
         run: npm run verify:remote

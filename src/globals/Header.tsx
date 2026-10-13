@@ -39,7 +39,6 @@ export const Header: GlobalConfig = {
           name: 'children',
           type: 'array',
           label: 'Dropdown Items',
-          admin: { description: 'Optional: shows these links in a dropdown under this item' },
           fields: [
             { name: 'label', type: 'text', required: true },
             { name: 'url', type: 'text', required: true, label: 'URL', ...urlField },

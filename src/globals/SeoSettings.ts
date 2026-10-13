@@ -83,8 +83,6 @@ export const SeoSettings: GlobalConfig = {
               type: 'text',
               label: 'Default Keywords (Comma Separated)',
               admin: {
-                description: 'Keywords to use across the site when page-specific ones are not provided',
-                placeholder: 'e.g. embedded systems, electronics product development, IoT',
               },
             },
           ],
@@ -286,18 +284,12 @@ export const SeoSettings: GlobalConfig = {
               type: 'checkbox',
               label: 'Allow Search Engine Indexing',
               defaultValue: true,
-              admin: {
-                description: 'Uncheck to globally noindex the site (e.g., for non-prod environments)',
-              },
             },
             {
               name: 'sitemapUrl',
               type: 'text',
               label: 'Sitemap URL',
               defaultValue: 'https://www.canopyembedded.com/sitemap.xml',
-              admin: {
-                description: 'Full URL to the sitemap.xml (used in robots.txt)',
-              },
             },
             {
               name: 'disallowPaths',
@@ -313,9 +305,6 @@ export const SeoSettings: GlobalConfig = {
                   },
                 },
               ],
-              admin: {
-                description: 'Paths blocked from all search engines',
-              },
             },
           ],
         },

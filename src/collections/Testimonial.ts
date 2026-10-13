@@ -26,16 +26,12 @@ export const Testimonial: CollectionConfig = {
       type: 'text',
       label: 'Client Label',
       defaultValue: 'Canopy client',
-      admin: {
-        description: 'e.g. "Canopy client" or "CTO, Acme Corp"',
-      },
     },
     { name: 'quote', type: 'textarea', required: true },
     {
       name: 'order',
       type: 'number',
       defaultValue: 0,
-      admin: { description: 'Display order on the site (ascending)' },
     },
   ],
 }

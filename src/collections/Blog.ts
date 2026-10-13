@@ -48,9 +48,6 @@ export const Blog: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
       label: 'Featured article',
-      admin: {
-        description: 'Shown in the Featured Article block on the Insights page. Optional — when no post is featured the block is hidden.',
-      },
     },
     {
       name: 'dek',
@@ -80,40 +77,13 @@ export const Blog: CollectionConfig = {
       name: 'tags',
       type: 'text',
       label: 'Tags (Comma Separated)',
-      admin: {
-        description: 'Enter article tags separated by commas.',
-        placeholder: 'e.g. BMS, Firmware, IoT',
-      },
-    },
-    {
-      name: 'contentUpgrade',
-      type: 'group',
-      label: 'Content Upgrade (CTA box at bottom)',
-      fields: [
-        {
-          name: 'label',
-          type: 'text',
-          admin: {
-            placeholder: 'e.g., Get the Checklist This Article Is Built On',
-          },
-        },
-        {
-          name: 'checklistLink',
-          type: 'relationship',
-          relationTo: 'checklist',
-          label: 'Link to Checklist',
-        },
-      ],
     },
     {
       name: 'layoutSections',
       type: 'relationship',
       relationTo: 'section',
       hasMany: true,
-      label: 'Extra Layout Sections',
-      admin: {
-        description: 'Optional reusable blocks (cards, table, steps, FAQ, chips…) shown below the main content',
-      },
+      label: 'Layout Sections',
     },
     seoGroupField,
   ],

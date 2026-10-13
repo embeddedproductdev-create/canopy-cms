@@ -47,32 +47,6 @@ export const CaseStudy: CollectionConfig = {
       label: 'Featured Project',
       defaultValue: false,
     },
-    {
-      name: 'overview',
-      type: 'array',
-      label: 'Project Overview',
-      fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'text', type: 'textarea' },
-      ],
-    },
-    {
-      name: 'specGroups',
-      type: 'array',
-      label: 'Technical Specification Groups',
-      fields: [
-        { name: 'heading', type: 'text', required: true },
-        {
-          name: 'rows',
-          type: 'array',
-          fields: [
-            { name: 'label', type: 'text', required: true },
-            { name: 'value', type: 'text' },
-            { name: 'builtIn', type: 'checkbox', defaultValue: false },
-          ],
-        },
-      ],
-    },
     { name: 'body', type: 'richText' },
     {
       name: 'tags',
@@ -94,22 +68,6 @@ export const CaseStudy: CollectionConfig = {
           label: 'Landing Image (Single)',
         },
 
-        {
-          name: 'pageImages',
-          type: 'array',
-          admin: {
-            initCollapsed: true,
-          },
-          fields: [
-            {
-              name: 'image',
-              type: 'upload',
-              relationTo: 'media',
-              required: true,
-              label: 'Select Image',
-            },
-          ],
-        },
       ],
     },
     {
@@ -157,31 +115,13 @@ export const CaseStudy: CollectionConfig = {
         { label: 'Proto Built', value: 'proto-built' },
         { label: 'Shipped', value: 'shipped' },
       ],
-      admin: {
-        description: 'Visual badge displayed on the project',
-      },
-    },
-    {
-      name: 'atAGlance',
-      type: 'array',
-      label: 'At a Glance (Specs)',
-      admin: {
-        description: 'Quick specs/highlights (e.g., "20A/30A burst", "100W/channel")',
-      },
-      fields: [
-        { name: 'label', type: 'text', label: 'Label', required: true },
-        { name: 'value', type: 'text', label: 'Value', required: true },
-      ],
     },
     {
       name: 'layoutSections',
       type: 'relationship',
       relationTo: 'section',
       hasMany: true,
-      label: 'Extra Layout Sections',
-      admin: {
-        description: 'Optional reusable blocks (cards, table, steps, FAQ, chips…) shown below the main content',
-      },
+      label: 'Layout Sections',
     },
     seoGroupField,
   ],

@@ -49,6 +49,8 @@ npm run dev                     # http://localhost:3000
 | `npm run test:int` | Vitest integration tests (migrations, URL normaliser, ...) |
 | `npm run generate:types:payload` | Regenerate `src/payload-types.ts` after changing collections or globals |
 | `npm run generate:importmap` | Regenerate the admin import map after adding or changing admin components |
+| `npm run docs:cms` | Regenerate `CMS-GUIDE.md` (every field, the section layout matrix and the conditional-field rules) |
+| `npm run apply:cleanup` | Apply the content migration to the remote D1 once (the deploy workflow runs it; safe to repeat) |
 | `npm run build:cf` | Production Worker build (what the deploy workflow runs) |
 | `npm run deploy:database` | `payload migrate` against the remote D1 (needs Cloudflare credentials) |
 | `npm run verify:remote` | Fails if a migration is unapplied or the remote has no pages or admin user |
@@ -68,6 +70,8 @@ seed/              db-dump.sql and media/ used to fill a fresh database and buck
 wrangler.jsonc     Worker name, D1 and R2 bindings
 .github/workflows/ seed-cms.yml and deploy-cms.yml
 ```
+
+**How to use the admin and what every field does: [CMS-GUIDE.md](CMS-GUIDE.md).** Pick a Section Type and the form shows only the fields that layout reads.
 
 Content model: landing, capability and industry pages are built from `Page` -> `Section` -> `Card`. A section's `type` picks the layout and `variant` refines it. Tags, chips, columns and marquee items are comma-separated text; CTAs are plain `label` + `url` pairs. Bare emails and phone numbers are stored as `mailto:` and `tel:`.
 
@@ -111,6 +115,8 @@ Everything is manual: **Actions -> choose the workflow -> Run workflow**. Each w
 | Verify credentials | all required secrets present, `wrangler whoami` |
 | Lint, type check, integration tests | a broken commit never reaches production |
 | Record D1 bookmark | logs the Time Travel bookmark taken before the migrations |
+| Apply content migration | `npm run apply:cleanup` records and applies the content migration on the remote D1 (no preview session needed) |
+| CMS guide check | `CMS-GUIDE.md` must match what `npm run docs:cms` generates |
 | Verify remote | every migration in the code is already applied to the remote D1 (the seed marks all current ones applied); pages and admin user exist. The workflow fails here if you add a migration without applying it |
 | Build | `npm run build:cf` (`PAYLOAD_USE_LOCAL_BINDINGS=true`, so the build never opens a Cloudflare session) |
 | Worker size | gzipped `handler.mjs` must stay under 10 MB |

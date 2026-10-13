@@ -20,7 +20,7 @@ const seoFields: Field[] = [
   {
     name: 'canonicalUrl',
     type: 'text',
-    label: 'Canonical URL (optional)',
+    label: 'Canonical URL',
     admin: {
       placeholder: 'https://www.canopyembedded.com/path/ (leave blank for auto)',
     },
@@ -47,27 +47,23 @@ const seoFields: Field[] = [
   {
     name: 'keywords',
     type: 'text',
-    label: 'Keywords (optional)',
-    admin: { description: 'Comma separated. Written to the keywords meta tag.' },
+    label: 'Keywords',
   },
   {
     name: 'ogTitle',
     type: 'text',
-    label: 'Social share title (optional)',
-    admin: { description: 'Facebook / LinkedIn / X title. Blank = the SEO title.' },
+    label: 'Social share title',
   },
   {
     name: 'ogDescription',
     type: 'text',
-    label: 'Social share description (optional)',
-    admin: { description: 'Blank = the meta description.' },
+    label: 'Social share description',
   },
   {
     name: 'ogImage',
     type: 'upload',
     relationTo: 'media',
-    label: 'Social share image (optional)',
-    admin: { description: 'Blank = the site default image from SEO Settings.' },
+    label: 'Social share image',
   },
   {
     name: 'schemaType',
@@ -84,7 +80,6 @@ const seoFields: Field[] = [
       { label: 'NewsArticle', value: 'NewsArticle' },
     ],
     defaultValue: 'auto',
-    admin: { description: 'Automatic picks Service, BlogPosting, Article or WebPage from the page type; Organization + breadcrumbs are always added.' },
   },
 ]
 

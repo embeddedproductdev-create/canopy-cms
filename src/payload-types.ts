@@ -192,8 +192,6 @@ export interface Media {
   height?: number | null;
 }
 /**
- * Core website pages with custom layouts and sections
- *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "page".
  */
@@ -202,18 +200,9 @@ export interface Page {
   title: string;
   heading?: string | null;
   subheading?: string | null;
-  /**
-   * Small label above the page heading
-   */
   eyebrow?: string | null;
-  /**
-   * landing, capability, industry … add the word left for a left-aligned header (free text)
-   */
   pageType?: string | null;
   url: string;
-  /**
-   * Wide picture under the page heading (About page). Leave empty to keep an empty frame.
-   */
   heroImage?: (number | null) | Media;
   body?: {
     root: {
@@ -232,64 +221,15 @@ export interface Page {
   } | null;
   cta?: {
     label?: string | null;
-    /**
-     * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-     */
     href?: string | null;
   };
-  layoutSections?: (number | Section)[] | null;
-  /**
-   * Pill-shaped tags above the main heading
-   */
   pills?:
     | {
         label: string;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Discipline cards, feature cards, or other card types
-   */
-  cards?: (number | Card)[] | null;
-  faqs?:
-    | {
-        question: string;
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  workflowSteps?:
-    | {
-        stepNumber: number;
-        title: string;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  relatedCaseStudies?: (number | CaseStudy)[] | null;
-  /**
-   * For About page team grid
-   */
-  teamMembers?:
-    | {
-        name: string;
-        role: string;
-        bio?: string | null;
-        photo?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  companyFacts?: {
-    name?: string | null;
-    location?: string | null;
-    sectors?:
-      | {
-          sector: string;
-          id?: string | null;
-        }[]
-      | null;
-    contactEmail?: string | null;
-  };
+  layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
     metaDescription?: string | null;
@@ -298,25 +238,10 @@ export interface Page {
       index?: boolean | null;
       follow?: boolean | null;
     };
-    /**
-     * Comma separated. Written to the keywords meta tag.
-     */
     keywords?: string | null;
-    /**
-     * Facebook / LinkedIn / X title. Blank = the SEO title.
-     */
     ogTitle?: string | null;
-    /**
-     * Blank = the meta description.
-     */
     ogDescription?: string | null;
-    /**
-     * Blank = the site default image from SEO Settings.
-     */
     ogImage?: (number | null) | Media;
-    /**
-     * Automatic picks Service, BlogPosting, Article or WebPage from the page type; Organization + breadcrumbs are always added.
-     */
     schemaType?:
       | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
       | null;
@@ -332,73 +257,29 @@ export interface Page {
 export interface Section {
   id: number;
   title: string;
-  sectionKey?: string | null;
-  heading?: string | null;
-  headingFirstLine?: string | null;
-  headingSecondLine?: string | null;
-  subheading?: string | null;
-  summary?: string | null;
-  eyebrow?: string | null;
-  tagLine?: string | null;
-  highlight?: string | null;
-  /**
-   * How the website renders this section: hero, text, cards, chips, table, steps, stats, faq, marquee, cta-band, media, tabs, pinned
-   */
-  type?: string | null;
-  /**
-   * Optional layout / tone hint, e.g. olive, surface, dark, nodes, columns
-   */
+  type:
+    | 'hero'
+    | 'tabs'
+    | 'steps'
+    | 'form'
+    | 'stats'
+    | 'cards'
+    | 'chips'
+    | 'marquee'
+    | 'table'
+    | 'faq'
+    | 'text'
+    | 'list'
+    | 'team'
+    | 'projects'
+    | 'articles'
+    | 'featured'
+    | 'subscribe'
+    | 'cta-band';
   variant?: string | null;
-  /**
-   * Table header labels, e.g. Specification, Details. Each linked card is one row.
-   */
-  columns?: string | null;
-  /**
-   * Chip list, marquee items or tab labels, e.g. Zigbee, Bluetooth, Wi-Fi
-   */
-  tags?: string | null;
-  /**
-   * Optional HTML id for in-page links
-   */
-  anchor?: string | null;
-  /**
-   * Tick to hide this section on the website without deleting it
-   */
-  hidden?: boolean | null;
-  image?: (number | null) | Media;
-  imageUrl?: string | null;
-  logoMedia?: (number | null) | Media;
-  logo?: string | null;
-  imageAlt?: string | null;
-  backgroundImageMedia?: (number | null) | Media;
-  backgroundImage?: string | null;
-  backgroundVideoMedia?: (number | null) | Media;
-  backgroundVideo?: string | null;
-  previewAlt?: string | null;
-  mockup?: {
-    assistantName?: string | null;
-    schedulingMessage?: string | null;
-    timeSlots?:
-      | {
-          value?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    syncTitle?: string | null;
-    telemetryTitle?: string | null;
-    telemetryMetrics?:
-      | {
-          value?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  imageLabels?:
-    | {
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
   body?: {
     root: {
       type: string;
@@ -414,32 +295,20 @@ export interface Section {
     };
     [k: string]: unknown;
   } | null;
+  tags?: string | null;
   cta?: {
     label?: string | null;
-    /**
-     * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-     */
     href?: string | null;
   };
   secondaryCta?: {
     label?: string | null;
-    /**
-     * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-     */
     href?: string | null;
   };
-  controls?: {
-    tabsLabel?: string | null;
-    previousLabel?: string | null;
-    nextLabel?: string | null;
-  };
-  categories?:
-    | {
-        category?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  image?: (number | null) | Media;
   cards?: (number | Card)[] | null;
+  sectionKey?: string | null;
+  anchor?: string | null;
+  hidden?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -450,18 +319,9 @@ export interface Section {
 export interface Card {
   id: number;
   title: string;
-  heading?: string | null;
+  type?: ('stat' | 'breadcrumb' | 'field' | 'link' | 'empty') | null;
   subheading?: string | null;
-  index?: string | null;
   value?: string | null;
-  category?: string | null;
-  role?: string | null;
-  date?: string | null;
-  image?: (number | null) | Media;
-  imageUrl?: string | null;
-  imageAlt?: string | null;
-  icon?: string | null;
-  theme?: string | null;
   shortDescription?: string | null;
   description?: {
     root: {
@@ -478,31 +338,73 @@ export interface Card {
     };
     [k: string]: unknown;
   } | null;
-  additionalDescription?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  body?: string | null;
   ctaLabel?: string | null;
-  /**
-   * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-   */
   ctaUrl?: string | null;
-  readMoreLabel?: string | null;
-  linkedinUrl?: string | null;
-  type?: string | null;
+  icon?: string | null;
   tags?: string | null;
+  image?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "capability".
+ */
+export interface Capability {
+  id: number;
+  title: string;
+  slug: string;
+  heading?: string | null;
+  subheading?: string | null;
+  summary?: string | null;
+  layoutSections?: (number | Section)[] | null;
+  seo?: {
+    seoTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+    };
+    keywords?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    schemaType?:
+      | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industry".
+ */
+export interface Industry {
+  id: number;
+  title: string;
+  slug: string;
+  heading?: string | null;
+  subheading?: string | null;
+  summary?: string | null;
+  layoutSections?: (number | Section)[] | null;
+  seo?: {
+    seoTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+    };
+    keywords?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    schemaType?:
+      | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -518,27 +420,6 @@ export interface CaseStudy {
   subheading?: string | null;
   category?: string | null;
   featured?: boolean | null;
-  overview?:
-    | {
-        label: string;
-        text?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  specGroups?:
-    | {
-        heading: string;
-        rows?:
-          | {
-              label: string;
-              value?: string | null;
-              builtIn?: boolean | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
   body?: {
     root: {
       type: string;
@@ -557,44 +438,16 @@ export interface CaseStudy {
   tags?: string | null;
   Images?: {
     landingImage?: (number | null) | Media;
-    pageImages?:
-      | {
-          image: number | Media;
-          id?: string | null;
-        }[]
-      | null;
   };
   cardCta?: {
     label?: string | null;
-    /**
-     * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-     */
     link?: string | null;
   };
   pageCta?: {
     label?: string | null;
-    /**
-     * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-     */
     link?: string | null;
   };
-  /**
-   * Visual badge displayed on the project
-   */
   projectStage?: ('in-design' | 'proto-built' | 'shipped') | null;
-  /**
-   * Quick specs/highlights (e.g., "20A/30A burst", "100W/channel")
-   */
-  atAGlance?:
-    | {
-        label: string;
-        value: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional reusable blocks (cards, table, steps, FAQ, chips…) shown below the main content
-   */
   layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
@@ -604,25 +457,10 @@ export interface CaseStudy {
       index?: boolean | null;
       follow?: boolean | null;
     };
-    /**
-     * Comma separated. Written to the keywords meta tag.
-     */
     keywords?: string | null;
-    /**
-     * Facebook / LinkedIn / X title. Blank = the SEO title.
-     */
     ogTitle?: string | null;
-    /**
-     * Blank = the meta description.
-     */
     ogDescription?: string | null;
-    /**
-     * Blank = the site default image from SEO Settings.
-     */
     ogImage?: (number | null) | Media;
-    /**
-     * Automatic picks Service, BlogPosting, Article or WebPage from the page type; Organization + breadcrumbs are always added.
-     */
     schemaType?:
       | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
       | null;
@@ -630,133 +468,6 @@ export interface CaseStudy {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "capability".
- */
-export interface Capability {
-  id: number;
-  /**
-   * Internal name (also used in menus and breadcrumbs).
-   */
-  title: string;
-  /**
-   * URL part, e.g. "pcb-design" → /capabilities/pcb-design/
-   */
-  slug: string;
-  /**
-   * Small label above the heading.
-   */
-  eyebrow?: string | null;
-  /**
-   * Page heading (H1).
-   */
-  heading?: string | null;
-  /**
-   * Lead paragraph under the heading.
-   */
-  subheading?: string | null;
-  cta?: {
-    label?: string | null;
-    href?: string | null;
-  };
-  secondaryCta?: {
-    label?: string | null;
-    href?: string | null;
-  };
-  image?: (number | null) | Media;
-  imageAlt?: string | null;
-  includedHeading?: string | null;
-  included?:
-    | {
-        title: string;
-        /**
-         * Optional icon name (chip, pulse, code, cube, monitor, cloud, bolt, layers, wave, cpu).
-         */
-        icon?: string | null;
-        text?: string | null;
-        /**
-         * Comma separated chips.
-         */
-        tags?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  whyHeading?: string | null;
-  whyText?: string | null;
-  /**
-   * Silicon / protocols / standards / materials blocks, shown in this order.
-   */
-  stacks?:
-    | {
-        kind?: ('logos' | 'chips' | 'rows' | 'cards') | null;
-        /**
-         * Leave empty to continue the block above.
-         */
-        heading?: string | null;
-        intro?: string | null;
-        items: string;
-        /**
-         * Small print under the block (optional).
-         */
-        note?: string | null;
-        tinted?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  workflowEyebrow?: string | null;
-  workflowHeading?: string | null;
-  workflowIntro?: string | null;
-  /**
-   * One step per line:  Title | short text
-   */
-  workflow?: string | null;
-  projectsHeading?: string | null;
-  relatedProjects?: (number | CaseStudy)[] | null;
-  insightsHeading?: string | null;
-  relatedInsights?: (number | Blog)[] | null;
-  faqHeading?: string | null;
-  faqs?:
-    | {
-        question: string;
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  seo?: {
-    seoTitle?: string | null;
-    metaDescription?: string | null;
-    canonicalUrl?: string | null;
-    robots?: {
-      index?: boolean | null;
-      follow?: boolean | null;
-    };
-    /**
-     * Comma separated. Written to the keywords meta tag.
-     */
-    keywords?: string | null;
-    /**
-     * Facebook / LinkedIn / X title. Blank = the SEO title.
-     */
-    ogTitle?: string | null;
-    /**
-     * Blank = the meta description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Blank = the site default image from SEO Settings.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Automatic picks Service, BlogPosting, Article or WebPage from the page type; Organization + breadcrumbs are always added.
-     */
-    schemaType?:
-      | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -768,9 +479,6 @@ export interface Blog {
   slug: string;
   heading?: string | null;
   category?: string | null;
-  /**
-   * Shown in the Featured Article block on the Insights page. Optional — when no post is featured the block is hidden.
-   */
   featured?: boolean | null;
   dek?: string | null;
   image?: (number | null) | Media;
@@ -792,17 +500,7 @@ export interface Blog {
     };
     [k: string]: unknown;
   };
-  /**
-   * Enter article tags separated by commas.
-   */
   tags?: string | null;
-  contentUpgrade?: {
-    label?: string | null;
-    checklistLink?: (number | null) | Checklist;
-  };
-  /**
-   * Optional reusable blocks (cards, table, steps, FAQ, chips…) shown below the main content
-   */
   layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
@@ -812,25 +510,10 @@ export interface Blog {
       index?: boolean | null;
       follow?: boolean | null;
     };
-    /**
-     * Comma separated. Written to the keywords meta tag.
-     */
     keywords?: string | null;
-    /**
-     * Facebook / LinkedIn / X title. Blank = the SEO title.
-     */
     ogTitle?: string | null;
-    /**
-     * Blank = the meta description.
-     */
     ogDescription?: string | null;
-    /**
-     * Blank = the site default image from SEO Settings.
-     */
     ogImage?: (number | null) | Media;
-    /**
-     * Automatic picks Service, BlogPosting, Article or WebPage from the page type; Organization + breadcrumbs are always added.
-     */
     schemaType?:
       | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
       | null;
@@ -863,48 +546,15 @@ export interface Checklist {
         id?: string | null;
       }[]
     | null;
-  accessGate?: {
-    heading?: string | null;
-    unlockedHeading?: string | null;
-    description?: string | null;
-    unlockedDescription?: string | null;
-    emailLabel?: string | null;
-    companyLabel?: string | null;
-    emailPlaceholder?: string | null;
-    emailHelper?: string | null;
-    companyPlaceholder?: string | null;
-    submitLabel?: string | null;
-    privacyNote?: string | null;
-    lockedActionLabel?: string | null;
-    /**
-     * Id of the form section the locked-items banner scrolls to.
-     */
-    formAnchor?: string | null;
-    progressConnector?: string | null;
-    progressSuffix?: string | null;
-    validationError?: string | null;
-  };
-  /**
-   * Filled automatically from the first 3 unlocked items.
-   */
   visibleItems?:
     | {
         item: string;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Filled automatically from the locked items.
-   */
   lockedItemsCount?: number | null;
-  /**
-   * PDF file for download (optional until the real PDF is ready)
-   */
   pdfAsset?: (number | null) | Media;
-  /**
-   * Form system ID for email capture + delivery
-   */
-  formId?: string | null;
+  layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
     metaDescription?: string | null;
@@ -913,25 +563,10 @@ export interface Checklist {
       index?: boolean | null;
       follow?: boolean | null;
     };
-    /**
-     * Comma separated. Written to the keywords meta tag.
-     */
     keywords?: string | null;
-    /**
-     * Facebook / LinkedIn / X title. Blank = the SEO title.
-     */
     ogTitle?: string | null;
-    /**
-     * Blank = the meta description.
-     */
     ogDescription?: string | null;
-    /**
-     * Blank = the site default image from SEO Settings.
-     */
     ogImage?: (number | null) | Media;
-    /**
-     * Automatic picks Service, BlogPosting, Article or WebPage from the page type; Organization + breadcrumbs are always added.
-     */
     schemaType?:
       | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
       | null;
@@ -942,162 +577,18 @@ export interface Checklist {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industry".
- */
-export interface Industry {
-  id: number;
-  /**
-   * Internal name (also used in menus and breadcrumbs).
-   */
-  title: string;
-  /**
-   * URL part, e.g. "pcb-design" → /capabilities/pcb-design/
-   */
-  slug: string;
-  /**
-   * Small label above the heading.
-   */
-  eyebrow?: string | null;
-  /**
-   * Page heading (H1).
-   */
-  heading?: string | null;
-  /**
-   * Lead paragraph under the heading.
-   */
-  subheading?: string | null;
-  cta?: {
-    label?: string | null;
-    href?: string | null;
-  };
-  secondaryCta?: {
-    label?: string | null;
-    href?: string | null;
-  };
-  image?: (number | null) | Media;
-  imageAlt?: string | null;
-  /**
-   * One line shown on the "other industries" cards.
-   */
-  summary?: string | null;
-  challengesHeading?: string | null;
-  /**
-   * One per line:  Title | text
-   */
-  challenges?: string | null;
-  disciplinesHeading?: string | null;
-  /**
-   * One per line:  Title | text | /capabilities/slug/
-   */
-  disciplines?: string | null;
-  calloutHeading?: string | null;
-  calloutText?: string | null;
-  productsHeading?: string | null;
-  /**
-   * One per line:  Title | text
-   */
-  products?: string | null;
-  /**
-   * Silicon / protocols / standards / materials blocks, shown in this order.
-   */
-  stacks?:
-    | {
-        kind?: ('logos' | 'chips' | 'rows' | 'cards') | null;
-        /**
-         * Leave empty to continue the block above.
-         */
-        heading?: string | null;
-        intro?: string | null;
-        items: string;
-        /**
-         * Small print under the block (optional).
-         */
-        note?: string | null;
-        tinted?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  projectsHeading?: string | null;
-  relatedProjects?: (number | CaseStudy)[] | null;
-  processHeading?: string | null;
-  processHighlight?: string | null;
-  processCtaLabel?: string | null;
-  processCtaHref?: string | null;
-  /**
-   * One step per line:  Title | text
-   */
-  process?: string | null;
-  faqHeading?: string | null;
-  faqs?:
-    | {
-        question: string;
-        answer: string;
-        id?: string | null;
-      }[]
-    | null;
-  othersHeading?: string | null;
-  seo?: {
-    seoTitle?: string | null;
-    metaDescription?: string | null;
-    canonicalUrl?: string | null;
-    robots?: {
-      index?: boolean | null;
-      follow?: boolean | null;
-    };
-    /**
-     * Comma separated. Written to the keywords meta tag.
-     */
-    keywords?: string | null;
-    /**
-     * Facebook / LinkedIn / X title. Blank = the SEO title.
-     */
-    ogTitle?: string | null;
-    /**
-     * Blank = the meta description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Blank = the site default image from SEO Settings.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Automatic picks Service, BlogPosting, Article or WebPage from the page type; Organization + breadcrumbs are always added.
-     */
-    schemaType?:
-      | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Submissions from the website forms. New ones are counted on the dashboard.
- *
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submission".
  */
 export interface FormSubmission {
   id: number;
-  /**
-   * Which form: engagement, checklist, subscribe or consultation (filter the list by this)
-   */
   form: string;
-  /**
-   * Page the form was submitted from
-   */
   source?: string | null;
   name?: string | null;
   email: string;
   company?: string | null;
   scope?: string | null;
   message?: string | null;
-  /**
-   * Checklist slug (checklist gate only)
-   */
   checklist?: string | null;
-  /**
-   * Every submitted field, as sent
-   */
   data?:
     | {
         [k: string]: unknown;
@@ -1108,9 +599,6 @@ export interface FormSubmission {
     | boolean
     | null;
   status?: ('new' | 'read' | 'archived') | null;
-  /**
-   * Set when archived; archived submissions are deleted permanently after 60 days.
-   */
   archivedAt?: string | null;
   website?: string | null;
   updatedAt: string;
@@ -1123,14 +611,8 @@ export interface FormSubmission {
 export interface Testimonial {
   id: number;
   heading: string;
-  /**
-   * e.g. "Canopy client" or "CTO, Acme Corp"
-   */
   clientLabel?: string | null;
   quote: string;
-  /**
-   * Display order on the site (ascending)
-   */
   order?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -1308,52 +790,13 @@ export interface PageSelect<T extends boolean = true> {
         label?: T;
         href?: T;
       };
-  layoutSections?: T;
   pills?:
     | T
     | {
         label?: T;
         id?: T;
       };
-  cards?: T;
-  faqs?:
-    | T
-    | {
-        question?: T;
-        answer?: T;
-        id?: T;
-      };
-  workflowSteps?:
-    | T
-    | {
-        stepNumber?: T;
-        title?: T;
-        description?: T;
-        id?: T;
-      };
-  relatedCaseStudies?: T;
-  teamMembers?:
-    | T
-    | {
-        name?: T;
-        role?: T;
-        bio?: T;
-        photo?: T;
-        id?: T;
-      };
-  companyFacts?:
-    | T
-    | {
-        name?: T;
-        location?: T;
-        sectors?:
-          | T
-          | {
-              sector?: T;
-              id?: T;
-            };
-        contactEmail?: T;
-      };
+  layoutSections?: T;
   seo?:
     | T
     | {
@@ -1382,58 +825,13 @@ export interface PageSelect<T extends boolean = true> {
  */
 export interface SectionSelect<T extends boolean = true> {
   title?: T;
-  sectionKey?: T;
-  heading?: T;
-  headingFirstLine?: T;
-  headingSecondLine?: T;
-  subheading?: T;
-  summary?: T;
-  eyebrow?: T;
-  tagLine?: T;
-  highlight?: T;
   type?: T;
   variant?: T;
-  columns?: T;
-  tags?: T;
-  anchor?: T;
-  hidden?: T;
-  image?: T;
-  imageUrl?: T;
-  logoMedia?: T;
-  logo?: T;
-  imageAlt?: T;
-  backgroundImageMedia?: T;
-  backgroundImage?: T;
-  backgroundVideoMedia?: T;
-  backgroundVideo?: T;
-  previewAlt?: T;
-  mockup?:
-    | T
-    | {
-        assistantName?: T;
-        schedulingMessage?: T;
-        timeSlots?:
-          | T
-          | {
-              value?: T;
-              id?: T;
-            };
-        syncTitle?: T;
-        telemetryTitle?: T;
-        telemetryMetrics?:
-          | T
-          | {
-              value?: T;
-              id?: T;
-            };
-      };
-  imageLabels?:
-    | T
-    | {
-        label?: T;
-        id?: T;
-      };
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
   body?: T;
+  tags?: T;
   cta?:
     | T
     | {
@@ -1446,20 +844,11 @@ export interface SectionSelect<T extends boolean = true> {
         label?: T;
         href?: T;
       };
-  controls?:
-    | T
-    | {
-        tabsLabel?: T;
-        previousLabel?: T;
-        nextLabel?: T;
-      };
-  categories?:
-    | T
-    | {
-        category?: T;
-        id?: T;
-      };
+  image?: T;
   cards?: T;
+  sectionKey?: T;
+  anchor?: T;
+  hidden?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1469,28 +858,16 @@ export interface SectionSelect<T extends boolean = true> {
  */
 export interface CardSelect<T extends boolean = true> {
   title?: T;
-  heading?: T;
+  type?: T;
   subheading?: T;
-  index?: T;
   value?: T;
-  category?: T;
-  role?: T;
-  date?: T;
-  image?: T;
-  imageUrl?: T;
-  imageAlt?: T;
-  icon?: T;
-  theme?: T;
   shortDescription?: T;
   description?: T;
-  additionalDescription?: T;
-  body?: T;
   ctaLabel?: T;
   ctaUrl?: T;
-  readMoreLabel?: T;
-  linkedinUrl?: T;
-  type?: T;
+  icon?: T;
   tags?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1501,62 +878,10 @@ export interface CardSelect<T extends boolean = true> {
 export interface CapabilitySelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  eyebrow?: T;
   heading?: T;
   subheading?: T;
-  cta?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-      };
-  secondaryCta?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-      };
-  image?: T;
-  imageAlt?: T;
-  includedHeading?: T;
-  included?:
-    | T
-    | {
-        title?: T;
-        icon?: T;
-        text?: T;
-        tags?: T;
-        id?: T;
-      };
-  whyHeading?: T;
-  whyText?: T;
-  stacks?:
-    | T
-    | {
-        kind?: T;
-        heading?: T;
-        intro?: T;
-        items?: T;
-        note?: T;
-        tinted?: T;
-        id?: T;
-      };
-  workflowEyebrow?: T;
-  workflowHeading?: T;
-  workflowIntro?: T;
-  workflow?: T;
-  projectsHeading?: T;
-  relatedProjects?: T;
-  insightsHeading?: T;
-  relatedInsights?: T;
-  faqHeading?: T;
-  faqs?:
-    | T
-    | {
-        question?: T;
-        answer?: T;
-        id?: T;
-      };
+  summary?: T;
+  layoutSections?: T;
   seo?:
     | T
     | {
@@ -1585,59 +910,10 @@ export interface CapabilitySelect<T extends boolean = true> {
 export interface IndustrySelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  eyebrow?: T;
   heading?: T;
   subheading?: T;
-  cta?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-      };
-  secondaryCta?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-      };
-  image?: T;
-  imageAlt?: T;
   summary?: T;
-  challengesHeading?: T;
-  challenges?: T;
-  disciplinesHeading?: T;
-  disciplines?: T;
-  calloutHeading?: T;
-  calloutText?: T;
-  productsHeading?: T;
-  products?: T;
-  stacks?:
-    | T
-    | {
-        kind?: T;
-        heading?: T;
-        intro?: T;
-        items?: T;
-        note?: T;
-        tinted?: T;
-        id?: T;
-      };
-  projectsHeading?: T;
-  relatedProjects?: T;
-  processHeading?: T;
-  processHighlight?: T;
-  processCtaLabel?: T;
-  processCtaHref?: T;
-  process?: T;
-  faqHeading?: T;
-  faqs?:
-    | T
-    | {
-        question?: T;
-        answer?: T;
-        id?: T;
-      };
-  othersHeading?: T;
+  layoutSections?: T;
   seo?:
     | T
     | {
@@ -1670,39 +946,12 @@ export interface CaseStudySelect<T extends boolean = true> {
   subheading?: T;
   category?: T;
   featured?: T;
-  overview?:
-    | T
-    | {
-        label?: T;
-        text?: T;
-        id?: T;
-      };
-  specGroups?:
-    | T
-    | {
-        heading?: T;
-        rows?:
-          | T
-          | {
-              label?: T;
-              value?: T;
-              builtIn?: T;
-              id?: T;
-            };
-        id?: T;
-      };
   body?: T;
   tags?: T;
   Images?:
     | T
     | {
         landingImage?: T;
-        pageImages?:
-          | T
-          | {
-              image?: T;
-              id?: T;
-            };
       };
   cardCta?:
     | T
@@ -1717,13 +966,6 @@ export interface CaseStudySelect<T extends boolean = true> {
         link?: T;
       };
   projectStage?: T;
-  atAGlance?:
-    | T
-    | {
-        label?: T;
-        value?: T;
-        id?: T;
-      };
   layoutSections?: T;
   seo?:
     | T
@@ -1764,12 +1006,6 @@ export interface BlogSelect<T extends boolean = true> {
   updatedDate?: T;
   body?: T;
   tags?: T;
-  contentUpgrade?:
-    | T
-    | {
-        label?: T;
-        checklistLink?: T;
-      };
   layoutSections?: T;
   seo?:
     | T
@@ -1813,26 +1049,6 @@ export interface ChecklistSelect<T extends boolean = true> {
         locked?: T;
         id?: T;
       };
-  accessGate?:
-    | T
-    | {
-        heading?: T;
-        unlockedHeading?: T;
-        description?: T;
-        unlockedDescription?: T;
-        emailLabel?: T;
-        companyLabel?: T;
-        emailPlaceholder?: T;
-        emailHelper?: T;
-        companyPlaceholder?: T;
-        submitLabel?: T;
-        privacyNote?: T;
-        lockedActionLabel?: T;
-        formAnchor?: T;
-        progressConnector?: T;
-        progressSuffix?: T;
-        validationError?: T;
-      };
   visibleItems?:
     | T
     | {
@@ -1841,7 +1057,7 @@ export interface ChecklistSelect<T extends boolean = true> {
       };
   lockedItemsCount?: T;
   pdfAsset?: T;
-  formId?: T;
+  layoutSections?: T;
   seo?:
     | T
     | {
@@ -1947,19 +1163,10 @@ export interface Header {
   navItems?:
     | {
         label: string;
-        /**
-         * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-         */
         url: string;
-        /**
-         * Optional: shows these links in a dropdown under this item
-         */
         children?:
           | {
               label: string;
-              /**
-               * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-               */
               url: string;
               description?: string | null;
               id?: string | null;
@@ -1970,9 +1177,6 @@ export interface Header {
     | null;
   navCta?: {
     label?: string | null;
-    /**
-     * https://… opens in a new tab · /page stays in the site · name@host adds mailto: · +91… adds tel:
-     */
     href?: string | null;
   };
   updatedAt?: string | null;
@@ -2036,9 +1240,6 @@ export interface SeoSetting {
   titleSeparator?: string | null;
   defaultSeoTitle?: string | null;
   defaultMetaDescription?: string | null;
-  /**
-   * Keywords to use across the site when page-specific ones are not provided
-   */
   defaultKeywords?: string | null;
   organization?: {
     organizationName?: string | null;
@@ -2072,17 +1273,8 @@ export interface SeoSetting {
     siteHandle?: string | null;
     creatorHandle?: string | null;
   };
-  /**
-   * Uncheck to globally noindex the site (e.g., for non-prod environments)
-   */
   allowIndexing?: boolean | null;
-  /**
-   * Full URL to the sitemap.xml (used in robots.txt)
-   */
   sitemapUrl?: string | null;
-  /**
-   * Paths blocked from all search engines
-   */
   disallowPaths?:
     | {
         path: string;
@@ -2093,16 +1285,11 @@ export interface SeoSetting {
   createdAt?: string | null;
 }
 /**
- * Global UI strings and chrome text used across the site
- *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-chrome".
  */
 export interface SiteChrome {
   id: number;
-  /**
-   * Every generic label the website shows (badges, buttons, table headers, form labels, aria text). Key = identifier used by the site, e.g. work.featuredBadge; Value = the text.
-   */
   uiLabels?:
     | {
         key: string;
@@ -2110,9 +1297,6 @@ export interface SiteChrome {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Default site-wide CTA button — pages can override
-   */
   primaryCta: {
     label: string;
     url: string;
@@ -2137,9 +1321,6 @@ export interface SiteChrome {
     downloadPrompt?: string | null;
     getFullChecklistCta?: string | null;
   };
-  /**
-   * Controls the modal copy. Its selectable options come from Checklist records.
-   */
   checklistModal?: {
     title?: string | null;
     subtitle?: string | null;
@@ -2152,9 +1333,6 @@ export interface SiteChrome {
     ctaUrl?: string | null;
   };
   navFallback?: {
-    /**
-     * Shown if logo image fails to load
-     */
     logoText?: string | null;
   };
   pageStates: {

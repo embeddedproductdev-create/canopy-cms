@@ -1,11 +1,13 @@
 import type { CollectionConfig } from 'payload'
 import { urlField } from '../hooks/normalizeUrl'
+import { cardKindOptions } from './sectionLayouts'
 
 export const Card: CollectionConfig = {
   slug: 'card',
   labels: { singular: 'Card', plural: 'Cards' },
   admin: {
     useAsTitle: 'title',
+    defaultColumns: ['title', 'type', 'shortDescription'],
     group: 'Content Management',
   },
   access: {
@@ -14,45 +16,31 @@ export const Card: CollectionConfig = {
     update: ({ req: { user } }) => !!user,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
-    { name: 'heading', type: 'text' },
-    { name: 'subheading', type: 'text' },
-    { name: 'index', type: 'text' },
-    { name: 'value', type: 'text' },
-    { name: 'category', type: 'text' },
-    { name: 'role', type: 'text' },
-    { name: 'date', type: 'text' },
     {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Image',
+      type: 'row',
+      fields: [
+        { name: 'title', type: 'text', required: true, admin: { width: '60%' } },
+        { name: 'type', type: 'select', label: 'Kind', options: cardKindOptions, admin: { width: '40%' } },
+      ],
     },
     {
-      name: 'imageUrl',
-      type: 'text',
-      label: 'Legacy Image URL / Path',
-      admin: { hidden: true },
+      type: 'row',
+      fields: [
+        { name: 'subheading', type: 'text', label: 'Subtitle', admin: { width: '50%' } },
+        { name: 'value', type: 'text', admin: { width: '50%' } },
+      ],
     },
-    { name: 'imageAlt', type: 'text' },
-    { name: 'icon', type: 'text' },
-    { name: 'theme', type: 'text' },
     { name: 'shortDescription', type: 'textarea' },
     { name: 'description', type: 'richText' },
-    { name: 'additionalDescription', type: 'richText', admin: { hidden: true } },
-    { name: 'body', type: 'textarea' },
-    { name: 'ctaLabel', type: 'text', label: 'CTA Label' },
-    { name: 'ctaUrl', type: 'text', label: 'CTA URL', ...urlField },
-    { name: 'readMoreLabel', type: 'text' },
-    { name: 'linkedinUrl', type: 'text' },
-    { name: 'type', type: 'text' },
     {
-      name: 'tags',
-      type: 'text',
-      label: 'Tags (Comma Separated)',
-      admin: {
-        placeholder: 'e.g. Hardware, Firmware, IoT',
-      },
+      type: 'row',
+      fields: [
+        { name: 'ctaLabel', type: 'text', label: 'Link Label', admin: { width: '33%' } },
+        { name: 'ctaUrl', type: 'text', label: 'Link URL', ...urlField, admin: { width: '33%' } },
+        { name: 'icon', type: 'text', admin: { width: '34%' } },
+      ],
     },
+    { name: 'tags', type: 'text', label: 'Tags (Comma Separated)' },
+    { name: 'image', type: 'upload', relationTo: 'media' },
   ],
 }
