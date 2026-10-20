@@ -10,6 +10,7 @@ import * as migration_20261012_120000_section_card_cleanup from './20261012_1200
 import * as migration_20261013_120000_project_content_and_cleanup from './20261013_120000_project_content_and_cleanup';
 import * as migration_20261014_120000_restructure_collections from './20261014_120000_restructure_collections';
 import * as migration_20261015_120000_how_we_work_steps from './20261015_120000_how_we_work_steps';
+import * as migration_20261016_120000_json_site_settings from './20261016_120000_json_site_settings';
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261015_120000_how_we_work_steps.up,
     down: migration_20261015_120000_how_we_work_steps.down,
     name: '20261015_120000_how_we_work_steps',
+  },
+  {
+    up: migration_20261016_120000_json_site_settings.up,
+    down: migration_20261016_120000_json_site_settings.down,
+    name: '20261016_120000_json_site_settings',
   },
 ];

@@ -109,6 +109,38 @@ Pick the Type, then fill what the form shows. A field that is not listed for the
 - Links: `https://...` opens in a new tab, `/page/` stays on the site, `#id` scrolls, `#consultation` and `#checklist-modal` open the pop-ups, bare emails and phone numbers become `mailto:` and `tel:` automatically.
 - The last Call-to-action band of a page is the contact band above the footer. Use variant `inline` for a lighter band that should not become the contact band.
 
+## 3a. Settings stored as JSON
+
+Five settings are edited as JSON text in the admin. The editor checks the format while you type, and saving a wrong shape is refused with a message that says what is missing. Links typed as a bare email, phone or `www.` address are converted the same way as everywhere else.
+
+**Header -> Main Navigation Menu**
+
+~~~json
+[
+  { "label": "Work", "url": "/work/" },
+  { "label": "Capabilities", "url": "#", "children": [ { "label": "Firmware", "url": "/capabilities/firmware/", "description": "RTOS, Linux, OTA" } ] }
+]
+~~~
+
+**Footer -> Link Groups** and **Social Links** (`icon` is linkedin, instagram or twitter)
+
+~~~json
+[ { "heading": "Company", "links": [ { "label": "About", "href": "/about/" } ] } ]
+[ { "label": "LinkedIn", "href": "https://www.linkedin.com/company/example", "icon": "linkedin" } ]
+~~~
+
+**SEO Settings -> Disallowed Paths** (one text per path, starting with `/`)
+
+~~~json
+[ "/admin", "/api/*" ]
+~~~
+
+**Site Chrome -> UI Label Registry** (an object: key, then text; a key that is missing shows nothing on the website)
+
+~~~json
+{ "work.glance": "At a glance", "checklist.gate.emailPlaceholder": "you@company.com" }
+~~~
+
 ## 4. Field reference
 
 Every field of every collection and global. Fields hidden by the layout rules appear only when the Type uses them.
@@ -437,13 +469,7 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 |---|---|---|
 | Primary Logo | Upload to media | - |
 | Secondary / Mobile Logo | Upload to media | - |
-| Main Navigation Menu | List | - |
-| navItems > Label * | Text | - |
-| navItems > URL * | Text | - |
-| navItems > Dropdown Items | List | - |
-| navItems > children > Label * | Text | - |
-| navItems > children > URL * | Text | - |
-| navItems > children > Description | Text | - |
+| Main Navigation Menu (JSON) | JSON | JSON list of menu entries. See section 3a for the format. |
 | Navigation CTA Button | Group | - |
 | navCta > Button Label | Text | - |
 | navCta > Button URL | Text | - |
@@ -462,15 +488,8 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | cta > Label | Text | - |
 | cta > Href | Text | - |
 | Social Nav Label | Text | - |
-| Link Groups | List | - |
-| linkGroups > Heading | Text | - |
-| linkGroups > Links | List | - |
-| linkGroups > links > Label | Text | - |
-| linkGroups > links > Href | Text | - |
-| Social Links | List | - |
-| socialLinks > Label | Text | - |
-| socialLinks > Href | Text | - |
-| socialLinks > Icon | Select: LinkedIn, Instagram, Twitter | - |
+| Link Groups (JSON) | JSON | JSON list of footer columns. See section 3a for the format. |
+| Social Links (JSON) | JSON | JSON list of social icons. See section 3a for the format. |
 | Helpline Number | Text | - |
 | Tech Support Email | Text | - |
 | Request Intro | Text | - |
@@ -521,8 +540,7 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | twitterDefaults > Creator Twitter Handle | Text | - |
 | Allow Search Engine Indexing | Checkbox | - |
 | Sitemap URL | Text | - |
-| Disallowed Paths (robots.txt) | List | - |
-| disallowPaths > Path * | Text | - |
+| Disallowed Paths (JSON) | JSON | JSON list of paths written to robots.txt as Disallow lines. See section 3a. |
 
 `*` required
 
@@ -530,9 +548,7 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 
 | Field | Type | What it does |
 |---|---|---|
-| UI Label Registry | List | - |
-| uiLabels > Key * | Text | - |
-| uiLabels > Value | Text | - |
+| UI Label Registry (JSON) | JSON | JSON object of every UI text, key -> text. See section 3a. |
 | Primary CTA (Fallback) | Group | - |
 | primaryCta > Button Label * | Text | - |
 | primaryCta > URL * | Text | - |

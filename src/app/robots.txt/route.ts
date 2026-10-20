@@ -19,11 +19,9 @@ export async function GET() {
     if (!allowIndexing) {
       robotsContent += 'Disallow: /\n'
     } else {
-      if (Array.isArray(disallowPaths) && disallowPaths.length > 0) {
-        for (const pathObj of disallowPaths) {
-          if (pathObj && 'path' in pathObj) {
-            robotsContent += `Disallow: ${pathObj.path}\n`
-          }
+      if (Array.isArray(disallowPaths)) {
+        for (const entry of disallowPaths) {
+          if (typeof entry === 'string' && entry) robotsContent += `Disallow: ${entry}\n`
         }
       }
     }

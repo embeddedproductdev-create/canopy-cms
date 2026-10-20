@@ -1160,21 +1160,17 @@ export interface Header {
   id: number;
   primaryLogo?: (number | null) | Media;
   secondaryLogo?: (number | null) | Media;
-  navItems?:
-    | {
-        label: string;
-        url: string;
-        children?:
-          | {
-              label: string;
-              url: string;
-              description?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
+  navItems?: {
+    label: string;
+    url: string;
+    children?: {
+      label: string;
+      url: string;
+      description?: string;
+      [k: string]: unknown;
+    }[];
+    [k: string]: unknown;
+  }[];
   navCta?: {
     label?: string | null;
     href?: string | null;
@@ -1197,27 +1193,21 @@ export interface Footer {
     href?: string | null;
   };
   socialNavLabel?: string | null;
-  linkGroups?:
-    | {
-        heading?: string | null;
-        links?:
-          | {
-              label?: string | null;
-              href?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  socialLinks?:
-    | {
-        label?: string | null;
-        href?: string | null;
-        icon?: ('linkedin' | 'instagram' | 'twitter') | null;
-        id?: string | null;
-      }[]
-    | null;
+  linkGroups?: {
+    heading: string;
+    links: {
+      label: string;
+      href: string;
+      [k: string]: unknown;
+    }[];
+    [k: string]: unknown;
+  }[];
+  socialLinks?: {
+    label: string;
+    href: string;
+    icon: 'linkedin' | 'instagram' | 'twitter';
+    [k: string]: unknown;
+  }[];
   helplineNumber?: string | null;
   techSupportEmail?: string | null;
   requestIntro?: string | null;
@@ -1275,12 +1265,7 @@ export interface SeoSetting {
   };
   allowIndexing?: boolean | null;
   sitemapUrl?: string | null;
-  disallowPaths?:
-    | {
-        path: string;
-        id?: string | null;
-      }[]
-    | null;
+  disallowPaths?: string[];
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1290,13 +1275,9 @@ export interface SeoSetting {
  */
 export interface SiteChrome {
   id: number;
-  uiLabels?:
-    | {
-        key: string;
-        value?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  uiLabels?: {
+    [k: string]: string;
+  };
   primaryCta: {
     label: string;
     url: string;
@@ -1357,21 +1338,7 @@ export interface SiteChrome {
 export interface HeaderSelect<T extends boolean = true> {
   primaryLogo?: T;
   secondaryLogo?: T;
-  navItems?:
-    | T
-    | {
-        label?: T;
-        url?: T;
-        children?:
-          | T
-          | {
-              label?: T;
-              url?: T;
-              description?: T;
-              id?: T;
-            };
-        id?: T;
-      };
+  navItems?: T;
   navCta?:
     | T
     | {
@@ -1398,27 +1365,8 @@ export interface FooterSelect<T extends boolean = true> {
         href?: T;
       };
   socialNavLabel?: T;
-  linkGroups?:
-    | T
-    | {
-        heading?: T;
-        links?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-              id?: T;
-            };
-        id?: T;
-      };
-  socialLinks?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-        icon?: T;
-        id?: T;
-      };
+  linkGroups?: T;
+  socialLinks?: T;
   helplineNumber?: T;
   techSupportEmail?: T;
   requestIntro?: T;
@@ -1486,12 +1434,7 @@ export interface SeoSettingsSelect<T extends boolean = true> {
       };
   allowIndexing?: T;
   sitemapUrl?: T;
-  disallowPaths?:
-    | T
-    | {
-        path?: T;
-        id?: T;
-      };
+  disallowPaths?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1501,13 +1444,7 @@ export interface SeoSettingsSelect<T extends boolean = true> {
  * via the `definition` "site-chrome_select".
  */
 export interface SiteChromeSelect<T extends boolean = true> {
-  uiLabels?:
-    | T
-    | {
-        key?: T;
-        value?: T;
-        id?: T;
-      };
+  uiLabels?: T;
   primaryCta?:
     | T
     | {

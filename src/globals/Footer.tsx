@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { revalidateGlobalOnChange } from '../hooks/revalidate'
+import { linkGroupsField, socialLinksField } from './jsonFields'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
@@ -33,38 +34,8 @@ export const Footer: GlobalConfig = {
       ],
     },
     { name: 'socialNavLabel', type: 'text', defaultValue: 'Social media' },
-    {
-      name: 'linkGroups',
-      type: 'array',
-      fields: [
-        { name: 'heading', type: 'text' },
-        {
-          name: 'links',
-          type: 'array',
-          fields: [
-            { name: 'label', type: 'text' },
-            { name: 'href', type: 'text' },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'socialLinks',
-      type: 'array',
-      fields: [
-        { name: 'label', type: 'text' },
-        { name: 'href', type: 'text' },
-        {
-          name: 'icon',
-          type: 'select',
-          options: [
-            { label: 'LinkedIn', value: 'linkedin' },
-            { label: 'Instagram', value: 'instagram' },
-            { label: 'Twitter', value: 'twitter' },
-          ],
-        },
-      ],
-    },
+    linkGroupsField,
+    socialLinksField,
     { name: 'helplineNumber', type: 'text', defaultValue: '+1999 888-76-54' },
     { name: 'techSupportEmail', type: 'text', defaultValue: 'contact@canopyembedded.com' },
     { name: 'requestIntro', type: 'text', defaultValue: 'Raise a general' },

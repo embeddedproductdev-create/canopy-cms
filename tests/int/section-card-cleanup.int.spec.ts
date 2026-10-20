@@ -52,7 +52,7 @@ describe('section and card cleanup migration', () => {
     expect(String(all(sqlite, `SELECT subheading FROM case_study WHERE slug = 'smart-bms'`)[0].subheading).length).toBeGreaterThan(20)
     expect(all(sqlite, `SELECT category FROM blog WHERE category LIKE '%·%'`)).toHaveLength(0)
     expect(all(sqlite, `SELECT sub_heading FROM footer`)[0].sub_heading).toBe('Electronics product development - Chennai, India')
-    expect(all(sqlite, `SELECT value FROM site_chrome_ui_labels WHERE key = 'checklist.gate.emailPlaceholder'`)[0].value).toBe('you@company.com')
+    expect(all(sqlite, `SELECT json_extract(ui_labels, '$."checklist.gate.emailPlaceholder"') AS value FROM site_chrome`)[0].value).toBe('you@company.com')
 
     const snapshot = JSON.stringify([
       all(sqlite, 'SELECT * FROM section ORDER BY id'),

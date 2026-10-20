@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { revalidateGlobalOnChange } from '../hooks/revalidate'
+import { uiLabelsField } from './jsonFields'
 
 export const SiteChrome: GlobalConfig = {
   slug: 'site-chrome',
@@ -19,15 +20,7 @@ export const SiteChrome: GlobalConfig = {
         {
           label: 'UI Labels',
           fields: [
-            {
-              name: 'uiLabels',
-              type: 'array',
-              label: 'UI Label Registry',
-              fields: [
-                { name: 'key', type: 'text', required: true },
-                { name: 'value', type: 'text' },
-              ],
-            },
+            uiLabelsField,
           ],
         },
         {

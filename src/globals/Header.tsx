@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { revalidateGlobalOnChange } from '../hooks/revalidate'
 import { urlField } from '../hooks/normalizeUrl'
+import { navItemsField } from './jsonFields'
 
 export const Header: GlobalConfig = {
   slug: 'header',
@@ -28,25 +29,7 @@ export const Header: GlobalConfig = {
       relationTo: 'media',
       label: 'Secondary / Mobile Logo',
     },
-    {
-      name: 'navItems',
-      type: 'array',
-      label: 'Main Navigation Menu',
-      fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'url', type: 'text', required: true, label: 'URL', ...urlField },
-        {
-          name: 'children',
-          type: 'array',
-          label: 'Dropdown Items',
-          fields: [
-            { name: 'label', type: 'text', required: true },
-            { name: 'url', type: 'text', required: true, label: 'URL', ...urlField },
-            { name: 'description', type: 'text' },
-          ],
-        },
-      ],
-    },
+    navItemsField,
     {
       name: 'navCta',
       type: 'group',

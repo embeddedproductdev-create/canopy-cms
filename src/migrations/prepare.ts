@@ -6,6 +6,7 @@ import { applySectionCardCleanup } from './20261012_120000_section_card_cleanup'
 import { applyProjectContentAndCleanup } from './20261013_120000_project_content_and_cleanup'
 import { applyRestructure } from './20261014_120000_restructure_collections'
 import { applyHowWeWork } from './20261015_120000_how_we_work_steps'
+import { applyJsonSiteSettings } from './20261016_120000_json_site_settings'
 import { buildVersionRepair } from './versions'
 
 type Db = Parameters<typeof applyRestructure>[0]
@@ -26,6 +27,7 @@ export async function prepareDatabase(db: Db): Promise<{ rebuiltVersions: number
   await runOnce(db, '20261013_120000_project_content_and_cleanup', applyProjectContentAndCleanup)
   await runOnce(db, '20261014_120000_restructure_collections', applyRestructure)
   await runOnce(db, '20261015_120000_how_we_work_steps', applyHowWeWork)
+  await runOnce(db, '20261016_120000_json_site_settings', applyJsonSiteSettings)
   const repair = await buildVersionRepair(async (query) => (await db.all(sql.raw(query))) as Record<string, unknown>[])
   for (const statement of repair) await db.run(sql.raw(statement))
   return { rebuiltVersions: repair.length }

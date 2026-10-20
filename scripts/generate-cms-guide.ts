@@ -57,6 +57,11 @@ const notes: Record<string, string> = {
   'checklist.layoutSections': 'Extra blocks shown on the checklist page.',
   'capability.summary': 'One-line description used in lists and SEO.',
   'industry.summary': 'One-line description used in lists and SEO.',
+  'header.navItems': 'JSON list of menu entries. See section 3a for the format.',
+  'footer.linkGroups': 'JSON list of footer columns. See section 3a for the format.',
+  'footer.socialLinks': 'JSON list of social icons. See section 3a for the format.',
+  'seo-settings.disallowPaths': 'JSON list of paths written to robots.txt as Disallow lines. See section 3a.',
+  'site-chrome.uiLabels': 'JSON object of every UI text, key -> text. See section 3a.',
   'media.alt': 'Description of the picture. Every place that shows the file uses this text.',
 }
 
@@ -221,6 +226,40 @@ async function main(): Promise<void> {
     out.push('', '`*` required', '')
   }
 
+  out.push(
+    '## 3a. Settings stored as JSON',
+    '',
+    'Five settings are edited as JSON text in the admin. The editor checks the format while you type, and saving a wrong shape is refused with a message that says what is missing. Links typed as a bare email, phone or `www.` address are converted the same way as everywhere else.',
+    '',
+    '**Header -> Main Navigation Menu**',
+    '',
+    '~~~json',
+    '[',
+    '  { "label": "Work", "url": "/work/" },',
+    '  { "label": "Capabilities", "url": "#", "children": [ { "label": "Firmware", "url": "/capabilities/firmware/", "description": "RTOS, Linux, OTA" } ] }',
+    ']',
+    '~~~',
+    '',
+    '**Footer -> Link Groups** and **Social Links** (`icon` is linkedin, instagram or twitter)',
+    '',
+    '~~~json',
+    '[ { "heading": "Company", "links": [ { "label": "About", "href": "/about/" } ] } ]',
+    '[ { "label": "LinkedIn", "href": "https://www.linkedin.com/company/example", "icon": "linkedin" } ]',
+    '~~~',
+    '',
+    '**SEO Settings -> Disallowed Paths** (one text per path, starting with `/`)',
+    '',
+    '~~~json',
+    '[ "/admin", "/api/*" ]',
+    '~~~',
+    '',
+    '**Site Chrome -> UI Label Registry** (an object: key, then text; a key that is missing shows nothing on the website)',
+    '',
+    '~~~json',
+    '{ "work.glance": "At a glance", "checklist.gate.emailPlaceholder": "you@company.com" }',
+    '~~~',
+    '',
+  )
   out.push('## 4. Field reference', '', 'Every field of every collection and global. Fields hidden by the layout rules appear only when the Type uses them.', '')
   for (const collection of resolved.collections) {
     const slug = collection.slug

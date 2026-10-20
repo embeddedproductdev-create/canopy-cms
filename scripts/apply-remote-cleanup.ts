@@ -5,6 +5,7 @@ import { buildSectionCardCleanup, type Row } from '../src/migrations/20261012_12
 import { buildProjectContentAndCleanup } from '../src/migrations/20261013_120000_project_content_and_cleanup'
 import { buildRestructure, ensureRestructureSchema } from '../src/migrations/20261014_120000_restructure_collections'
 import { buildHowWeWork } from '../src/migrations/20261015_120000_how_we_work_steps'
+import { buildJsonSiteSettings } from '../src/migrations/20261016_120000_json_site_settings'
 import { buildVersionRepair } from '../src/migrations/versions'
 import { readWranglerConfig } from './lib/wrangler-config'
 
@@ -41,6 +42,7 @@ const steps: { name: string; schema?: (read: Reader) => Promise<string[]>; plan:
   { name: '20261013_120000_project_content_and_cleanup', plan: buildProjectContentAndCleanup },
   { name: '20261014_120000_restructure_collections', schema: ensureRestructureSchema, plan: buildRestructure },
   { name: '20261015_120000_how_we_work_steps', plan: async () => ({ statements: buildHowWeWork() }) },
+  { name: '20261016_120000_json_site_settings', plan: async (r) => ({ statements: await buildJsonSiteSettings(r) }) },
 ]
 
 for (const step of steps) {

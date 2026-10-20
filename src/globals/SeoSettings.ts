@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { revalidateGlobalOnChange } from '../hooks/revalidate'
+import { disallowPathsField } from './jsonFields'
 
 export const SeoSettings: GlobalConfig = {
   slug: 'seo-settings',
@@ -291,21 +292,7 @@ export const SeoSettings: GlobalConfig = {
               label: 'Sitemap URL',
               defaultValue: 'https://www.canopyembedded.com/sitemap.xml',
             },
-            {
-              name: 'disallowPaths',
-              type: 'array',
-              label: 'Disallowed Paths (robots.txt)',
-              fields: [
-                {
-                  name: 'path',
-                  type: 'text',
-                  required: true,
-                  admin: {
-                    placeholder: '/admin, /api/*, etc.',
-                  },
-                },
-              ],
-            },
+            disallowPathsField,
           ],
         },
       ],
