@@ -62,10 +62,10 @@ for (const page of all(`SELECT * FROM page ORDER BY id`)) {
 }
 
 const collections: { title: string; table: string; label: string; identity: (row: Row) => string }[] = [
-  { title: 'Capabilities', table: 'capability', label: 'capability', identity: (r) => `slug \`${r.slug}\`, summary "${cut(r.summary, 80)}"` },
-  { title: 'Industries', table: 'industry', label: 'industry', identity: (r) => `slug \`${r.slug}\`, summary "${cut(r.summary, 80)}"` },
-  { title: 'Portfolio', table: 'case_study', label: 'project', identity: (r) => `slug \`${r.slug}\`, ${r.category}, stage ${r.project_stage}${r.featured ? ', featured' : ''}` },
-  { title: 'Insights', table: 'blog', label: 'insight', identity: (r) => `slug \`${r.slug}\`, ${r.category}, published ${cut(r.published_date, 10)}${r.featured ? ', featured' : ''}` },
+  { title: 'Capabilities', table: 'capability', label: 'capability', identity: (r) => `slug \`${r.slug}\`, summary "${cut(r.hero_summary ?? r.summary, 80)}"` },
+  { title: 'Industries', table: 'industry', label: 'industry', identity: (r) => `slug \`${r.slug}\`, summary "${cut(r.hero_summary ?? r.summary, 80)}"` },
+  { title: 'Portfolio', table: 'case_study', label: 'project', identity: (r) => `slug \`${r.slug}\`, ${r.project_category ?? r.category}, stage ${r.project_project_stage ?? r.project_stage}${r.project_featured ?? r.featured ? ', featured' : ''}` },
+  { title: 'Insights', table: 'blog', label: 'insight', identity: (r) => `slug \`${r.slug}\`, ${r.article_category ?? r.category}, published ${cut(r.article_published_at ?? r.published_date, 10)}${r.article_featured ?? r.featured ? ', featured' : ''}` },
   { title: 'Checklists', table: 'checklist', label: 'checklist', identity: (r) => `slug \`${r.slug}\`, ${all(`SELECT count(*) n FROM checklist_items WHERE _parent_id = ${Number(r.id)}`)[0].n} items (${r.locked_items_count} locked)` },
 ]
 for (const collection of collections) {

@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 import { section } from '../fields/sections'
 import { contentAccess } from '../access'
 import { formatSlug } from '../utilities/formatSlug'
@@ -120,6 +120,6 @@ export const Blog: CollectionConfig = {
       label: 'Legacy layout sections',
       admin: { hidden: true },
     },
-    { ...seoGroupField, admin: { ...seoGroupField.admin, hidden: true } },
+    { ...seoGroupField, admin: { ...seoGroupField.admin, hidden: true } } as unknown as Field,
   ],
 }

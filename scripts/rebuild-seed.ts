@@ -7,7 +7,7 @@ import { buildProjectContentAndCleanup } from '../src/migrations/20261013_120000
 import { buildRestructure, ensureRestructureSchema } from '../src/migrations/20261014_120000_restructure_collections'
 import { buildHowWeWork } from '../src/migrations/20261015_120000_how_we_work_steps'
 import { buildJsonSiteSettings } from '../src/migrations/20261016_120000_json_site_settings'
-import { buildVersionRepair } from '../src/migrations/versions'
+import { buildVersionRepair } from '../src/utilities/versionRepair'
 
 const base = process.argv[2] ?? 'HEAD:seed/db-dump.sql'
 const target = path.resolve('seed/db-dump.sql')

@@ -26,7 +26,9 @@ export default function PasteTables({ path }: { path?: string }) {
   const { value, setValue } = useField<string>({ path: path ?? '' })
   const marker = useRef<HTMLSpanElement>(null)
   const latest = useRef({ value, setValue })
-  latest.current = { value, setValue }
+  useEffect(() => {
+    latest.current = { value, setValue }
+  })
 
   useEffect(() => {
     const textarea = marker.current?.closest('.field-type')?.querySelector('textarea')

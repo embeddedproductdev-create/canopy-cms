@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import config from '@/payload.config'
 import { sectionLayouts, sectionTypes } from '../../src/collections/sectionLayouts'
 
-type AnyField = { name?: string; type: string; relationTo?: unknown; hasMany?: boolean; fields?: AnyField[]; tabs?: { fields: AnyField[] }[] }
+type AnyField = { name?: string; type: string; admin?: { hidden?: boolean }; relationTo?: unknown; hasMany?: boolean; fields?: AnyField[]; tabs?: { fields: AnyField[] }[] }
 
 const identity: Record<string, string[]> = {
   page: ['title', 'heading', 'subheading', 'eyebrow', 'pageType', 'url', 'heroImage', 'body', 'cta', 'pills', 'layoutSections', 'seo'],

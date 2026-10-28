@@ -86,14 +86,14 @@ Pick the Type, then fill what the form shows. A field that is not listed for the
 | Form (`form`) | Enquiry form that posts to Form Submissions | Heading, Subheading, Body, Button, Cards | **col**: Place this section next to the neighbouring section marked col (two columns) | - | Kind Field: title = label, Value = input type (text, email, textarea, select), Short description = placeholder, Subtitle = hint, Tags = select options |
 | Stats (`stats`) | Row of big numbers | Eyebrow, Heading, Subheading, Button, Cards | **col**: Place this section next to the neighbouring section marked col (two columns) | - | Kind Stat: title = label, Value = number (animated when numeric) |
 | Cards (`cards`) | Grid of cards | Eyebrow, Heading, Subheading, Body, Button, Image, Cards | **grid2**: Two columns<br>**grid3**: Three columns<br>**grid4**: Four columns<br>**numbered**: Show 01, 02 ... computed from the order<br>**summary**: Plain text columns for a short summary, the last one highlighted<br>**icons**: Show an icon on every card<br>**media**: Picture cards with a link<br>**pills**: Only titles as pill links<br>**links**: Whole card is a link<br>**olive**: Olive background<br>**dark**: Dark background with the section image<br>**surface**: Grey background<br>**col**: Place this section next to the neighbouring section marked col (two columns) | - | Title (summary variant: label), Subtitle (media cards), Short description, Icon, Link, Tags, Image (media cards). Body = small note under the cards |
-| Chips (`chips`) | Row of outlined keyword chips | Eyebrow, Heading, Subheading, Items | **col**: Place this section next to the neighbouring section marked col (two columns) | One chip per item | - |
+| Chips (`chips`) | Row of outlined keyword chips | Eyebrow, Heading, Subheading, Items | **surface**: Grey background<br>**col**: Place this section next to the neighbouring section marked col (two columns) | One chip per item | - |
 | Marquee (`marquee`) | Scrolling strip of names or logos | Eyebrow, Heading, Subheading, Items | **col**: Place this section next to the neighbouring section marked col (two columns) | Name\|MARK\|/api/media/file/logo.png per item | - |
 | Table (`table`) | Rows and columns made of cards | Eyebrow, Heading, Subheading, Body, Items, Cards | **list**: Plain list with chips<br>**facts**: Label and value pairs<br>**matrix**: Numbered rows with a tick<br>**spec**: Specification table with the heading numbered; a card with icon check shows a Built in badge<br>**col**: Place this section next to the neighbouring section marked col (two columns) | Column headings | One row per card: Title = first column, Value / Tags / Link = second column, Icon check = tick |
 | FAQ (`faq`) | Accordion of questions | Eyebrow, Heading, Subheading, Cards | **col**: Place this section next to the neighbouring section marked col (two columns) | - | Title = question, Short description = answer |
 | Text (`text`) | Heading on the left, text on the right | Eyebrow, Heading, Subheading, Body, Button, Items | **lead**: Larger body text<br>**surface**: Grey band<br>**col**: Place this section next to the neighbouring section marked col (two columns) | Numbered tiles below the text | - |
 | List (`list`) | Bullet list | Eyebrow, Heading, Subheading, Cards | **col**: Place this section next to the neighbouring section marked col (two columns) | - | Title = bullet text |
 | Team (`team`) | People grid | Eyebrow, Heading, Subheading, Cards | **col**: Place this section next to the neighbouring section marked col (two columns) | - | Title = name, Subtitle = role, Short description = bio, Image = photo, numbered from the order |
-| Projects (`projects`) | Portfolio cards pulled from Portfolio | Heading, Subheading, Button, Second button, Items, Cards | **recent**: Badge on the first project<br>**col**: Place this section next to the neighbouring section marked col (two columns) | Portfolio slugs to show, in order | Overrides (title = slug) and Kind Empty slots |
+| Projects (`projects`) | Portfolio cards pulled from Portfolio | Heading, Subheading, Button, Second button, Items, Cards | **recent**: Badge on the first project<br>**related**: Related projects block<br>**col**: Place this section next to the neighbouring section marked col (two columns) | Portfolio slugs to show, in order | Overrides (title = slug) and Kind Empty slots |
 | Articles (`articles`) | Insight cards pulled from Insights | Eyebrow, Heading, Subheading, Items | **related**: Related articles block<br>**col**: Place this section next to the neighbouring section marked col (two columns) | Insight slugs to show, in order | - |
 | Featured article (`featured`) | The featured Insights post (filled by the Insights page) | Heading | - | - | - |
 | Subscribe (`subscribe`) | Email sign-up box | Heading, Subheading, Button | **col**: Place this section next to the neighbouring section marked col (two columns) | - | - |
@@ -247,45 +247,53 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 |---|---|---|
 | Title * | Text | - |
 | Slug * | Text | - |
-| Heading | Text | - |
-| Subheading | Long text | - |
-| Summary | Text | One-line description used in lists and SEO. |
-| Eyebrow | Text | - |
-| Primary call to action | Group | - |
-| cta > Label | Text | - |
-| cta > URL | Text | - |
-| Secondary call to action | Group | - |
-| secondaryCta > Label | Text | - |
-| secondaryCta > URL | Text | - |
-| Hero image | Upload to media | - |
-| Hero image description | Text | - |
-| Included section heading | Text | - |
-| Included capabilities | List | - |
-| included > Title * | Text | - |
-| included > Icon | Text | - |
-| included > Text | Long text | - |
-| included > Tags | Text | - |
-| Intro band heading | Text | - |
-| Intro band text | Long text | - |
-| Technology and materials | List | - |
-| stacks > Kind | Select: Logo strip, Tag chips, Rows, Cards | - |
-| stacks > Heading | Text | - |
-| stacks > Intro | Long text | - |
-| stacks > Items * | Long text | - |
-| stacks > Note | Text | - |
-| stacks > Use a grey background band | Checkbox | - |
-| Workflow Eyebrow | Text | - |
-| Workflow Heading | Text | - |
-| Workflow Intro | Long text | - |
-| Workflow | Long text | - |
-| Projects Heading | Text | - |
-| Related projects | Relationship (many) to case-study | - |
-| Insights Heading | Text | - |
-| Related insights | Relationship (many) to blog | - |
-| Faq Heading | Text | - |
-| Frequently asked questions | List | - |
-| faqs > Question * | Text | - |
-| faqs > Answer * | Long text | - |
+| Hero | Group | - |
+| hero > Heading | Text | - |
+| hero > Subheading | Long text | - |
+| hero > Summary | Text | - |
+| hero > Eyebrow | Text | - |
+| hero > Primary call to action | Group | - |
+| hero > cta > Label | Text | - |
+| hero > cta > URL | Text | - |
+| hero > Secondary call to action | Group | - |
+| hero > secondaryCta > Label | Text | - |
+| hero > secondaryCta > URL | Text | - |
+| hero > Hero image | Upload to media | - |
+| hero > Hero image description | Text | - |
+| hero > Hero image fit | Select: Show whole image (recommended), Fill the space (may crop edges) | - |
+| hero > Hero image position | Select: Centre, Sit on the bottom edge | - |
+| What is included | Group | - |
+| scope > Included section heading | Text | - |
+| scope > Included capabilities | List | - |
+| scope > included > Title * | Text | - |
+| scope > included > Icon | Text | - |
+| scope > included > Text | Long text | - |
+| scope > included > Tags | Text | - |
+| scope > Intro band heading | Text | - |
+| scope > Intro band text | Long text | - |
+| Technology | Group | - |
+| technology > Technology and materials | List | - |
+| technology > stacks > Kind | Select: Logo strip, Tag chips, Rows, Cards | - |
+| technology > stacks > Heading | Text | - |
+| technology > stacks > Intro | Long text | - |
+| technology > stacks > Items * | Long text | - |
+| technology > stacks > Note | Text | - |
+| technology > stacks > Use a grey background band | Checkbox | - |
+| Workflow | Group | - |
+| process > Workflow Eyebrow | Text | - |
+| process > Workflow Heading | Text | - |
+| process > Workflow Intro | Long text | - |
+| process > Workflow | Long text | - |
+| Related work | Group | - |
+| related > Projects Heading | Text | - |
+| related > Related projects | Relationship (many) to case-study | - |
+| related > Insights Heading | Text | - |
+| related > Related insights | Relationship (many) to blog | - |
+| FAQ | Group | - |
+| faq > Faq Heading | Text | - |
+| faq > Frequently asked questions | List | - |
+| faq > faqs > Question * | Text | - |
+| faq > faqs > Answer * | Long text | - |
 | SEO | Group | - |
 | seo > SEO Title | Text | - |
 | seo > Meta Description | Text | - |
@@ -319,6 +327,8 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | secondaryCta > URL | Text | - |
 | Hero image | Upload to media | - |
 | Hero image description | Text | - |
+| Hero image fit | Select: Show whole image (recommended), Fill the space (may crop edges) | - |
+| Hero image position | Select: Centre, Sit on the bottom edge | - |
 | Challenges Heading | Text | - |
 | Challenges | Long text | - |
 | Disciplines Heading | Text | - |
@@ -367,21 +377,16 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 |---|---|---|
 | Title * | Text | - |
 | Slug * | Text | - |
-| Heading | Text | - |
-| Subheading | Text | - |
-| Category | Text | - |
-| Featured Project | Checkbox | - |
-| Project overview | List | - |
-| overview > Label * | Text | - |
-| overview > Text | Long text | - |
-| Technical specification groups | List | - |
-| specGroups > Heading * | Text | - |
-| specGroups > Rows | List | - |
-| specGroups > rows > Label * | Text | - |
-| specGroups > rows > Value | Text | - |
-| specGroups > rows > Built In | Checkbox | - |
-| Body | Rich text | - |
-| Tags/Keywords (Comma Separated) | Text | - |
+| Overview | Group | - |
+| project > Heading | Text | - |
+| project > Subheading | Text | - |
+| project > Category | Text | - |
+| project > Featured Project | Checkbox | - |
+| project > Project Stage | Select: In Design, Proto Built, Shipped | - |
+| project > Project overview | List | - |
+| project > overview > Label * | Text | - |
+| project > overview > Text | Long text | - |
+| project > Tags/Keywords (Comma Separated) | Text | - |
 | Images | Group | - |
 | Images > Card and landing image | Upload to media | - |
 | Images > Page images | List | - |
@@ -392,10 +397,19 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Page Call to Action | Group | - |
 | pageCta > CTA Label | Text | - |
 | pageCta > CTA URL | Text | - |
-| Project Stage | Select: In Design, Proto Built, Shipped | - |
-| At a glance | List | - |
-| atAGlance > Label * | Text | - |
-| atAGlance > Value * | Text | - |
+| At a glance | Group | - |
+| glance > At a glance | List | - |
+| glance > atAGlance > Label * | Text | - |
+| glance > atAGlance > Value * | Text | - |
+| Specifications | Group | - |
+| specs > Technical specification groups | List | - |
+| specs > specGroups > Heading * | Text | - |
+| specs > specGroups > Rows | List | - |
+| specs > specGroups > rows > Label * | Text | - |
+| specs > specGroups > rows > Value | Text | - |
+| specs > specGroups > rows > Built In | Checkbox | - |
+| Body | Group | - |
+| content > Body | Rich text | - |
 | SEO | Group | - |
 | seo > SEO Title | Text | - |
 | seo > Meta Description | Text | - |
@@ -418,20 +432,21 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 |---|---|---|
 | Title * | Text | - |
 | Slug * | Text | - |
-| Heading | Text | - |
-| Category | Text | - |
-| Featured article | Checkbox | - |
-| Teaser/Description | Text | - |
-| Article Image | Upload to media | - |
-| Byline | Text | - |
-| Published Date * | Date | - |
-| Updated Date | Date | - |
-| Body * | Rich text | - |
-| Tags (Comma Separated) | Text | - |
-| Content upgrade | Group | - |
+| Article | Group | - |
+| article > Category | Text | - |
+| article > Featured article | Checkbox | - |
+| article > Teaser | Text | - |
+| article > Byline | Text | - |
+| article > Published At * | Date | - |
+| article > Tags (Comma Separated) | Text | - |
+| Cover image | Group | - |
+| cover > Article Image | Upload to media | - |
+| Meta | Group | - |
+| meta > Meta title | Text | Search and social title. Falls back to the article title when empty. |
+| meta > Meta description | Long text | Search and social description. Falls back to the teaser when empty. |
+| Content (Markdown) * | Long text | Markdown article body. Use H2 headings, paragraphs, lists, tables, and links. Do not add an H1. |
 | contentUpgrade > Callout heading | Text | - |
 | contentUpgrade > Linked checklist | Relationship to checklist | - |
-| SEO | Group | - |
 | seo > SEO Title | Text | - |
 | seo > Meta Description | Text | - |
 | seo > Canonical URL | Text | - |

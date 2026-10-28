@@ -1,6 +1,6 @@
 import config from '../src/payload.config'
 import { getPayload } from 'payload'
-import { prepareDatabase } from '../src/migrations/prepare'
+import { prepareDatabase } from '../src/utilities/prepareDatabase'
 
 try {
   const payload = await getPayload({ config })
