@@ -152,6 +152,7 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Name * | Text | - |
 | Role * | Select: Admin, Editor, Viewer | - |
 | email * | Email | - |
+| resetPasswordRequestedAt | Date | - |
 
 `*` required
 

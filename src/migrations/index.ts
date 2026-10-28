@@ -16,6 +16,7 @@ import * as migration_20261027_000000_complete_content_columns from './20261027_
 import * as migration_20261028_000000_blog_markdown_content from './20261028_000000_blog_markdown_content';
 import * as migration_20261029_000000_hero_image_fit from './20261029_000000_hero_image_fit';
 import * as migration_20261030_000000_section_groups from './20261030_000000_section_groups';
+import * as migration_20261031_000000_payload_3_92_columns from './20261031_000000_payload_3_92_columns';
 
 export const migrations = [
   {
@@ -107,5 +108,10 @@ export const migrations = [
     up: migration_20261030_000000_section_groups.up,
     down: migration_20261030_000000_section_groups.down,
     name: '20261030_000000_section_groups',
+  },
+  {
+    up: migration_20261031_000000_payload_3_92_columns.up,
+    down: migration_20261031_000000_payload_3_92_columns.down,
+    name: '20261031_000000_payload_3_92_columns',
   },
 ];

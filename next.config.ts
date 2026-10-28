@@ -1,6 +1,9 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 
 const nextConfig = {
+  // Page-data workers each start a local D1 (miniflare) on the same SQLite file during `build:cf`;
+  // more than one of them racing for it fails with SQLITE_BUSY, so collect page data in one worker.
+  experimental: { cpus: 1 },
   images: {
     localPatterns: [
       {

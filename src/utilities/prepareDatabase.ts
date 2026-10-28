@@ -11,6 +11,7 @@ import { applyContentColumns } from '../migrations/20261027_000000_complete_cont
 import { applyBlogMarkdownContent } from '../migrations/20261028_000000_blog_markdown_content'
 import { applyHeroImageFit } from '../migrations/20261029_000000_hero_image_fit'
 import { applySectionGroups } from '../migrations/20261030_000000_section_groups'
+import { applyPayload392Columns } from '../migrations/20261031_000000_payload_3_92_columns'
 import { buildVersionRepair } from './versionRepair'
 
 type Db = Parameters<typeof applyRestructure>[0]
@@ -36,6 +37,7 @@ export async function prepareDatabase(db: Db): Promise<{ rebuiltVersions: number
   await runOnce(db, '20261028_000000_blog_markdown_content', applyBlogMarkdownContent)
   await runOnce(db, '20261029_000000_hero_image_fit', applyHeroImageFit)
   await runOnce(db, '20261030_000000_section_groups', applySectionGroups)
+  await runOnce(db, '20261031_000000_payload_3_92_columns', applyPayload392Columns)
   const repair = await buildVersionRepair(async (query) => (await db.all(sql.raw(query))) as Record<string, unknown>[])
   for (const statement of repair) await db.run(sql.raw(statement))
   return { rebuiltVersions: repair.length }
