@@ -22,7 +22,7 @@ async function migrate(sqlite: DatabaseSync) {
 }
 
 describe('project content and clean-up migration', () => {
-  it('writes the data.md content, removes unused data and is idempotent', async () => {
+  it('writes the data.md content, removes unused data and is idempotent', async (ctx) => {
     let sqlite: DatabaseSync
     try {
       sqlite = olderSeed()
@@ -30,6 +30,8 @@ describe('project content and clean-up migration', () => {
       sqlite = new DatabaseSync(':memory:')
       sqlite.exec(fs.readFileSync(path.resolve('seed/db-dump.sql'), 'utf8'))
     }
+    // The committed seed already includes this migration, so there is nothing left to replay.
+    if (all(sqlite, `SELECT name FROM payload_migrations WHERE name = '20261013_120000_project_content_and_cleanup'`).length) ctx.skip()
     await migrate(sqlite)
 
     for (const project of projectContent) {

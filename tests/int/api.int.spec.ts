@@ -1,6 +1,7 @@
 import { getPayload, Payload } from 'payload'
 import { sql } from '@payloadcms/db-d1-sqlite'
 import config from '@/payload.config'
+import { prepareDatabase } from '@/utilities/prepareDatabase'
 
 import { describe, it, beforeAll, expect } from 'vitest'
 
@@ -15,6 +16,8 @@ describe('API', () => {
       sql.raw(`SELECT "name" FROM "payload_migrations" WHERE "name" = '20261014_120000_restructure_collections'`),
     )) as unknown[]
     prepared = done.length > 0
+    // A freshly seeded database may predate the latest migrations; apply them as `npm run dev` does.
+    if (prepared) await prepareDatabase(payload.db.drizzle)
   })
 
   it('supports published and draft list queries for seeded or empty local content', async (ctx) => {

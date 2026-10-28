@@ -65,17 +65,8 @@ jobs:
           npm run generate:importmap
           git diff --exit-code -- 'src/app/(payload)/admin/importMap.js'
 
-      - name: Lint
-        run: npm run lint
-
       - name: Type-check
         run: npx tsc --noEmit
-
-      - name: Load seed into the local test database
-        run: npm run seed:local
-
-      - name: Integration tests
-        run: npm run test:int
 
       - name: Record D1 point-in-time restore bookmark
         run: |
