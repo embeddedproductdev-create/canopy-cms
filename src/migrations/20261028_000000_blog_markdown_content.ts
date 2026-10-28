@@ -123,7 +123,7 @@ export async function buildBlogMarkdownContent(read: Reader): Promise<string[]> 
     const contentColumn = `${prefix}content`
     const select = have[table].has(contentColumn)
       ? `SELECT "id", "${prefix}body" AS "body", "${contentColumn}" AS "content" FROM "${table}"`
-      : `SELECT "id", "${prefix}body" AS "body", NULL AS "content" FROM "${table}"`
+      : `SELECT "id", "${prefix}body" AS "body" FROM "${table}"` // never SELECT NULL AS ...: wrangler returns it as the text "null"
     for (const row of (await read(select)) as unknown as BlogRow[]) {
       if (row.content) continue
       const content = legacyBodyToMarkdown(row.body)
