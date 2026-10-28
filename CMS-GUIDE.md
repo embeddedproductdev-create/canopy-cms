@@ -250,7 +250,42 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Heading | Text | - |
 | Subheading | Long text | - |
 | Summary | Text | One-line description used in lists and SEO. |
-| Layout Sections | Relationship (many) to section | Sections of the page, in order: hero, included, workflow, stacks, projects, FAQ, insights. |
+| Eyebrow | Text | - |
+| Primary call to action | Group | - |
+| cta > Label | Text | - |
+| cta > URL | Text | - |
+| Secondary call to action | Group | - |
+| secondaryCta > Label | Text | - |
+| secondaryCta > URL | Text | - |
+| Hero image | Upload to media | - |
+| Hero image description | Text | - |
+| Included section heading | Text | - |
+| Included capabilities | List | - |
+| included > Title * | Text | - |
+| included > Icon | Text | - |
+| included > Text | Long text | - |
+| included > Tags | Text | - |
+| Intro band heading | Text | - |
+| Intro band text | Long text | - |
+| Technology and materials | List | - |
+| stacks > Kind | Select: Logo strip, Tag chips, Rows, Cards | - |
+| stacks > Heading | Text | - |
+| stacks > Intro | Long text | - |
+| stacks > Items * | Long text | - |
+| stacks > Note | Text | - |
+| stacks > Use a grey background band | Checkbox | - |
+| Workflow Eyebrow | Text | - |
+| Workflow Heading | Text | - |
+| Workflow Intro | Long text | - |
+| Workflow | Long text | - |
+| Projects Heading | Text | - |
+| Related projects | Relationship (many) to case-study | - |
+| Insights Heading | Text | - |
+| Related insights | Relationship (many) to blog | - |
+| Faq Heading | Text | - |
+| Frequently asked questions | List | - |
+| faqs > Question * | Text | - |
+| faqs > Answer * | Long text | - |
 | SEO | Group | - |
 | seo > SEO Title | Text | - |
 | seo > Meta Description | Text | - |
@@ -275,7 +310,42 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Heading | Text | - |
 | Subheading | Long text | - |
 | Summary | Text | One-line description used in lists and SEO. |
-| Layout Sections | Relationship (many) to section | Sections of the page, in order: hero, challenges, disciplines, products, projects, FAQ. |
+| Eyebrow | Text | - |
+| Primary call to action | Group | - |
+| cta > Label | Text | - |
+| cta > URL | Text | - |
+| Secondary call to action | Group | - |
+| secondaryCta > Label | Text | - |
+| secondaryCta > URL | Text | - |
+| Hero image | Upload to media | - |
+| Hero image description | Text | - |
+| Challenges Heading | Text | - |
+| Challenges | Long text | - |
+| Disciplines Heading | Text | - |
+| Disciplines | Long text | - |
+| Callout band heading | Text | - |
+| Callout Text | Text | - |
+| Products Heading | Text | - |
+| Products | Long text | - |
+| Technology and materials | List | - |
+| stacks > Kind | Select: Logo strip, Tag chips, Rows, Cards | - |
+| stacks > Heading | Text | - |
+| stacks > Intro | Long text | - |
+| stacks > Items * | Long text | - |
+| stacks > Note | Text | - |
+| stacks > Use a grey background band | Checkbox | - |
+| Projects Heading | Text | - |
+| Related projects | Relationship (many) to case-study | - |
+| Process Heading | Text | - |
+| Highlighted process heading words | Text | - |
+| Process Cta Label | Text | - |
+| Process button URL | Text | - |
+| Process | Long text | - |
+| Faq Heading | Text | - |
+| Frequently asked questions | List | - |
+| faqs > Question * | Text | - |
+| faqs > Answer * | Long text | - |
+| Other industries heading | Text | - |
 | SEO | Group | - |
 | seo > SEO Title | Text | - |
 | seo > Meta Description | Text | - |
@@ -301,10 +371,21 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Subheading | Text | - |
 | Category | Text | - |
 | Featured Project | Checkbox | - |
+| Project overview | List | - |
+| overview > Label * | Text | - |
+| overview > Text | Long text | - |
+| Technical specification groups | List | - |
+| specGroups > Heading * | Text | - |
+| specGroups > Rows | List | - |
+| specGroups > rows > Label * | Text | - |
+| specGroups > rows > Value | Text | - |
+| specGroups > rows > Built In | Checkbox | - |
 | Body | Rich text | - |
 | Tags/Keywords (Comma Separated) | Text | - |
 | Images | Group | - |
-| Images > Landing Image (Single) | Upload to media | - |
+| Images > Card and landing image | Upload to media | - |
+| Images > Page images | List | - |
+| Images > pageImages > Image * | Upload to media | - |
 | Card Call to Action | Group | - |
 | cardCta > CTA Label | Text | - |
 | cardCta > CTA URL | Text | - |
@@ -312,7 +393,9 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | pageCta > CTA Label | Text | - |
 | pageCta > CTA URL | Text | - |
 | Project Stage | Select: In Design, Proto Built, Shipped | - |
-| Layout Sections | Relationship (many) to section | Sections of the project page: overview, at a glance, specification tables, features. |
+| At a glance | List | - |
+| atAGlance > Label * | Text | - |
+| atAGlance > Value * | Text | - |
 | SEO | Group | - |
 | seo > SEO Title | Text | - |
 | seo > Meta Description | Text | - |
@@ -345,7 +428,9 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Updated Date | Date | - |
 | Body * | Rich text | - |
 | Tags (Comma Separated) | Text | - |
-| Layout Sections | Relationship (many) to section | Extra blocks of the article. A section with key upgrade becomes the checklist box beside the article. |
+| Content upgrade | Group | - |
+| contentUpgrade > Callout heading | Text | - |
+| contentUpgrade > Linked checklist | Relationship to checklist | - |
 | SEO | Group | - |
 | seo > SEO Title | Text | - |
 | seo > Meta Description | Text | - |

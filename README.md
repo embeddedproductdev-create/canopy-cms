@@ -21,15 +21,14 @@ Content management for the Canopy Embedded Labs website. Payload CMS v3 on Next.
 git clone <this-repo-url> canopy-cms
 cd canopy-cms
 npm ci
-cp .env.example .env            # then set PAYLOAD_SECRET to any long random string
-npm run seed:local              # loads seed/db-dump.sql into the local D1 and copies seed/media to ./media
 npm run dev                     # http://localhost:3000
 ```
 
-- Admin panel: http://localhost:3000/admin. Log in with the admin account stored in the seed. If the database has no users, Payload shows the "create first user" screen instead.
-- Run `npm run seed:local` **before** the first `npm run dev`. To start over, delete `.wrangler/state` and `media/`, then run it again.
+- Copy `.env.example` to `.env` and set `PAYLOAD_SECRET` before the first start.
+- Admin panel: http://localhost:3000/admin. On a fresh, unseeded local database, create the first admin user in Payload's setup screen.
+- Seeding is optional. Run `npm run seed:local` only when you intentionally want the bundled sample content and media.
 - Open the site and admin through `localhost`, not `127.0.0.1`. CORS and CSRF only allow `http://localhost:3000` and `http://localhost:4200` (plus the production addresses listed in `allowedOrigins` in `src/payload.config.ts`).
-- `npm run dev` first runs `scripts/prepare-dev-schema.ts`, which adds any columns the code expects but the local database lacks. It never drops anything.
+- `npm run dev` first applies the registered migrations and repairs draft-version tables when needed. It does not seed or drop local content.
 - The website (port 4200) expects this CMS on port 3000. See the website repository's README.
 
 ### Environment variables
@@ -73,7 +72,11 @@ wrangler.jsonc     Worker name, D1 and R2 bindings
 
 **How to use the admin and what every field does: [CMS-GUIDE.md](CMS-GUIDE.md).** Pick a Section Type and the form shows only the fields that layout reads.
 
-Content model: landing, capability and industry pages are built from `Page` -> `Section` -> `Card`. A section's `type` picks the layout and `variant` refines it. Tags, chips, columns and marquee items are comma-separated text; CTAs are plain `label` + `url` pairs. Bare emails and phone numbers are stored as `mailto:` and `tel:`.
+Content model: Pages retain their flexible `Section` / `Card` layout. Capabilities, Industries, Portfolio projects, and Insights are edited from their own collection forms using direct fields; legacy Section/Card relationships stay available to the public API for existing content but are hidden from the routine admin workflow.
+
+### Content JSON transfer
+
+The **Import / Export** link in the admin navigation transfers Insights, Portfolio, or Capabilities as `canopy-content-v1` JSON. Imports validate and preview records before any changes are made. After explicit confirmation, documents are matched by slug: matching records are updated, and unmatched slugs are created. Image references are resolved by media filename, so the corresponding media must already be uploaded to the target CMS.
 
 ### Changing the schema
 1. Edit the collection or global.

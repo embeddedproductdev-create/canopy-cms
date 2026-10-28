@@ -1,13 +1,25 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { execFileSync } from 'node:child_process'
 import { DatabaseSync } from 'node:sqlite'
 import { describe, expect, it } from 'vitest'
 import { buildSectionCardCleanup, type Row } from '../../src/migrations/20261012_120000_section_card_cleanup'
 
-function seedDatabase(): DatabaseSync {
+function olderSeedDatabase(): DatabaseSync {
+  const committed = execFileSync('git', ['show', 'HEAD:seed/db-dump.sql'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
   const sqlite = new DatabaseSync(':memory:')
-  sqlite.exec(fs.readFileSync(path.resolve('seed/db-dump.sql'), 'utf8'))
+  sqlite.exec(committed)
   return sqlite
+}
+
+function seedDatabase(): DatabaseSync {
+  try {
+    return olderSeedDatabase()
+  } catch {
+    const sqlite = new DatabaseSync(':memory:')
+    sqlite.exec(fs.readFileSync(path.resolve('seed/db-dump.sql'), 'utf8'))
+    return sqlite
+  }
 }
 
 async function migrate(sqlite: DatabaseSync): Promise<string[]> {

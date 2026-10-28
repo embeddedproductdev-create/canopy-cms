@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { contentAccess } from '../access'
 import { formatSlug } from '../utilities/formatSlug'
 import { seoGroupField } from '../fields/seo'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
@@ -11,12 +12,7 @@ export const Checklist: CollectionConfig = {
     useAsTitle: 'title',
     group: 'Content Management',
   },
-  access: {
-    create: ({ req: { user } }) => !!user,
-    read: () => true,
-    update: ({ req: { user } }) => !!user,
-    delete: ({ req: { user } }) => user?.role === 'admin',
-  },
+  access: contentAccess,
   hooks: {
     beforeValidate: [
       ({ data }) => {
@@ -68,6 +64,7 @@ export const Checklist: CollectionConfig = {
       name: 'items',
       type: 'array',
       label: 'Checklist Items',
+      admin: { initCollapsed: true },
       fields: [
         { name: 'number', type: 'text', required: true },
         {

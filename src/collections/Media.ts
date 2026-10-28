@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isAdmin, isEditorOrAdmin, isPublic } from '../access'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -7,7 +8,10 @@ export const Media: CollectionConfig = {
     group: 'Collections',
   },
   access: {
-    read: () => true,
+    create: isEditorOrAdmin,
+    read: isPublic,
+    update: isEditorOrAdmin,
+    delete: isAdmin,
   },
   fields: [
     {
@@ -19,5 +23,7 @@ export const Media: CollectionConfig = {
   upload: {
     crop: false,
     focalPoint: false,
+    // Allow-list: images, short video and PDF only (no SVG/HTML, which can carry script).
+    mimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif', 'video/mp4', 'video/webm', 'application/pdf'],
   },
 }

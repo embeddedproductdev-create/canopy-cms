@@ -11,6 +11,11 @@ import * as migration_20261013_120000_project_content_and_cleanup from './202610
 import * as migration_20261014_120000_restructure_collections from './20261014_120000_restructure_collections';
 import * as migration_20261015_120000_how_we_work_steps from './20261015_120000_how_we_work_steps';
 import * as migration_20261016_120000_json_site_settings from './20261016_120000_json_site_settings';
+import * as migration_20261026_120000_flat_portfolio_fields from './20261026_120000_flat_portfolio_fields';
+import * as migration_20261027_000000_complete_content_columns from './20261027_000000_complete_content_columns';
+import * as migration_20261028_000000_blog_markdown_content from './20261028_000000_blog_markdown_content';
+import * as migration_20261029_000000_hero_image_fit from './20261029_000000_hero_image_fit';
+import * as migration_20261030_000000_section_groups from './20261030_000000_section_groups';
 
 export const migrations = [
   {
@@ -77,5 +82,30 @@ export const migrations = [
     up: migration_20261016_120000_json_site_settings.up,
     down: migration_20261016_120000_json_site_settings.down,
     name: '20261016_120000_json_site_settings',
+  },
+  {
+    up: migration_20261026_120000_flat_portfolio_fields.up,
+    down: migration_20261026_120000_flat_portfolio_fields.down,
+    name: '20261026_120000_flat_portfolio_fields',
+  },
+  {
+    up: migration_20261027_000000_complete_content_columns.up,
+    down: migration_20261027_000000_complete_content_columns.down,
+    name: '20261027_000000_complete_content_columns',
+  },
+  {
+    up: migration_20261028_000000_blog_markdown_content.up,
+    down: migration_20261028_000000_blog_markdown_content.down,
+    name: '20261028_000000_blog_markdown_content',
+  },
+  {
+    up: migration_20261029_000000_hero_image_fit.up,
+    down: migration_20261029_000000_hero_image_fit.down,
+    name: '20261029_000000_hero_image_fit',
+  },
+  {
+    up: migration_20261030_000000_section_groups.up,
+    down: migration_20261030_000000_section_groups.down,
+    name: '20261030_000000_section_groups',
   },
 ];

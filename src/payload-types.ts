@@ -354,40 +354,94 @@ export interface Capability {
   id: number;
   title: string;
   slug: string;
-  heading?: string | null;
-  subheading?: string | null;
-  summary?: string | null;
-  layoutSections?: (number | Section)[] | null;
-  seo?: {
-    seoTitle?: string | null;
-    metaDescription?: string | null;
-    canonicalUrl?: string | null;
-    robots?: {
-      index?: boolean | null;
-      follow?: boolean | null;
+  hero?: {
+    heading?: string | null;
+    subheading?: string | null;
+    summary?: string | null;
+    /**
+     * Small label above the page heading.
+     */
+    eyebrow?: string | null;
+    cta?: {
+      label?: string | null;
+      href?: string | null;
     };
-    keywords?: string | null;
-    ogTitle?: string | null;
-    ogDescription?: string | null;
-    ogImage?: (number | null) | Media;
-    schemaType?:
-      | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
+    secondaryCta?: {
+      label?: string | null;
+      href?: string | null;
+    };
+    image?: (number | null) | Media;
+    imageAlt?: string | null;
+    /**
+     * Recommended upload: about 1200 x 1200 px PNG/WebP, subject centred, transparent background allowed.
+     */
+    imageFit?: ('contain' | 'cover') | null;
+    imageAlign?: ('center' | 'bottom') | null;
+  };
+  scope?: {
+    includedHeading?: string | null;
+    included?:
+      | {
+          title: string;
+          /**
+           * Optional icon name.
+           */
+          icon?: string | null;
+          text?: string | null;
+          /**
+           * Comma-separated chips.
+           */
+          tags?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    whyHeading?: string | null;
+    whyText?: string | null;
+  };
+  technology?: {
+    /**
+     * Add each technology block in display order.
+     */
+    stacks?:
+      | {
+          kind?: ('logos' | 'chips' | 'rows' | 'cards') | null;
+          heading?: string | null;
+          intro?: string | null;
+          /**
+           * One item per line. Rows: Label: item, item. Cards: Title | text.
+           */
+          items: string;
+          note?: string | null;
+          tinted?: boolean | null;
+          id?: string | null;
+        }[]
       | null;
   };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industry".
- */
-export interface Industry {
-  id: number;
-  title: string;
-  slug: string;
-  heading?: string | null;
-  subheading?: string | null;
-  summary?: string | null;
+  process?: {
+    workflowEyebrow?: string | null;
+    workflowHeading?: string | null;
+    workflowIntro?: string | null;
+    /**
+     * One step per line: Title | short text.
+     */
+    workflow?: string | null;
+  };
+  related?: {
+    projectsHeading?: string | null;
+    relatedProjects?: (number | CaseStudy)[] | null;
+    insightsHeading?: string | null;
+    relatedInsights?: (number | Blog)[] | null;
+  };
+  faq?: {
+    faqHeading?: string | null;
+    faqs?:
+      | {
+          question: string;
+          answer: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
@@ -416,28 +470,29 @@ export interface CaseStudy {
   id: number;
   title: string;
   slug: string;
-  heading?: string | null;
-  subheading?: string | null;
-  category?: string | null;
-  featured?: boolean | null;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  tags?: string | null;
+  project?: {
+    heading?: string | null;
+    subheading?: string | null;
+    category?: string | null;
+    featured?: boolean | null;
+    projectStage?: ('in-design' | 'proto-built' | 'shipped') | null;
+    overview?:
+      | {
+          label: string;
+          text?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    tags?: string | null;
+  };
   Images?: {
     landingImage?: (number | null) | Media;
+    pageImages?:
+      | {
+          image: number | Media;
+          id?: string | null;
+        }[]
+      | null;
   };
   cardCta?: {
     label?: string | null;
@@ -447,7 +502,48 @@ export interface CaseStudy {
     label?: string | null;
     link?: string | null;
   };
-  projectStage?: ('in-design' | 'proto-built' | 'shipped') | null;
+  glance?: {
+    atAGlance?:
+      | {
+          label: string;
+          value: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  specs?: {
+    specGroups?:
+      | {
+          heading: string;
+          rows?:
+            | {
+                label: string;
+                value?: string | null;
+                builtIn?: boolean | null;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  content?: {
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
   layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
@@ -477,15 +573,30 @@ export interface Blog {
   id: number;
   title: string;
   slug: string;
+  article: {
+    category?: string | null;
+    featured?: boolean | null;
+    teaser?: string | null;
+    byline?: string | null;
+    publishedAt: string;
+    tags?: string | null;
+  };
+  cover?: {
+    image?: (number | null) | Media;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  /**
+   * Markdown body with H2 headings, paragraphs, lists, tables, and links. Tables pasted from Word or Google Docs are converted automatically. Do not add an H1.
+   */
+  content: string;
   heading?: string | null;
-  category?: string | null;
-  featured?: boolean | null;
   dek?: string | null;
-  image?: (number | null) | Media;
-  byline?: string | null;
-  publishedDate: string;
+  publishedDate?: string | null;
   updatedDate?: string | null;
-  body: {
+  body?: {
     root: {
       type: string;
       children: {
@@ -499,8 +610,11 @@ export interface Blog {
       version: number;
     };
     [k: string]: unknown;
+  } | null;
+  contentUpgrade?: {
+    label?: string | null;
+    checklistLink?: (number | null) | Checklist;
   };
-  tags?: string | null;
   layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
@@ -574,6 +688,109 @@ export interface Checklist {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industry".
+ */
+export interface Industry {
+  id: number;
+  title: string;
+  slug: string;
+  heading?: string | null;
+  subheading?: string | null;
+  summary?: string | null;
+  /**
+   * Small label above the page heading.
+   */
+  eyebrow?: string | null;
+  cta?: {
+    label?: string | null;
+    href?: string | null;
+  };
+  secondaryCta?: {
+    label?: string | null;
+    href?: string | null;
+  };
+  image?: (number | null) | Media;
+  imageAlt?: string | null;
+  /**
+   * Recommended upload: about 1200 x 1200 px PNG/WebP, subject centred, transparent background allowed.
+   */
+  heroImageFit?: ('contain' | 'cover') | null;
+  heroImageAlign?: ('center' | 'bottom') | null;
+  challengesHeading?: string | null;
+  /**
+   * One per line: Title | text.
+   */
+  challenges?: string | null;
+  disciplinesHeading?: string | null;
+  /**
+   * One per line: Title | text | /capabilities/slug/.
+   */
+  disciplines?: string | null;
+  calloutHeading?: string | null;
+  calloutText?: string | null;
+  productsHeading?: string | null;
+  /**
+   * One per line: Title | text.
+   */
+  products?: string | null;
+  /**
+   * Add each technology block in display order.
+   */
+  stacks?:
+    | {
+        kind?: ('logos' | 'chips' | 'rows' | 'cards') | null;
+        heading?: string | null;
+        intro?: string | null;
+        /**
+         * One item per line. Rows: Label: item, item. Cards: Title | text.
+         */
+        items: string;
+        note?: string | null;
+        tinted?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  projectsHeading?: string | null;
+  relatedProjects?: (number | CaseStudy)[] | null;
+  processHeading?: string | null;
+  processHighlight?: string | null;
+  processCtaLabel?: string | null;
+  processCtaHref?: string | null;
+  /**
+   * One step per line: Title | text.
+   */
+  process?: string | null;
+  faqHeading?: string | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  othersHeading?: string | null;
+  layoutSections?: (number | Section)[] | null;
+  seo?: {
+    seoTitle?: string | null;
+    metaDescription?: string | null;
+    canonicalUrl?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+    };
+    keywords?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    schemaType?:
+      | ('auto' | 'none' | 'Organization' | 'BreadcrumbList' | 'Service' | 'FAQPage' | 'BlogPosting' | 'NewsArticle')
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -878,9 +1095,89 @@ export interface CardSelect<T extends boolean = true> {
 export interface CapabilitySelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  heading?: T;
-  subheading?: T;
-  summary?: T;
+  hero?:
+    | T
+    | {
+        heading?: T;
+        subheading?: T;
+        summary?: T;
+        eyebrow?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        secondaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        image?: T;
+        imageAlt?: T;
+        imageFit?: T;
+        imageAlign?: T;
+      };
+  scope?:
+    | T
+    | {
+        includedHeading?: T;
+        included?:
+          | T
+          | {
+              title?: T;
+              icon?: T;
+              text?: T;
+              tags?: T;
+              id?: T;
+            };
+        whyHeading?: T;
+        whyText?: T;
+      };
+  technology?:
+    | T
+    | {
+        stacks?:
+          | T
+          | {
+              kind?: T;
+              heading?: T;
+              intro?: T;
+              items?: T;
+              note?: T;
+              tinted?: T;
+              id?: T;
+            };
+      };
+  process?:
+    | T
+    | {
+        workflowEyebrow?: T;
+        workflowHeading?: T;
+        workflowIntro?: T;
+        workflow?: T;
+      };
+  related?:
+    | T
+    | {
+        projectsHeading?: T;
+        relatedProjects?: T;
+        insightsHeading?: T;
+        relatedInsights?: T;
+      };
+  faq?:
+    | T
+    | {
+        faqHeading?: T;
+        faqs?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+      };
   layoutSections?: T;
   seo?:
     | T
@@ -913,6 +1210,58 @@ export interface IndustrySelect<T extends boolean = true> {
   heading?: T;
   subheading?: T;
   summary?: T;
+  eyebrow?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  image?: T;
+  imageAlt?: T;
+  heroImageFit?: T;
+  heroImageAlign?: T;
+  challengesHeading?: T;
+  challenges?: T;
+  disciplinesHeading?: T;
+  disciplines?: T;
+  calloutHeading?: T;
+  calloutText?: T;
+  productsHeading?: T;
+  products?: T;
+  stacks?:
+    | T
+    | {
+        kind?: T;
+        heading?: T;
+        intro?: T;
+        items?: T;
+        note?: T;
+        tinted?: T;
+        id?: T;
+      };
+  projectsHeading?: T;
+  relatedProjects?: T;
+  processHeading?: T;
+  processHighlight?: T;
+  processCtaLabel?: T;
+  processCtaHref?: T;
+  process?: T;
+  faqHeading?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  othersHeading?: T;
   layoutSections?: T;
   seo?:
     | T
@@ -942,16 +1291,33 @@ export interface IndustrySelect<T extends boolean = true> {
 export interface CaseStudySelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  heading?: T;
-  subheading?: T;
-  category?: T;
-  featured?: T;
-  body?: T;
-  tags?: T;
+  project?:
+    | T
+    | {
+        heading?: T;
+        subheading?: T;
+        category?: T;
+        featured?: T;
+        projectStage?: T;
+        overview?:
+          | T
+          | {
+              label?: T;
+              text?: T;
+              id?: T;
+            };
+        tags?: T;
+      };
   Images?:
     | T
     | {
         landingImage?: T;
+        pageImages?:
+          | T
+          | {
+              image?: T;
+              id?: T;
+            };
       };
   cardCta?:
     | T
@@ -965,7 +1331,40 @@ export interface CaseStudySelect<T extends boolean = true> {
         label?: T;
         link?: T;
       };
-  projectStage?: T;
+  glance?:
+    | T
+    | {
+        atAGlance?:
+          | T
+          | {
+              label?: T;
+              value?: T;
+              id?: T;
+            };
+      };
+  specs?:
+    | T
+    | {
+        specGroups?:
+          | T
+          | {
+              heading?: T;
+              rows?:
+                | T
+                | {
+                    label?: T;
+                    value?: T;
+                    builtIn?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  content?:
+    | T
+    | {
+        body?: T;
+      };
   layoutSections?: T;
   seo?:
     | T
@@ -996,16 +1395,39 @@ export interface CaseStudySelect<T extends boolean = true> {
 export interface BlogSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  article?:
+    | T
+    | {
+        category?: T;
+        featured?: T;
+        teaser?: T;
+        byline?: T;
+        publishedAt?: T;
+        tags?: T;
+      };
+  cover?:
+    | T
+    | {
+        image?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  content?: T;
   heading?: T;
-  category?: T;
-  featured?: T;
   dek?: T;
-  image?: T;
-  byline?: T;
   publishedDate?: T;
   updatedDate?: T;
   body?: T;
-  tags?: T;
+  contentUpgrade?:
+    | T
+    | {
+        label?: T;
+        checklistLink?: T;
+      };
   layoutSections?: T;
   seo?:
     | T
@@ -1167,6 +1589,10 @@ export interface Header {
       label: string;
       url: string;
       description?: string;
+      /**
+       * Picture for this items featured card, e.g. /api/media/file/pcb.png
+       */
+      image?: string;
       [k: string]: unknown;
     }[];
     [k: string]: unknown;

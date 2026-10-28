@@ -1,5 +1,14 @@
 import type { CollectionConfig } from 'payload'
-import { detailAccess, detailHooks, identityFields, layoutSectionsField, seoGroupField } from '../fields/serviceDetail'
+import {
+  detailAccess,
+  detailHooks,
+  faqsField,
+  identityFields,
+  layoutSectionsField,
+  seoGroupField,
+  serviceContentFields,
+  stacksField,
+} from '../fields/serviceDetail'
 
 export const Industry: CollectionConfig = {
   slug: 'industry',
@@ -11,5 +20,29 @@ export const Industry: CollectionConfig = {
   },
   access: detailAccess,
   hooks: detailHooks,
-  fields: [...identityFields, layoutSectionsField, seoGroupField],
+  fields: [
+    ...identityFields,
+    ...serviceContentFields,
+    { name: 'challengesHeading', type: 'text' },
+    { name: 'challenges', type: 'textarea', admin: { description: 'One per line: Title | text.' } },
+    { name: 'disciplinesHeading', type: 'text' },
+    { name: 'disciplines', type: 'textarea', admin: { description: 'One per line: Title | text | /capabilities/slug/.' } },
+    { name: 'calloutHeading', type: 'text', label: 'Callout band heading' },
+    { name: 'calloutText', type: 'text' },
+    { name: 'productsHeading', type: 'text' },
+    { name: 'products', type: 'textarea', admin: { description: 'One per line: Title | text.' } },
+    stacksField,
+    { name: 'projectsHeading', type: 'text' },
+    { name: 'relatedProjects', type: 'relationship', relationTo: 'case-study', hasMany: true, label: 'Related projects' },
+    { name: 'processHeading', type: 'text' },
+    { name: 'processHighlight', type: 'text', label: 'Highlighted process heading words' },
+    { name: 'processCtaLabel', type: 'text' },
+    { name: 'processCtaHref', type: 'text', label: 'Process button URL' },
+    { name: 'process', type: 'textarea', admin: { description: 'One step per line: Title | text.' } },
+    { name: 'faqHeading', type: 'text' },
+    faqsField,
+    { name: 'othersHeading', type: 'text', label: 'Other industries heading' },
+    layoutSectionsField,
+    seoGroupField,
+  ],
 }

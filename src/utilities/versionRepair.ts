@@ -1,4 +1,4 @@
-import type { Reader } from './20261012_120000_section_card_cleanup'
+import type { Reader } from '../migrations/20261012_120000_section_card_cleanup'
 
 export const VERSIONED_COLLECTIONS = ['page', 'blog', 'case_study', 'checklist'] as const
 

@@ -1,4 +1,5 @@
 import { APIError, type CollectionConfig } from 'payload'
+import { hasRole, isAdmin, isEditorOrAdmin } from '../access'
 import { notifyOnSubmission } from '../hooks/notifySubmission'
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -26,9 +27,9 @@ export const FormSubmission: CollectionConfig = {
   defaultSort: '-createdAt',
   access: {
     create: () => true,
-    read: ({ req: { user } }) => !!user,
-    update: ({ req: { user } }) => !!user,
-    delete: ({ req: { user } }) => !!user,
+    read: isEditorOrAdmin,
+    update: isEditorOrAdmin,
+    delete: isAdmin,
   },
   endpoints: [
     {
@@ -36,6 +37,7 @@ export const FormSubmission: CollectionConfig = {
       method: 'post',
       handler: async (req) => {
         if (!req.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        if (!hasRole(req, 'admin')) return Response.json({ error: 'Forbidden' }, { status: 403 })
         const cutoff = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
         const result = await req.payload.delete({
           collection: 'form-submission',

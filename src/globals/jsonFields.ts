@@ -53,7 +53,7 @@ export const navItemsField: Field = jsonField(
       properties: {
         label: text,
         url: text,
-        children: { type: 'array', items: { type: 'object', required: ['label', 'url'], properties: { label: text, url: text, description: text } } },
+        children: { type: 'array', items: { type: 'object', required: ['label', 'url'], properties: { label: text, url: text, description: text, image: { type: 'string', description: 'Picture for this items featured card, e.g. /api/media/file/pcb.png' } } } },
       },
     },
   },
@@ -61,7 +61,11 @@ export const navItemsField: Field = jsonField(
     listOf(value, 'Main Navigation Menu', (entry, where) => {
       const base = needs(entry, ['label', 'url'], where)
       if (base !== true) return base
-      return entry.children === undefined ? true : listOf(entry.children, `${where} children`, (child, childWhere) => needs(child, ['label', 'url'], childWhere))
+      return entry.children === undefined ? true : listOf(entry.children, `${where} children`, (child, childWhere) => {
+        const problem = needs(child, ['label', 'url'], childWhere)
+        if (problem !== true) return problem
+        return child.image === undefined || typeof child.image === 'string' ? true : `${childWhere} "image" must be text, for example "/api/media/file/pcb.png"`
+      })
     }),
   true,
 )

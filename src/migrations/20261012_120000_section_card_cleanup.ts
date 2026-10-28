@@ -140,7 +140,13 @@ export async function buildSectionCardCleanup(read: Reader): Promise<string[]> {
     )
   }
 
+  const tables = new Set(
+    (await read(`SELECT "name" FROM "sqlite_master" WHERE "type" = 'table'`)).map((row) => String(row.name)),
+  )
   for (const [table, column] of SEPARATOR_COLUMNS) {
+    if (!tables.has(table)) continue
+    const columns = new Set((await read(`PRAGMA table_info("${table}")`)).map((row) => String(row.name)))
+    if (!columns.has(column)) continue
     statements.push(`UPDATE "${table}" SET "${column}" = REPLACE("${column}", ' · ', ' - ') WHERE "${column}" LIKE '% · %'`)
   }
 
@@ -148,10 +154,20 @@ export async function buildSectionCardCleanup(read: Reader): Promise<string[]> {
     ['checklist', ''],
     ['_checklist_v', 'version_'],
   ]) {
-    statements.push(
-      `UPDATE "${table}" SET "${prefix}access_gate_email_placeholder" = 'you@company.com' WHERE "${prefix}access_gate_email_placeholder" = 'Enter your work email'`,
-      `UPDATE "${table}" SET "${prefix}access_gate_company_placeholder" = 'Company name' WHERE "${prefix}access_gate_company_placeholder" = 'Enter your company name'`,
-    )
+    if (!tables.has(table)) continue
+    const columns = new Set((await read(`PRAGMA table_info("${table}")`)).map((row) => String(row.name)))
+    const emailPlaceholder = `${prefix}access_gate_email_placeholder`
+    const companyPlaceholder = `${prefix}access_gate_company_placeholder`
+    if (columns.has(emailPlaceholder)) {
+      statements.push(
+        `UPDATE "${table}" SET "${emailPlaceholder}" = 'you@company.com' WHERE "${emailPlaceholder}" = 'Enter your work email'`,
+      )
+    }
+    if (columns.has(companyPlaceholder)) {
+      statements.push(
+        `UPDATE "${table}" SET "${companyPlaceholder}" = 'Company name' WHERE "${companyPlaceholder}" = 'Enter your company name'`,
+      )
+    }
   }
 
   return statements

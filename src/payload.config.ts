@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { EXPERIMENTAL_TableFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
@@ -63,6 +63,9 @@ const getPayloadSecret = (): string => {
 }
 
 const payloadSecret = getPayloadSecret()
+if (!payloadSecret && process.env.NODE_ENV === 'production') {
+  throw new Error('PAYLOAD_SECRET is not set; refusing to start without it in production.')
+}
 
 const isCLI = process.argv.some((value) => realpath(value).replaceAll('\\', '/').endsWith('payload/bin.js'))
 const isProduction = process.env.NODE_ENV === 'production'
@@ -94,8 +97,7 @@ const cloudflare =
     : await getCloudflareContext({ async: true })
 
 const allowedOrigins = [
-  'http://localhost:4200',
-  'http://localhost:3000',
+  ...(isProduction ? [] : ['http://localhost:4200', 'http://localhost:3000']),
   'https://canopy-cms.embeddedproductdev.workers.dev',
   'https://canopyembedded.com',
   'https://www.canopyembedded.com',
@@ -124,11 +126,15 @@ export default buildConfig({
       autoGenerate: false,
     },
   },
+  upload: { limits: { fileSize: 25 * 1024 * 1024 } },
+  graphQL: { disablePlaygroundInProduction: true },
   cors: allowedOrigins,
   csrf: allowedOrigins,
   globals: [Header, Footer, SeoSettings, SiteChrome],
   collections: [User, Media, Page, Section, Card, Capability, Industry, CaseStudy, Blog, Checklist, FormSubmission, Testimonial],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [...defaultFeatures, EXPERIMENTAL_TableFeature()],
+  }),
   secret: payloadSecret,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

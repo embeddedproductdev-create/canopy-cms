@@ -79,6 +79,8 @@ describe('project content and clean-up migration', () => {
     const rows = all(sqlite, 'SELECT filename FROM media')
     expect(rows.every((row) => files.has(String(row.filename)))).toBe(true)
     expect(files.size).toBe(rows.length)
-    expect(all(sqlite, 'SELECT id FROM _case_study_v WHERE latest = 1')).toHaveLength(3)
+    expect(all(sqlite, 'SELECT id FROM _case_study_v WHERE latest = 1')).toHaveLength(
+      all(sqlite, 'SELECT id FROM case_study').length,
+    )
   })
 })

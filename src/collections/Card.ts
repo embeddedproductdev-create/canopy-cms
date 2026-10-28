@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { contentAccess } from '../access'
 import { urlField } from '../hooks/normalizeUrl'
 import { cardKindOptions } from './sectionLayouts'
 
@@ -8,13 +9,9 @@ export const Card: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'type', 'shortDescription'],
-    group: 'Content Management',
+    hidden: true,
   },
-  access: {
-    create: ({ req: { user } }) => !!user,
-    read: () => true,
-    update: ({ req: { user } }) => !!user,
-  },
+  access: contentAccess,
   fields: [
     {
       type: 'row',

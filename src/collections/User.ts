@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isAdmin, isAdminOrSelf } from '../access'
 
 export const User: CollectionConfig = {
   slug: 'user',
@@ -6,7 +7,21 @@ export const User: CollectionConfig = {
     useAsTitle: 'email',
     group: 'Collections',
   },
-  auth: true,
+  access: {
+    create: isAdmin,
+    read: isAdminOrSelf,
+    update: isAdminOrSelf,
+    delete: isAdmin,
+  },
+  auth: {
+    tokenExpiration: 60 * 60 * 8,
+    maxLoginAttempts: 5,
+    lockTime: 15 * 60 * 1000,
+    cookies: {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+    },
+  },
   fields: [
     {
       name: 'name',

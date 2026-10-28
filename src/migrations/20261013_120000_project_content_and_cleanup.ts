@@ -1,6 +1,6 @@
 import { MigrateDownArgs, MigrateUpArgs, sql } from '@payloadcms/db-d1-sqlite'
 import { projectContent, type ProjectBlock } from './data/projects'
-import { buildVersionRepair } from './versions'
+import { buildVersionRepair } from '../utilities/versionRepair'
 
 export type Row = Record<string, unknown>
 export type Reader = (query: string) => Promise<Row[]>

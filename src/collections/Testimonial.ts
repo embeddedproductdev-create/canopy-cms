@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { contentAccess } from '../access'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
 
 export const Testimonial: CollectionConfig = {
@@ -9,12 +10,7 @@ export const Testimonial: CollectionConfig = {
     group: 'Testimonials',
     defaultColumns: ['heading', 'clientLabel', 'order'],
   },
-  access: {
-    create: ({ req: { user } }) => !!user,
-    read: () => true,
-    update: ({ req: { user } }) => !!user,
-    delete: ({ req: { user } }) => user?.role === 'admin',
-  },
+  access: contentAccess,
   hooks: {
     afterChange: [revalidateOnChange],
     afterDelete: [revalidateOnDelete],

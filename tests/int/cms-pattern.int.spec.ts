@@ -6,25 +6,41 @@ type AnyField = { name?: string; type: string; relationTo?: unknown; hasMany?: b
 
 const identity: Record<string, string[]> = {
   page: ['title', 'heading', 'subheading', 'eyebrow', 'pageType', 'url', 'heroImage', 'body', 'cta', 'pills', 'layoutSections', 'seo'],
-  capability: ['title', 'slug', 'heading', 'subheading', 'summary', 'layoutSections', 'seo'],
-  industry: ['title', 'slug', 'heading', 'subheading', 'summary', 'layoutSections', 'seo'],
-  'case-study': ['title', 'slug', 'heading', 'subheading', 'category', 'featured', 'body', 'tags', 'Images', 'cardCta', 'pageCta', 'projectStage', 'layoutSections', 'seo'],
-  blog: ['title', 'slug', 'heading', 'category', 'featured', 'dek', 'image', 'byline', 'publishedDate', 'updatedDate', 'body', 'tags', 'layoutSections', 'seo'],
+  capability: ['title', 'slug', 'hero', 'scope', 'technology', 'process', 'related', 'faq', 'layoutSections', 'seo'],
+  industry: ['title', 'slug', 'heading', 'subheading', 'summary', 'eyebrow', 'cta', 'secondaryCta', 'image', 'imageAlt', 'heroImageFit', 'heroImageAlign', 'challengesHeading', 'challenges', 'disciplinesHeading', 'disciplines', 'calloutHeading', 'calloutText', 'productsHeading', 'products', 'stacks', 'projectsHeading', 'relatedProjects', 'processHeading', 'processHighlight', 'processCtaLabel', 'processCtaHref', 'process', 'faqHeading', 'faqs', 'othersHeading', 'layoutSections', 'seo'],
+  'case-study': ['title', 'slug', 'project', 'Images', 'cardCta', 'pageCta', 'glance', 'specs', 'content', 'layoutSections', 'seo'],
+  blog: ['title', 'slug', 'article', 'cover', 'meta', 'content', 'heading', 'dek', 'publishedDate', 'updatedDate', 'body', 'contentUpgrade', 'layoutSections', 'seo'],
   checklist: ['title', 'heading', 'subheading', 'introduction', 'slug', 'itemsHeading', 'items', 'visibleItems', 'lockedItemsCount', 'pdfAsset', 'layoutSections', 'seo'],
   section: ['title', 'type', 'variant', 'eyebrow', 'heading', 'subheading', 'body', 'tags', 'cta', 'secondaryCta', 'image', 'cards', 'sectionKey', 'anchor', 'hidden'],
   card: ['title', 'type', 'subheading', 'value', 'shortDescription', 'description', 'ctaLabel', 'ctaUrl', 'icon', 'tags', 'image'],
+}
+
+/** Every named field, descending into groups too (the flat view of the form). */
+function deepNames(fields: AnyField[]): AnyField[] {
+  return names(fields).flatMap((field) => (field.type === 'group' ? [field, ...deepNames(field.fields ?? [])] : [field]))
 }
 
 function names(fields: AnyField[]): AnyField[] {
   return fields.flatMap((field) => {
     if (field.type === 'row' || field.type === 'collapsible') return names(field.fields ?? [])
     if (field.type === 'tabs') return (field.tabs ?? []).flatMap((tab) => names(tab.fields))
-    return field.name ? [field] : []
+    return field.name && field.type !== 'ui' ? [field] : []
   })
 }
 
-describe('Page + Section + Card pattern', () => {
-  it('keeps every content collection to identity fields plus layout sections', async () => {
+describe('Collection authoring model', () => {
+  it('uses the requested Markdown insight fields while retaining hidden legacy fields', async () => {
+    const resolved = await config
+    const collection = resolved.collections.find((c) => c.slug === 'blog')!
+    const fields = deepNames(collection.fields as unknown as AnyField[])
+    const required = ['teaser', 'publishedAt', 'meta', 'content']
+    for (const name of required) expect(fields.some((field) => field.name === name), name).toBe(true)
+    expect(fields.find((field) => field.name === 'content')?.type).toBe('textarea')
+    expect(fields.find((field) => field.name === 'body')?.admin?.hidden).toBe(true)
+    expect(fields.find((field) => field.name === 'publishedDate')?.admin?.hidden).toBe(true)
+  })
+
+  it('keeps service, portfolio, and insight content in their collection forms', async () => {
     const resolved = await config
     for (const [slug, allowed] of Object.entries(identity)) {
       const collection = resolved.collections.find((c) => c.slug === slug)

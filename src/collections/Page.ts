@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { contentAccess } from '../access'
 import { formatSlug, formatUrlPath } from '../utilities/formatSlug'
 import { seoGroupField } from '../fields/seo'
 import { urlField } from '../hooks/normalizeUrl'
@@ -12,12 +13,7 @@ export const Page: CollectionConfig = {
     defaultColumns: ['title', 'url', 'pageType', 'updatedAt'],
     group: 'Content Management',
   },
-  access: {
-    create: ({ req: { user } }) => !!user,
-    read: () => true,
-    update: ({ req: { user } }) => !!user,
-    delete: ({ req: { user } }) => user?.role === 'admin',
-  },
+  access: contentAccess,
   hooks: {
     afterChange: [revalidateOnChange],
     afterDelete: [revalidateOnDelete],
@@ -63,6 +59,7 @@ export const Page: CollectionConfig = {
       name: 'pills',
       type: 'array',
       label: 'Eyebrow Pills',
+      admin: { initCollapsed: true },
       fields: [{ name: 'label', type: 'text', label: 'Label', required: true }],
     },
     {

@@ -80,7 +80,7 @@ export const sectionLayouts: Record<string, SectionLayout> = {
     label: 'Chips',
     renders: 'Row of outlined keyword chips',
     fields: ['eyebrow', 'heading', 'subheading', 'items'],
-    variants: { ...COLUMNS },
+    variants: { surface: 'Grey background', ...COLUMNS },
     items: 'One chip per item',
   },
   marquee: {
@@ -136,7 +136,11 @@ export const sectionLayouts: Record<string, SectionLayout> = {
     label: 'Projects',
     renders: 'Portfolio cards pulled from Portfolio',
     fields: ['heading', 'subheading', 'cta', 'secondaryCta', 'items', 'cards'],
-    variants: { recent: 'Badge on the first project', ...COLUMNS },
+    variants: {
+      recent: 'Badge on the first project',
+      related: 'Related projects block',
+      ...COLUMNS,
+    },
     items: 'Portfolio slugs to show, in order',
     cards: 'Overrides (title = slug) and Kind Empty slots',
   },

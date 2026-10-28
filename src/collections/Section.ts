@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { contentAccess } from '../access'
 import { urlField } from '../hooks/normalizeUrl'
 import { layoutFor, sectionTypeOptions, showsField, validateVariant } from './sectionLayouts'
 
@@ -8,13 +9,9 @@ export const Section: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'type', 'variant', 'hidden'],
-    group: 'Content Management',
+    hidden: true,
   },
-  access: {
-    create: ({ req: { user } }) => !!user,
-    read: () => true,
-    update: ({ req: { user } }) => !!user,
-  },
+  access: contentAccess,
   fields: [
     { name: 'title', type: 'text', required: true },
     {
