@@ -6,6 +6,9 @@ import { buildProjectContentAndCleanup } from '../src/migrations/20261013_120000
 import { buildRestructure, ensureRestructureSchema } from '../src/migrations/20261014_120000_restructure_collections'
 import { buildHowWeWork } from '../src/migrations/20261015_120000_how_we_work_steps'
 import { buildJsonSiteSettings } from '../src/migrations/20261016_120000_json_site_settings'
+import { buildBlogMarkdownContent } from '../src/migrations/20261028_000000_blog_markdown_content'
+import { buildHeroImageFit } from '../src/migrations/20261029_000000_hero_image_fit'
+import { buildSectionGroups } from '../src/migrations/20261030_000000_section_groups'
 import { buildVersionRepair } from '../src/utilities/versionRepair'
 import { readWranglerConfig } from './lib/wrangler-config'
 
@@ -43,6 +46,9 @@ const steps: { name: string; schema?: (read: Reader) => Promise<string[]>; plan:
   { name: '20261014_120000_restructure_collections', schema: ensureRestructureSchema, plan: buildRestructure },
   { name: '20261015_120000_how_we_work_steps', plan: async () => ({ statements: buildHowWeWork() }) },
   { name: '20261016_120000_json_site_settings', plan: async (r) => ({ statements: await buildJsonSiteSettings(r) }) },
+  { name: '20261028_000000_blog_markdown_content', plan: async (r) => ({ statements: await buildBlogMarkdownContent(r) }) },
+  { name: '20261029_000000_hero_image_fit', plan: async (r) => ({ statements: await buildHeroImageFit(r) }) },
+  { name: '20261030_000000_section_groups', plan: async (r) => ({ statements: await buildSectionGroups(r) }) },
 ]
 
 for (const step of steps) {

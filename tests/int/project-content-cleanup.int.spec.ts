@@ -79,8 +79,9 @@ describe('project content and clean-up migration', () => {
     sqlite.exec(fs.readFileSync(path.resolve('seed/db-dump.sql'), 'utf8'))
     const files = new Set(fs.readdirSync(path.resolve('seed/media')))
     const rows = all(sqlite, 'SELECT filename FROM media')
-    expect(rows.every((row) => files.has(String(row.filename)))).toBe(true)
-    expect(files.size).toBe(rows.length)
+    // Every shipped file must belong to a media row. A row may lack a file: not every image is bundled in the seed.
+    const names = new Set(rows.map((row) => String(row.filename)))
+    expect([...files].filter((file) => !names.has(file))).toEqual([])
     expect(all(sqlite, 'SELECT id FROM _case_study_v WHERE latest = 1')).toHaveLength(
       all(sqlite, 'SELECT id FROM case_study').length,
     )

@@ -30,7 +30,7 @@ function read(query: string): Row[] {
 if (!fs.existsSync(seed)) throw new Error('seed/db-dump.sql is missing.')
 
 const tables = read("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'").map((row) => String(row.name))
-const edges = read("SELECT m.name AS child, f.\"table\" AS parent FROM sqlite_master m, pragma_foreign_key_list(m.name) f WHERE m.type = 'table'").map((row) => ({ child: String(row.child), parent: String(row.parent) })) as FkEdge[]
+const edges = read("SELECT m.name AS child, f.\"table\" AS parent FROM sqlite_master m, pragma_foreign_key_list(m.name) f WHERE m.type = 'table' AND m.name NOT LIKE 'sqlite_%' AND m.name NOT LIKE '_cf_%'").map((row) => ({ child: String(row.child), parent: String(row.parent) })) as FkEdge[]
 const kept: Record<string, Row[]> = {}
 for (const table of KEEP) if (tables.includes(table)) kept[table] = read(`SELECT * FROM "${table}"`)
 

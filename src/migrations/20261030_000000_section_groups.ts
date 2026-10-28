@@ -115,18 +115,23 @@ export function groupStatements(schema: Schema, spec: CollectionSpec[] = section
   return statements
 }
 
-export async function applySectionGroups(db: MigrateUpArgs['db']): Promise<void> {
+type Row = Record<string, unknown>
+export type Reader = (query: string) => Promise<Row[]>
+
+export async function buildSectionGroups(read: Reader): Promise<string[]> {
   // Only the tables we may rename: D1's own `_cf_*` tables refuse PRAGMA table_info.
   const relevant = new RegExp(`^(${sectionGroups.flatMap((entry) => [entry.table, entry.versions].filter(Boolean)).join('|')})(_|$)`)
-  const names = ((await db.all(sql`SELECT "name" FROM "sqlite_master" WHERE "type" = 'table'`)) as { name: string }[])
-    .map((row) => row.name)
-    .filter((name) => relevant.test(name))
+  const names = (await read(`SELECT name FROM sqlite_master WHERE type = 'table'`)).map((row) => String(row.name)).filter((name) => relevant.test(name))
   const schema: Schema = { tables: {} }
   for (const name of names) {
-    const columns = (await db.all(sql.raw(`PRAGMA table_info("${name}")`))) as { name: string }[]
-    schema.tables[name] = columns.map((column) => column.name)
+    schema.tables[name] = (await read(`SELECT name FROM pragma_table_info('${name}')`)).map((column) => String(column.name))
   }
-  for (const statement of groupStatements(schema)) await db.run(sql.raw(statement))
+  return groupStatements(schema)
+}
+
+export async function applySectionGroups(db: MigrateUpArgs['db']): Promise<void> {
+  const read: Reader = async (query) => (await db.all(sql.raw(query))) as Row[]
+  for (const statement of await buildSectionGroups(read)) await db.run(sql.raw(statement))
 }
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
