@@ -1,6 +1,8 @@
 import { execFileSync } from 'child_process'
 import path from 'path'
 import { migrations } from '../src/migrations'
+import expectedSchema from './lib/expected-schema.json'
+import { findSchemaGaps, type ActualColumn } from './lib/schema-check'
 
 const target = process.argv.includes('--local') ? '--local' : '--remote'
 const wrangler = path.resolve('node_modules/wrangler/bin/wrangler.js')
@@ -29,6 +31,20 @@ const applied = new Set(query('SELECT name FROM payload_migrations').map((row) =
 const pending = migrations.map((m) => m.name).filter((name) => !applied.has(name))
 console.log(`Migrations in code: ${migrations.length}, applied on ${target.slice(2)}: ${migrations.length - pending.length}`)
 if (pending.length) problems.push(`Migrations not applied: ${pending.join(', ')}`)
+
+// A migration can be marked applied without its tables being right (for example after importing an older seed).
+// Compare the real tables and columns with what Payload expects: a gap makes admin lists render blank.
+const actualSchema = query(
+  "SELECT m.name AS t, p.name AS c FROM sqlite_master m, pragma_table_info(m.name) p WHERE m.type = 'table' AND m.name NOT LIKE 'sqlite_%' AND m.name NOT LIKE '_cf_%'",
+) as unknown as ActualColumn[]
+const gaps = findSchemaGaps(expectedSchema as Record<string, string[]>, actualSchema)
+console.log(`Schema: ${Object.keys(expectedSchema).length} expected tables, ${gaps.length} gap(s)`)
+if (gaps.length) {
+  problems.push(
+    `The database schema does not match the code (${gaps.length} missing): ${gaps.slice(0, 12).join(', ')}${gaps.length > 12 ? ', ...' : ''}. ` +
+      'Run "npm run apply:cleanup" against it (the deploy workflow does this) before deploying, or the admin lists will be blank.',
+  )
+}
 
 const count = (table: string): number => Number(query(`SELECT COUNT(*) AS n FROM ${table}`)[0]?.n ?? 0)
 const counts = { page: count('page'), media: count('media'), users: count('user') }

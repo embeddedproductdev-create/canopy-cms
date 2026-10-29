@@ -1,13 +1,14 @@
 import type { Endpoint, Payload } from 'payload'
 import { hasRole } from '../access'
 import { sectionGroups } from '../migrations/20261030_000000_section_groups'
+import { MAX_IMPORT_RECORDS } from './transferLimits'
 
 export type TransferCollection = 'blog' | 'case-study' | 'capability' | 'industry'
 type RelatedCollection = TransferCollection | 'checklist'
 type TransferRecord = Record<string, unknown>
 
 const IMPORTABLE_COLLECTIONS = new Set<TransferCollection>(['blog', 'case-study', 'capability'])
-const MAX_RECORDS = 500
+const MAX_RECORDS = MAX_IMPORT_RECORDS
 const MAX_IMPORT_BYTES = 5 * 1024 * 1024
 
 const isRecord = (value: unknown): value is TransferRecord =>

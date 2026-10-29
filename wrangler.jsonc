@@ -3,7 +3,11 @@
   "main": ".open-next/worker.js",
   "name": "canopy-cms",
   "compatibility_date": "2025-08-15",
-  "observability": { "enabled": false },
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "invocation_logs": true, "head_sampling_rate": 1 }
+  },
+  "limits": { "cpu_ms": 300000 },
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "directory": ".open-next/assets",

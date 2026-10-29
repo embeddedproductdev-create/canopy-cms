@@ -28,7 +28,9 @@
     "seed:local": "wrangler d1 execute D1 --local --file seed/db-dump.sql -y && node -e \"require('fs').cpSync('seed/media','media',{recursive:true})\"",
     "replace:db": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/replace-remote-db.ts",
     "sync:db": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/sync-remote-db.ts",
-    "sync:media": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/sync-remote-media.ts"
+    "sync:media": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/sync-remote-media.ts",
+    "predeploy": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/predeploy.ts",
+    "schema:expected": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" PAYLOAD_MIGRATING=true node scripts/generate-expected-schema.ts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.14",

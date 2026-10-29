@@ -2,6 +2,8 @@
 
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, type DragEvent } from 'react'
+import { createPortal } from 'react-dom'
+import { MAX_IMPORT_RECORDS } from '../../utilities/transferLimits'
 
 type Preview = { creates: string[]; updates: string[]; errors: string[] }
 type ExportFile = { format: 'canopy-content-v1'; collection: string; documents: Record<string, unknown>[] }
@@ -9,7 +11,7 @@ type Mode = 'export' | 'import' | null
 
 const LABELS: Record<string, string> = { blog: 'Insights', 'case-study': 'Portfolio', capability: 'Capabilities' }
 const MAX_BYTES = 5 * 1024 * 1024
-const MAX_RECORDS = 500
+const MAX_RECORDS = MAX_IMPORT_RECORDS
 
 /** Cheap checks run in the browser before anything is uploaded. The server repeats and extends them. */
 async function verifyFile(file: File, collection: string): Promise<{ data?: ExportFile; errors: string[] }> {
@@ -69,8 +71,46 @@ const css = `
 .ct-muted{color:var(--theme-elevation-600);font-size:.875rem}
 `
 
+/** Payload's own button markup, so Import and Export look like the Create New button they sit next to. */
+const pill = 'btn btn--icon-style-without-border btn--size-small btn--withoutPopup btn--style-secondary'
+
+/**
+ * Where the buttons go: the row that holds "Create New" in the list header. `undefined` while that row is still being
+ * looked for, `null` if it never shows up (no create permission, or Payload changed its markup), so the buttons are
+ * then shown under the heading instead of being lost.
+ */
+function useTitleActionsSlot(): HTMLElement | null | undefined {
+  const [slot, setSlot] = useState<HTMLElement | null | undefined>(undefined)
+  useEffect(() => {
+    const find = () => document.querySelector<HTMLElement>('.list-header__title-actions')
+    const found = find()
+    if (found) {
+      setSlot(found)
+      return
+    }
+    const observer = new MutationObserver(() => {
+      const element = find()
+      if (element) {
+        setSlot(element)
+        observer.disconnect()
+      }
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+    const giveUp = window.setTimeout(() => {
+      observer.disconnect()
+      setSlot((current) => current ?? null)
+    }, 1500)
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(giveUp)
+    }
+  }, [])
+  return slot
+}
+
 export default function ContentTransferButtons() {
   const collectionSlug = /\/collections\/([^/?#]+)/.exec(usePathname())?.[1] ?? ''
+  const slot = useTitleActionsSlot()
   const [mode, setMode] = useState<Mode>(null)
   const [busy, setBusy] = useState(false)
   const [dragOver, setDragOver] = useState(false)
@@ -178,17 +218,22 @@ export default function ContentTransferButtons() {
     void chooseFile(event.dataTransfer.files?.[0])
   }
 
+  const buttons = (
+    <>
+      {(['import', 'export'] as const).map((action) => (
+        <button key={action} type="button" className={pill} onClick={() => setMode(action)}>
+          <span className="btn__content">
+            <span className="btn__label">{action === 'import' ? 'Import' : 'Export'}</span>
+          </span>
+        </button>
+      ))}
+    </>
+  )
+
   return (
     <>
       <style>{css}</style>
-      <div className="ct-actions">
-        <button type="button" className="ct-btn" onClick={() => setMode('import')}>
-          Import
-        </button>
-        <button type="button" className="ct-btn" onClick={() => setMode('export')}>
-          Export
-        </button>
-      </div>
+      {slot ? createPortal(buttons, slot) : slot === null ? <div className="ct-actions">{buttons}</div> : null}
 
       {mode && (
         <div className="ct-overlay" onMouseDown={(event) => event.target === event.currentTarget && !busy && close()}>

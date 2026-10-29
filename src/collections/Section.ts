@@ -9,7 +9,7 @@ export const Section: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'type', 'variant', 'hidden'],
-    hidden: true,
+    group: 'Content Management',
   },
   access: contentAccess,
   fields: [

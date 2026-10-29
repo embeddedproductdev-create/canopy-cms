@@ -126,12 +126,19 @@ export default buildConfig({
       autoGenerate: false,
     },
   },
-  upload: { limits: { fileSize: 25 * 1024 * 1024 } },
-  graphQL: { disablePlaygroundInProduction: true },
+  // The Worker has 128 MB of memory and buffers an upload several times over, so large files are refused.
+  upload: { limits: { fileSize: 10 * 1024 * 1024 } },
+  // The website reads the REST API only; leaving GraphQL out keeps its schema off every cold start.
+  graphQL: { disable: true },
+  // Deep populates and long lists are what blow the Worker's memory; the site's deepest read is depth 3.
+  maxDepth: 3,
   cors: allowedOrigins,
   csrf: allowedOrigins,
   globals: [Header, Footer, SeoSettings, SiteChrome],
-  collections: [User, Media, Page, Section, Card, Capability, Industry, CaseStudy, Blog, Checklist, FormSubmission, Testimonial],
+  // Admin lists load 25 rows at a time (at most 50) so opening a collection never reads it whole.
+  collections: [User, Media, Page, Section, Card, Capability, Industry, CaseStudy, Blog, Checklist, FormSubmission, Testimonial].map(
+    (collection) => ({ ...collection, admin: { ...collection.admin, pagination: { defaultLimit: 25, limits: [10, 25, 50] } } }),
+  ),
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [...defaultFeatures, EXPERIMENTAL_TableFeature()],
   }),

@@ -63,6 +63,15 @@ describe('Collection authoring model', () => {
     }
   })
 
+  it('shows Sections and Cards in the admin next to Pages', async () => {
+    const resolved = await config
+    for (const slug of ['section', 'card']) {
+      const collection = resolved.collections.find((c) => c.slug === slug)!
+      expect(collection.admin.hidden, slug).toBeFalsy()
+      expect(collection.admin.group, slug).toBe('Content Management')
+    }
+  })
+
   it('describes every section type that the select offers', async () => {
     const resolved = await config
     const section = resolved.collections.find((c) => c.slug === 'section')!

@@ -72,7 +72,7 @@ wrangler.jsonc     Worker name, D1 and R2 bindings
 
 **How to use the admin and what every field does: [CMS-GUIDE.md](CMS-GUIDE.md).** Pick a Section Type and the form shows only the fields that layout reads.
 
-Content model: Pages retain their flexible `Section` / `Card` layout. Capabilities, Industries, Portfolio projects, and Insights are edited from their own collection forms using direct fields; legacy Section/Card relationships stay available to the public API for existing content but are hidden from the routine admin workflow.
+Content model: Pages retain their flexible `Section` / `Card` layout. Capabilities, Industries, Portfolio projects, and Insights are edited from their own collection forms using direct fields; Sections and Cards stay available in the admin under Content Management for building Pages, and their legacy relationships stay available to the public API for existing content.
 
 ### Content JSON transfer
 
@@ -81,7 +81,7 @@ The **Import / Export** link in the admin navigation transfers Insights, Portfol
 ### Changing the schema
 1. Edit the collection or global.
 2. Add an idempotent migration in `src/migrations/` and register it in `src/migrations/index.ts`.
-3. `npm run generate:types:payload`.
+3. `npm run generate:types:payload` and `npm run schema:expected` (rewrites `scripts/lib/expected-schema.json`, which `verify:remote` uses to catch a database that is missing tables or columns).
 4. `npm run lint`, `npx tsc --noEmit`, `npm run test:int`.
 5. Apply the migration to the remote D1 yourself (`npm run deploy:database` with Cloudflare credentials in your shell), then commit and run the deploy workflow. The workflow does not run migrations: `payload migrate` needs a Cloudflare remote preview session that the GitHub runner could not create, and the verify step stops the deploy if a migration is still unapplied.
 
@@ -153,6 +153,9 @@ cp -r media/. seed/media/
 | production admin: collections show a 500 error, the bell request returns 401 | the CMS's own origin (`https://canopy-cms.<subdomain>.workers.dev`) must stay in `allowedOrigins` in `src/payload.config.ts`. Payload ignores the login cookie on any request whose `Origin` is not in the CSRF list, so the admin's own saves and list loads fail. A test (`tests/int/origins.int.spec.ts`) guards this |
 | local dev: "no such table" or missing columns | start from a clean state: delete `.wrangler/state`, run `npm run seed:local` |
 | build asks for Cloudflare login | use `npm run build:cf`, not a bare `opennextjs-cloudflare build` |
+| an admin list (for example Portfolio) is completely blank, with no browser error | the deployed code expects tables or columns the live database does not have yet; the query fails on the server and Payload renders nothing. Run the *Deploy CMS* workflow (it runs `apply:cleanup`; leave *replace_database* off to keep the content already in the live CMS). `npm run verify:remote` lists the missing tables and columns and fails the deploy before it ships a blank admin |
+| *Replace database* fails with `{"D1_RESET_DO":true}` | D1 reset itself during the import. The script now sends the seed in small steps and retries transient failures; if it still fails the log names the step. A failed step rolls back, so just rerun the workflow. To restore, use the Time Travel bookmark printed earlier in the log |
+| "Worker exceeded resource limits" (error 1102) | one request used more CPU or memory than allowed (CPU is capped at 5 min by `limits.cpu_ms`; memory is a fixed 128 MB). Invocation logs are on: Cloudflare Dashboard -> Workers & Pages -> canopy-cms -> Logs (or `npx wrangler tail`) shows the failing route and "Exceeded CPU Limit" vs "Exceeded Memory". Imports are capped at 100 records, uploads at 10 MB, populate depth at 3 and admin lists at 25 rows to keep requests small. See `docs/RESOURCE-LIMITS.md` |
 
 ## 4. Optional: form notifications and cache purge
 New form submissions can notify Telegram, email (Resend) or a Discord/Slack webhook, and content changes can purge the Cloudflare cache or call a deploy hook. These are driven by environment variables (`NOTIFICATIONS.md`) and are **not** set by the deploy workflow yet. To enable them, add the secrets and extend the *Set Worker runtime secrets* step in `deploy-cms.yml` with a `wrangler secret put` for each.

@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '../../payload.config'
+import { sitemapQuery } from '../../utilities/sitemapQuery'
 
 interface Entry {
   url: string
@@ -14,7 +15,7 @@ export async function GET() {
 
     const entries: Entry[] = []
     const add = async (collection: string, toUrl: (doc: any) => string | null) => {
-      const result = await payload.find({ collection: collection as never, limit: 1000, depth: 0, pagination: false })
+      const result = await payload.find({ collection: collection as never, ...sitemapQuery, select: { ...sitemapQuery.select } as never })
       for (const doc of result.docs as any[]) {
         if (doc.seo?.robots?.index === false) continue
         const url = toUrl(doc)

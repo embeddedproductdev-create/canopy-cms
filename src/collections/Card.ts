@@ -9,7 +9,7 @@ export const Card: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'type', 'shortDescription'],
-    hidden: true,
+    group: 'Content Management',
   },
   access: contentAccess,
   fields: [
