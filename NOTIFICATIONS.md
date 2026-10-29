@@ -40,6 +40,9 @@ Dependencies: a Telegram account only. No domain, no server.
    NOTIFY_TELEGRAM_CHAT_ID=987654321
    ```
 5. `pnpm run notify:test`.
+6. For the deployed CMS, add `NOTIFY_TELEGRAM_BOT_TOKEN` and `NOTIFY_TELEGRAM_CHAT_ID` (optionally `NOTIFY_ADMIN_URL`) as GitHub secrets on the `production` environment; the CMS deploy workflow pushes them to the Worker.
+
+To notify a team, use a Telegram **group** that contains the bot and use its (negative) chat id. Add or remove people in Telegram; nothing needs redeploying. The alert includes name, email, mobile number, company, role, chosen slot and message.
 
 Limits/notes: messages are plain text (4096 chars max; the hook trims). The token grants posting rights — treat it like a password; regenerate with `/revoke` in BotFather if it leaks.
 

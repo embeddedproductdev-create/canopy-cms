@@ -31,6 +31,9 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
       CMS_URL: ${{ secrets.CMS_URL }}
+      NOTIFY_TELEGRAM_BOT_TOKEN: ${{ secrets.NOTIFY_TELEGRAM_BOT_TOKEN }}
+      NOTIFY_TELEGRAM_CHAT_ID: ${{ secrets.NOTIFY_TELEGRAM_CHAT_ID }}
+      NOTIFY_ADMIN_URL: ${{ secrets.NOTIFY_ADMIN_URL }}
 
     steps:
       - name: Checkout code
@@ -143,6 +146,14 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "${PAYLOAD_SECRET}" | npx wrangler secret put PAYLOAD_SECRET
+          for name in NOTIFY_TELEGRAM_BOT_TOKEN NOTIFY_TELEGRAM_CHAT_ID NOTIFY_ADMIN_URL; do
+            value="${!name:-}"
+            if [ -n "$value" ]; then
+              printf '%s' "$value" | npx wrangler secret put "$name"
+            else
+              echo "::notice::$name is not set; skipping."
+            fi
+          done
       - name: Smoke-check the deployed CMS
         run: |
           set -euo pipefail

@@ -6,11 +6,12 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const REQUIRED: Record<string, string[]> = {
   engagement: ['name', 'company', 'message'],
-  consultation: ['name', 'company', 'message'],
+  consultation: ['name', 'company', 'message', 'phone'],
   checklist: ['company'],
   subscribe: [],
 }
-const MAX = { name: 120, company: 160, scope: 200, message: 4000, email: 254, source: 300, checklist: 120 } as const
+const MAX = { name: 120, company: 160, scope: 200, message: 4000, email: 254, source: 300, checklist: 120, phone: 32 } as const
+const PHONE_DIGITS = /^\d{7,15}$/
 const RATE_LIMIT_MS = 30_000
 
 const clean = (value: unknown, max: number): string => String(value ?? '').replace(/[\u0000-\u001f\u007f]+/g, ' ').trim().slice(0, max)
@@ -66,6 +67,7 @@ export const FormSubmission: CollectionConfig = {
           email: clean(data['email'], MAX.email),
           name: clean(data['name'], MAX.name),
           company: clean(data['company'], MAX.company),
+          phone: clean(data['phone'], MAX.phone),
           scope: clean(data['scope'], MAX.scope),
           message: String(data['message'] ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').trim().slice(0, MAX.message),
           checklist: clean(data['checklist'], MAX.checklist),
@@ -75,7 +77,9 @@ export const FormSubmission: CollectionConfig = {
         }
         const missing = (REQUIRED[form] ?? []).filter((field) => !(next as Record<string, unknown>)[field])
         if (missing.length) throw new APIError(`Missing required field(s): ${missing.join(', ')}`, 400)
-        const since = new Date(Date.now() - RATE_LIMIT_MS).toISOString()
+        if (next.phone && !/^\+?[\d\s().-]+$/.test(next.phone)) throw new APIError('A valid phone number is required', 400)
+        if (next.phone && !PHONE_DIGITS.test(next.phone.replace(/\D/g, ''))) throw new APIError('A valid phone number is required', 400)
+        const since =new Date(Date.now() - RATE_LIMIT_MS).toISOString()
         const recent = await req.payload.count({
           collection: 'form-submission',
           overrideAccess: true,
@@ -92,6 +96,7 @@ export const FormSubmission: CollectionConfig = {
     { name: 'name', type: 'text' },
     { name: 'email', type: 'email', required: true },
     { name: 'company', type: 'text' },
+    { name: 'phone', type: 'text' },
     { name: 'scope', type: 'text' },
     { name: 'message', type: 'textarea' },
     { name: 'checklist', type: 'text' },

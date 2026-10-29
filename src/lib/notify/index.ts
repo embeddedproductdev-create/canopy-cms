@@ -4,6 +4,7 @@ export interface SubmissionSummary {
   email: string
   name?: string
   company?: string
+  phone?: string
   scope?: string
   message?: string
   checklist?: string
@@ -22,12 +23,20 @@ const adminUrl = (id: number | string): string => {
   return base ? `${base}/admin/collections/form-submission/${id}` : ''
 }
 
-function formatText(s: SubmissionSummary): string {
+const detail = (s: SubmissionSummary, key: string): string => {
+  const value = s.data?.[key]
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+export function formatText(s: SubmissionSummary): string {
   const lines = [
     `New website submission — ${s.form}`,
     s.name ? `Name: ${s.name}` : '',
     `Email: ${s.email}`,
+    s.phone ? `Phone: ${s.phone}` : '',
     s.company ? `Company: ${s.company}` : '',
+    detail(s, 'role') ? `Role: ${detail(s, 'role')}` : '',
+    detail(s, 'slot') ? `Slot: ${detail(s, 'slot')}` : '',
     s.scope ? `Scope: ${s.scope}` : '',
     s.checklist ? `Checklist: ${s.checklist}` : '',
     s.message ? `Message: ${s.message}` : '',

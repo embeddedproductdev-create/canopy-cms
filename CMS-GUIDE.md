@@ -506,6 +506,7 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Name | Text | - |
 | Email * | Email | - |
 | Company | Text | - |
+| Phone | Text | - |
 | Scope | Text | - |
 | Message | Long text | - |
 | Checklist | Text | - |

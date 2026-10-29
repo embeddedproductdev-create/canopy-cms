@@ -8,6 +8,7 @@ import { buildHowWeWork } from '../src/migrations/20261015_120000_how_we_work_st
 import { buildJsonSiteSettings } from '../src/migrations/20261016_120000_json_site_settings'
 import { buildBlogMarkdownContent } from '../src/migrations/20261028_000000_blog_markdown_content'
 import { buildHeroImageFit } from '../src/migrations/20261029_000000_hero_image_fit'
+import { buildFormSubmissionPhone } from '../src/migrations/20261101_000000_form_submission_phone'
 import { buildPayload392Columns } from '../src/migrations/20261031_000000_payload_3_92_columns'
 import { buildSectionGroups } from '../src/migrations/20261030_000000_section_groups'
 import { buildVersionRepair } from '../src/utilities/versionRepair'
@@ -51,6 +52,7 @@ const steps: { name: string; schema?: (read: Reader) => Promise<string[]>; plan:
   { name: '20261029_000000_hero_image_fit', plan: async (r) => ({ statements: await buildHeroImageFit(r) }) },
   { name: '20261030_000000_section_groups', plan: async (r) => ({ statements: await buildSectionGroups(r) }) },
   { name: '20261031_000000_payload_3_92_columns', plan: async (r) => ({ statements: await buildPayload392Columns(r) }) },
+  { name: '20261101_000000_form_submission_phone', plan: async (r) => ({ statements: await buildFormSubmissionPhone(r) }) },
 ]
 
 for (const step of steps) {

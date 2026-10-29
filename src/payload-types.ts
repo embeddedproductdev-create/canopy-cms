@@ -805,6 +805,7 @@ export interface FormSubmission {
   name?: string | null;
   email: string;
   company?: string | null;
+  phone?: string | null;
   scope?: string | null;
   message?: string | null;
   checklist?: string | null;
@@ -1516,6 +1517,7 @@ export interface FormSubmissionSelect<T extends boolean = true> {
   name?: T;
   email?: T;
   company?: T;
+  phone?: T;
   scope?: T;
   message?: T;
   checklist?: T;
