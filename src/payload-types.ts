@@ -379,6 +379,16 @@ export interface Capability {
      */
     imageFit?: ('contain' | 'cover') | null;
     imageAlign?: ('center' | 'bottom') | null;
+    /**
+     * Shown above the hero heading, e.g. Capabilities > Deep Firmware Engineering. Leave the URL empty for the current page.
+     */
+    breadcrumbs?:
+      | {
+          label: string;
+          url?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   scope?: {
     includedHeading?: string | null;
@@ -444,7 +454,6 @@ export interface Capability {
         }[]
       | null;
   };
-  layoutSections?: (number | Section)[] | null;
   seo?: {
     seoTitle?: string | null;
     metaDescription?: string | null;
@@ -513,7 +522,19 @@ export interface CaseStudy {
         }[]
       | null;
   };
+  features?: {
+    heading?: string | null;
+    intro?: string | null;
+    items?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   specs?: {
+    heading?: string | null;
+    intro?: string | null;
     specGroups?:
       | {
           heading: string;
@@ -525,6 +546,16 @@ export interface CaseStudy {
                 id?: string | null;
               }[]
             | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  gap?: {
+    heading?: string | null;
+    cards?:
+      | {
+          title: string;
+          text?: string | null;
           id?: string | null;
         }[]
       | null;
@@ -1123,6 +1154,13 @@ export interface CapabilitySelect<T extends boolean = true> {
         imageAlt?: T;
         imageFit?: T;
         imageAlign?: T;
+        breadcrumbs?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
       };
   scope?:
     | T
@@ -1183,7 +1221,6 @@ export interface CapabilitySelect<T extends boolean = true> {
               id?: T;
             };
       };
-  layoutSections?: T;
   seo?:
     | T
     | {
@@ -1347,9 +1384,23 @@ export interface CaseStudySelect<T extends boolean = true> {
               id?: T;
             };
       };
+  features?:
+    | T
+    | {
+        heading?: T;
+        intro?: T;
+        items?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+      };
   specs?:
     | T
     | {
+        heading?: T;
+        intro?: T;
         specGroups?:
           | T
           | {
@@ -1362,6 +1413,18 @@ export interface CaseStudySelect<T extends boolean = true> {
                     builtIn?: T;
                     id?: T;
                   };
+              id?: T;
+            };
+      };
+  gap?:
+    | T
+    | {
+        heading?: T;
+        cards?:
+          | T
+          | {
+              title?: T;
+              text?: T;
               id?: T;
             };
       };

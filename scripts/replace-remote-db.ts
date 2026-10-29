@@ -1,7 +1,7 @@
 import { execFileSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
-import { buildReplaceChunks, countStatements, expectedRowCounts, type ColumnInfo, type FkEdge, type Row } from './lib/replace-sql'
+import { buildReplaceChunks, CONTENT_TABLES, countStatements, dataLossReport, expectedRowCounts, type ColumnInfo, type FkEdge, type Row } from './lib/replace-sql'
 import { runWithRetry } from './lib/retry'
 
 // Replaces the content of the remote D1 with seed/db-dump.sql. Admin users and form submissions that exist
@@ -44,6 +44,20 @@ for (const table of KEEP) {
 
 console.log(`Remote tables to replace: ${tables.length} (${edges.length} foreign keys)`)
 for (const table of KEEP) console.log(`  keeping ${kept[table]?.length ?? 0} row(s) of ${table}`)
+
+// A seed with fewer posts, projects or media than the live database means live edits would be deleted.
+const live: Record<string, number> = {}
+const liveTables = CONTENT_TABLES.filter((table) => tables.includes(table))
+const liveOut = d1(['--json', '--command', countStatements(liveTables).join('; ')])
+for (const set of JSON.parse(liveOut.slice(liveOut.indexOf('['))) as { results?: Row[] }[]) for (const row of set.results ?? []) live[String(row.t)] = Number(row.n)
+const loss = dataLossReport(live, expectedRowCounts(fs.readFileSync(seed, 'utf8')))
+if (loss.length) {
+  console.log(`\nThe seed has less content than the ${target.slice(2)} database:\n${loss.map((line) => `  ${line}`).join('\n')}`)
+  if (!process.argv.includes('--allow-data-loss')) {
+    throw new Error('Refusing to replace the database: it would delete content. Restore the seed first, or pass --allow-data-loss (workflow input allow_data_loss) if that is intended.')
+  }
+  console.log('--allow-data-loss given, continuing.')
+}
 
 if (!execute) {
   console.log('\nDry run only. Re-run with --yes to replace the remote database content.')

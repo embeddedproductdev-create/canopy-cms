@@ -38,6 +38,12 @@ describe('Blog Markdown content migration', () => {
     expect(legacyBodyToMarkdown(body)).toContain('| --- | --- |')
   })
 
+  it('keeps the text of list items whose text sits directly under the item', () => {
+    const text = (value: string) => ({ type: 'text', text: value })
+    const body = JSON.stringify({ root: { children: [{ type: 'list', listType: 'number', children: [{ type: 'listitem', children: [text('First step')] }, { type: 'listitem', children: [text('Second '), { ...text('step'), format: 1 }] }] }] } })
+    expect(legacyBodyToMarkdown(body)).toBe('1. First step\n2. Second **step**')
+  })
+
   it('preserves non-JSON legacy body values', () => {
     expect(legacyBodyToMarkdown('Plain article text')).toBe('Plain article text')
   })

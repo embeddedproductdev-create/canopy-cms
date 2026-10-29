@@ -4,6 +4,7 @@ import { contentAccess } from '../access'
 import { formatSlug } from '../utilities/formatSlug'
 import { seoGroupField } from '../fields/seo'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
+import { captureOwnSections, removeReferences } from '../utilities/removeReferences'
 import { contentTransferEndpoints } from '../utilities/contentTransfer'
 
 export const Blog: CollectionConfig = {
@@ -17,7 +18,8 @@ export const Blog: CollectionConfig = {
   access: contentAccess,
   hooks: {
     afterChange: [revalidateOnChange],
-    afterDelete: [revalidateOnDelete],
+    beforeDelete: [captureOwnSections('blog')],
+    afterDelete: [removeReferences('blog'), revalidateOnDelete],
   },
   endpoints: contentTransferEndpoints('blog'),
   versions: {

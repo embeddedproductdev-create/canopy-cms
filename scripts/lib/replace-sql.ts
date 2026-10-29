@@ -152,6 +152,13 @@ export function buildReplaceSql(tables: string[], edges: FkEdge[], kept: Record<
 }
 
 /** One simple count per table. D1 allows only a handful of terms in a compound SELECT, so never join them with UNION. */
+/** Content tables whose rows are edited in the live admin; a seed with fewer rows than the live database would delete them. */
+export const CONTENT_TABLES = ['blog', 'case_study', 'capability', 'industry', 'page', 'media', 'testimonial', 'checklist']
+
+export function dataLossReport(live: Record<string, number>, seed: Record<string, number>): string[] {
+  return CONTENT_TABLES.filter((table) => (live[table] ?? 0) > (seed[table] ?? 0)).map((table) => `${table}: live has ${live[table]}, the seed has ${seed[table] ?? 0}`)
+}
+
 export function countStatements(tables: string[]): string[] {
   return tables.map((table) => `SELECT '${table}' AS t, count(*) AS n FROM "${table}"`)
 }

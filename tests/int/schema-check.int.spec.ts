@@ -11,6 +11,8 @@ import { buildHeroImageFit } from '../../src/migrations/20261029_000000_hero_ima
 import { buildSectionGroups } from '../../src/migrations/20261030_000000_section_groups'
 import { buildPayload392Columns } from '../../src/migrations/20261031_000000_payload_3_92_columns'
 import { buildFormSubmissionPhone } from '../../src/migrations/20261101_000000_form_submission_phone'
+import { buildSectionsToFieldsSchema } from '../../src/migrations/20261102_000000_sections_to_fields'
+import { buildCapabilityBreadcrumbsSchema } from '../../src/migrations/20261103_000000_capability_breadcrumbs'
 import expected from '../../scripts/lib/expected-schema.json'
 
 const expectedSchema = expected as Record<string, string[]>
@@ -50,7 +52,7 @@ describe('database schema check', () => {
     const db = new DatabaseSync(':memory:')
     db.exec(seed)
     const read = async (query: string) => db.prepare(query).all() as Record<string, unknown>[]
-    for (const build of [buildBlogMarkdownContent, buildHeroImageFit, buildSectionGroups, buildPayload392Columns, buildFormSubmissionPhone]) {
+    for (const build of [buildBlogMarkdownContent, buildHeroImageFit, buildSectionGroups, buildPayload392Columns, buildFormSubmissionPhone, buildSectionsToFieldsSchema, buildCapabilityBreadcrumbsSchema]) {
       for (const statement of await build(read)) db.exec(statement)
     }
     expect(findSchemaGaps(expectedSchema, actualOf(db))).toEqual([])

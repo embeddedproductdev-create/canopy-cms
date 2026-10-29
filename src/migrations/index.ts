@@ -18,6 +18,8 @@ import * as migration_20261029_000000_hero_image_fit from './20261029_000000_her
 import * as migration_20261030_000000_section_groups from './20261030_000000_section_groups';
 import * as migration_20261031_000000_payload_3_92_columns from './20261031_000000_payload_3_92_columns';
 import * as migration_20261101_000000_form_submission_phone from './20261101_000000_form_submission_phone';
+import * as migration_20261102_000000_sections_to_fields from './20261102_000000_sections_to_fields';
+import * as migration_20261103_000000_capability_breadcrumbs from './20261103_000000_capability_breadcrumbs';
 
 export const migrations = [
   {
@@ -119,5 +121,15 @@ export const migrations = [
     up: migration_20261101_000000_form_submission_phone.up,
     down: migration_20261101_000000_form_submission_phone.down,
     name: '20261101_000000_form_submission_phone',
+  },
+  {
+    up: migration_20261102_000000_sections_to_fields.up,
+    down: migration_20261102_000000_sections_to_fields.down,
+    name: '20261102_000000_sections_to_fields',
+  },
+  {
+    up: migration_20261103_000000_capability_breadcrumbs.up,
+    down: migration_20261103_000000_capability_breadcrumbs.down,
+    name: '20261103_000000_capability_breadcrumbs',
   },
 ];

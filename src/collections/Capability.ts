@@ -6,7 +6,6 @@ import {
   detailHooks,
   faqsField,
   identityFields,
-  layoutSectionsField,
   seoGroupField,
   serviceContentFields,
   stacksField,
@@ -22,7 +21,7 @@ export const Capability: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'updatedAt'],
   },
   access: detailAccess,
-  hooks: detailHooks,
+  hooks: detailHooks('capability'),
   endpoints: contentTransferEndpoints('capability'),
   fields: [
     ...pick(identityFields, 'title', 'slug'),
@@ -35,6 +34,16 @@ export const Capability: CollectionConfig = {
             ? { ...field, name: 'imageAlign' }
             : field,
       ),
+      {
+        name: 'breadcrumbs',
+        type: 'array',
+        label: 'Breadcrumb',
+        admin: { description: 'Shown above the hero heading, e.g. Capabilities > Deep Firmware Engineering. Leave the URL empty for the current page.' },
+        fields: [
+          { name: 'label', type: 'text', required: true },
+          { name: 'url', type: 'text' },
+        ],
+      },
     ]),
     section('scope', 'What is included', [
       { name: 'includedHeading', type: 'text', label: 'Included section heading' },
@@ -52,7 +61,7 @@ export const Capability: CollectionConfig = {
       { name: 'whyHeading', type: 'text', label: 'Intro band heading' },
       { name: 'whyText', type: 'textarea', label: 'Intro band text' },
     ]),
-    section('technology', 'Technology', [stacksField]),
+    section('technology', '', [stacksField]),
     section('process', 'Workflow', [
       { name: 'workflowEyebrow', type: 'text' },
       { name: 'workflowHeading', type: 'text' },
@@ -66,7 +75,6 @@ export const Capability: CollectionConfig = {
       { name: 'relatedInsights', type: 'relationship', relationTo: 'blog', hasMany: true, label: 'Related insights' },
     ]),
     section('faq', 'FAQ', [{ name: 'faqHeading', type: 'text' }, faqsField]),
-    layoutSectionsField,
     seoGroupField,
   ],
 }

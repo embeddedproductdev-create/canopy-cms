@@ -60,7 +60,11 @@ function blockMarkdown(value: unknown, depth = 0): string {
       })
       .join('\n')
   }
-  if (type === 'listitem') return children.map((child) => blockMarkdown(child, depth)).filter(Boolean).join('')
+  if (type === 'listitem') {
+    const nested = children.some((child) => (child as Record<string, unknown>).type === 'list' || (child as Record<string, unknown>).type === 'paragraph')
+    // Text written straight under the item (no paragraph around it) is the item's own text.
+    return nested ? children.map((child) => blockMarkdown(child, depth)).filter(Boolean).join('') : inlineMarkdown(node)
+  }
   if (type === 'table') {
     const rows = children.map((row) => {
       const cells = (Array.isArray((row as Record<string, unknown>).children)

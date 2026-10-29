@@ -61,6 +61,11 @@
   "version_card_cta_link",
   "version_page_cta_label",
   "version_page_cta_link",
+  "version_features_heading",
+  "version_features_intro",
+  "version_specs_heading",
+  "version_specs_intro",
+  "version_gap_heading",
   "version_content_body",
   "version_seo_seo_title",
   "version_seo_meta_description",
@@ -85,6 +90,21 @@
   "parent_id",
   "path",
   "section_id"
+ ],
+ "_case_study_v_version_features_items": [
+  "_order",
+  "_parent_id",
+  "id",
+  "text",
+  "_uuid"
+ ],
+ "_case_study_v_version_gap_cards": [
+  "_order",
+  "_parent_id",
+  "id",
+  "title",
+  "text",
+  "_uuid"
  ],
  "_case_study_v_version_glance_at_a_glance": [
   "_order",
@@ -309,14 +329,20 @@
   "question",
   "answer"
  ],
+ "capability_hero_breadcrumbs": [
+  "_order",
+  "_parent_id",
+  "id",
+  "label",
+  "url"
+ ],
  "capability_rels": [
   "id",
   "order",
   "parent_id",
   "path",
   "case_study_id",
-  "blog_id",
-  "section_id"
+  "blog_id"
  ],
  "capability_scope_included": [
   "_order",
@@ -369,6 +395,11 @@
   "card_cta_link",
   "page_cta_label",
   "page_cta_link",
+  "features_heading",
+  "features_intro",
+  "specs_heading",
+  "specs_intro",
+  "gap_heading",
   "content_body",
   "seo_seo_title",
   "seo_meta_description",
@@ -383,6 +414,19 @@
   "updated_at",
   "created_at",
   "_status"
+ ],
+ "case_study_features_items": [
+  "_order",
+  "_parent_id",
+  "id",
+  "text"
+ ],
+ "case_study_gap_cards": [
+  "_order",
+  "_parent_id",
+  "id",
+  "title",
+  "text"
  ],
  "case_study_glance_at_a_glance": [
   "_order",

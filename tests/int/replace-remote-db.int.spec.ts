@@ -3,7 +3,7 @@ import path from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { execFileSync } from 'node:child_process'
 import { describe, expect, it } from 'vitest'
-import { buildReplaceChunks, buildReplaceSql, countStatements, dropOrder, expectedRowCounts, splitStatements, type FkEdge, type Row } from '../../scripts/lib/replace-sql'
+import { buildReplaceChunks, buildReplaceSql, countStatements, dataLossReport, dropOrder, expectedRowCounts, splitStatements, type FkEdge, type Row } from '../../scripts/lib/replace-sql'
 import { isTransientD1Error, runWithRetry } from '../../scripts/lib/retry'
 
 const seed = fs.readFileSync(path.resolve('seed/db-dump.sql'), 'utf8')
@@ -184,5 +184,22 @@ describe('replace remote database', () => {
     }
     expect(all('SELECT email FROM "user"').map((row) => row.email)).toEqual(kept.user.map((row) => row.email))
     expect(all('PRAGMA foreign_key_check')).toHaveLength(0)
+  })
+})
+
+describe('data-loss guard', () => {
+  const seedSql = `INSERT INTO "blog" ("id") VALUES (1);\nINSERT INTO "media" ("id") VALUES (1);\nINSERT INTO "media" ("id") VALUES (2);\n`
+
+  it('reports every content table where the seed has fewer rows than the live database', () => {
+    const problems = dataLossReport({ blog: 10, media: 2, case_study: 3 }, expectedRowCounts(seedSql))
+    expect(problems).toEqual(['blog: live has 10, the seed has 1', 'case_study: live has 3, the seed has 0'])
+  })
+
+  it('is quiet when the seed has at least as many rows', () => {
+    expect(dataLossReport({ blog: 1, media: 1 }, expectedRowCounts(seedSql))).toEqual([])
+  })
+
+  it('ignores tables that are not content', () => {
+    expect(dataLossReport({ payload_migrations: 20, user: 3 }, expectedRowCounts(seedSql))).toEqual([])
   })
 })

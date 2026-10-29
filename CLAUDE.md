@@ -23,7 +23,7 @@ Fix the cause, then add a row to the table below and add a test or a `predeploy`
 - Cloudflare account: **R2 enabled** and **Workers Paid** (`limits.cpu_ms` is refused on Free).
 - GitHub `production` environment secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `PAYLOAD_SECRET`, `CMS_URL`. Optional: `NOTIFY_TELEGRAM_BOT_TOKEN`, `NOTIFY_TELEGRAM_CHAT_ID`, `NOTIFY_ADMIN_URL`.
 - Deploy order when the website form changes: website first, then the CMS (the CMS rejects a consultation without a mobile number).
-- Leave `replace_database` off to keep the content already edited in the live CMS; turn it on only to reset the content to `seed/db-dump.sql`. Tick `upload_media` the first time R2 is used.
+- `replace_database` is **off by default** and overwrites the live content (posts, projects, images edited in the admin) with `seed/db-dump.sql`. It needs `confirm_replace` = `REPLACE`, backs the live DB up as a workflow artifact first, and refuses when the seed has fewer posts, projects or media than live unless `allow_data_loss` is ticked. A normal deploy leaves it off. Tick `upload_media` the first time R2 is used (its default is off too).
 
 ## Deployment error log
 
@@ -41,5 +41,8 @@ Fix the cause, then add a row to the table below and add a test or a `predeploy`
 | `replace:db` fails on the second run: "no column named ..." | Kept `user` / `form_submission` rows have columns added by later migrations that the seed lacks | `buildReplaceChunks` adds those columns before restoring the rows; test in `replace-remote-db.int.spec.ts` |
 | `replace:db` row-count check: "too many terms in compound SELECT" (found in the local rehearsal, before it could fail a deploy) | D1 allows only a few terms in a compound SELECT | `countStatements` sends one simple SELECT per table; test in `replace-remote-db.int.spec.ts` |
 | "Worker exceeded resource limits" (1102) | One request used too much CPU or memory | Observability logs, `limits.cpu_ms`, `maxDepth` 3, 25-row admin lists, 10 MB uploads, 100-record imports, no GraphQL |
+| Smoke check: `GET /api/media/file/raw-fw-1.jpg -> 404`, "Media is not served from R2" | Worker deployed, but `upload_media` was off so the new R2 bucket is empty | The error now says to re-run with `upload_media`; test in `deploy-workflow.int.spec.ts`; prerequisite "tick `upload_media` the first time R2 is used" |
+| Live site: images unmapped on most screens, Insights posts gone (10 posts -> 1) | A run with `replace_database` (it used to default to on) pushed the seed from commit `a261bd8`, which had 1 post, 2 projects and fewer image mappings, over the live content | `replace_database` defaults off and needs `confirm_replace`; live DB backup artifact; data-loss guard `dataLossReport` in `replace:db` (tests in `deploy-workflow` and `replace-remote-db` specs) |
+| Favicon lost after the cleanup migration | `unusedMedia` did not treat `seo_settings.site_icon_id` as a reference and deleted that media row | `icon` added to `MEDIA_REFERENCE`; test in `project-content-cleanup.int.spec.ts` |
 
 Known gap: `seed/media` lacks three real content images (blog cover and two project cards), so those show broken until they are uploaded.

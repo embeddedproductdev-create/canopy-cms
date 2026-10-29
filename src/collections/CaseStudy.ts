@@ -5,6 +5,7 @@ import { urlField } from '../hooks/normalizeUrl'
 import { formatSlug } from '../utilities/formatSlug'
 import { seoGroupField } from '../fields/seo'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
+import { captureOwnSections, removeReferences } from '../utilities/removeReferences'
 import { contentTransferEndpoints } from '../utilities/contentTransfer'
 
 export const CaseStudy: CollectionConfig = {
@@ -18,7 +19,8 @@ export const CaseStudy: CollectionConfig = {
   access: contentAccess,
   hooks: {
     afterChange: [revalidateOnChange],
-    afterDelete: [revalidateOnDelete],
+    beforeDelete: [captureOwnSections('case-study')],
+    afterDelete: [removeReferences('case-study'), revalidateOnDelete],
   },
   endpoints: contentTransferEndpoints('case-study'),
   versions: {
@@ -149,7 +151,19 @@ export const CaseStudy: CollectionConfig = {
         ],
       },
     ]),
+    section('features', 'Features', [
+      { name: 'heading', type: 'text' },
+      { name: 'intro', type: 'textarea' },
+      {
+        name: 'items',
+        type: 'array',
+        label: 'Feature list',
+        fields: [{ name: 'text', type: 'text', required: true }],
+      },
+    ]),
     section('specs', 'Specifications', [
+      { name: 'heading', type: 'text', admin: { placeholder: 'e.g. Technical specifications' } },
+      { name: 'intro', type: 'textarea' },
       {
         name: 'specGroups',
         type: 'array',
@@ -165,6 +179,17 @@ export const CaseStudy: CollectionConfig = {
               { name: 'builtIn', type: 'checkbox', defaultValue: false },
             ],
           },
+        ],
+      },
+    ]),
+    section('gap', 'Engineering gap', [
+      { name: 'heading', type: 'text' },
+      {
+        name: 'cards',
+        type: 'array',
+        fields: [
+          { name: 'title', type: 'text', required: true },
+          { name: 'text', type: 'textarea' },
         ],
       },
     ]),

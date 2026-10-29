@@ -3,13 +3,15 @@ import { formatSlug } from '../utilities/formatSlug'
 import { seoGroupField } from './seo'
 import { contentAccess } from '../access'
 import { revalidateOnChange, revalidateOnDelete } from '../hooks/revalidate'
+import { captureOwnSections, removeReferences } from '../utilities/removeReferences'
 
 export const detailAccess: CollectionConfig['access'] = contentAccess
 
-export const detailHooks: CollectionConfig['hooks'] = {
+export const detailHooks = (collection: 'capability' | 'industry'): CollectionConfig['hooks'] => ({
   afterChange: [revalidateOnChange],
-  afterDelete: [revalidateOnDelete],
-}
+  beforeDelete: [captureOwnSections(collection)],
+  afterDelete: [removeReferences(collection), revalidateOnDelete],
+})
 
 export const identityFields: Field[] = [
   { name: 'title', type: 'text', required: true },

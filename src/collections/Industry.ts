@@ -19,7 +19,7 @@ export const Industry: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'updatedAt'],
   },
   access: detailAccess,
-  hooks: detailHooks,
+  hooks: detailHooks('industry'),
   fields: [
     ...identityFields,
     ...serviceContentFields,

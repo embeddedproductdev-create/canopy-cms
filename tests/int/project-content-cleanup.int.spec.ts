@@ -3,7 +3,7 @@ import path from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { execFileSync } from 'node:child_process'
 import { describe, expect, it } from 'vitest'
-import { buildProjectContentAndCleanup, type Row } from '../../src/migrations/20261013_120000_project_content_and_cleanup'
+import { buildProjectContentAndCleanup, unusedMedia, type Row } from '../../src/migrations/20261013_120000_project_content_and_cleanup'
 import { projectContent } from '../../src/migrations/data/projects'
 
 const all = (sqlite: DatabaseSync, query: string) => sqlite.prepare(query).all() as Row[]
@@ -85,5 +85,19 @@ describe('project content and clean-up migration', () => {
     expect(all(sqlite, 'SELECT id FROM _case_study_v WHERE latest = 1')).toHaveLength(
       all(sqlite, 'SELECT id FROM case_study').length,
     )
+  })
+})
+
+describe('unused media detection', () => {
+  it('keeps media that is only used as the site icon or organisation logo', async () => {
+    const sqlite = new DatabaseSync(':memory:')
+    sqlite.exec(`
+      CREATE TABLE media (id integer PRIMARY KEY, filename text);
+      CREATE TABLE seo_settings (id integer PRIMARY KEY, site_icon_id integer, organization_logo_id integer);
+      INSERT INTO media VALUES (1, 'favicon.png'), (2, 'logo.png'), (3, 'orphan.png');
+      INSERT INTO seo_settings VALUES (1, 1, 2);
+    `)
+    const unused = await unusedMedia(async (query) => all(sqlite, query))
+    expect(unused.map((row) => row.filename)).toEqual(['orphan.png'])
   })
 })

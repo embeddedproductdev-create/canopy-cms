@@ -49,7 +49,7 @@ const CARD_LEGACY = ['heading', 'index', 'category', 'role', 'date', 'image_url'
 
 const TEXT_TABLES = new Set(['site_chrome_ui_labels', 'capability_stacks', 'industry_stacks', 'section', 'card', 'footer_link_groups_links', 'header_nav_items', 'header_nav_items_children'])
 
-const MEDIA_REFERENCE = /(^|_)(image|logo|photo|pdf_asset|media|landing_image|hero_image|og_image)_id$|^(primary|secondary)_logo_id$/
+const MEDIA_REFERENCE = /(^|_)(image|logo|icon|photo|pdf_asset|media|landing_image|hero_image|og_image)_id$|^(primary|secondary)_logo_id$/
 
 async function unionRows(read: Reader, parts: string[], joiner: string): Promise<Row[]> {
   const rows: Row[] = []
@@ -57,7 +57,7 @@ async function unionRows(read: Reader, parts: string[], joiner: string): Promise
   return rows
 }
 
-async function unusedMedia(read: Reader): Promise<Row[]> {
+export async function unusedMedia(read: Reader): Promise<Row[]> {
   const columns = await read(
     `SELECT m.name AS tbl, p.name AS col, p.type AS type FROM sqlite_master m JOIN pragma_table_info(m.name) p WHERE m.type = 'table' AND m.name NOT LIKE 'sqlite_%' AND m.name NOT LIKE '_cf_%' AND m.name NOT LIKE 'payload_%' AND m.name <> 'media'`,
   )

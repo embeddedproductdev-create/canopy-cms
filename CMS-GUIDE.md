@@ -402,13 +402,25 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | glance > At a glance | List | - |
 | glance > atAGlance > Label * | Text | - |
 | glance > atAGlance > Value * | Text | - |
+| Features | Group | - |
+| features > Heading | Text | - |
+| features > Intro | Long text | - |
+| features > Feature list | List | - |
+| features > items > Text * | Text | - |
 | Specifications | Group | - |
+| specs > Heading | Text | - |
+| specs > Intro | Long text | - |
 | specs > Technical specification groups | List | - |
 | specs > specGroups > Heading * | Text | - |
 | specs > specGroups > Rows | List | - |
 | specs > specGroups > rows > Label * | Text | - |
 | specs > specGroups > rows > Value | Text | - |
 | specs > specGroups > rows > Built In | Checkbox | - |
+| Engineering gap | Group | - |
+| gap > Heading | Text | - |
+| gap > Cards | List | - |
+| gap > cards > Title * | Text | - |
+| gap > cards > Text | Long text | - |
 | Body | Group | - |
 | content > Body | Rich text | - |
 | SEO | Group | - |

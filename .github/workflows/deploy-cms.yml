@@ -4,14 +4,24 @@ on:
   workflow_dispatch:
     inputs:
       replace_database:
-        description: Replace the remote D1 content with seed/db-dump.sql (admin users and form submissions are kept)
+        description: DANGEROUS - overwrite the live D1 content (posts, projects, images edited in the admin) with seed/db-dump.sql. Leave off for a normal deploy.
         required: true
-        default: true
+        default: false
+        type: boolean
+      confirm_replace:
+        description: Type REPLACE here to confirm replace_database
+        required: false
+        default: ''
+        type: string
+      allow_data_loss:
+        description: Replace even when the seed has fewer posts, projects or media than the live database
+        required: true
+        default: false
         type: boolean
       upload_media:
-        description: Upload seed/media/* to the R2 bucket
+        description: Upload seed/media/* to the R2 bucket (tick the first time R2 is used)
         required: true
-        default: true
+        default: false
         type: boolean
 
 concurrency:
@@ -77,9 +87,29 @@ jobs:
           npx wrangler d1 time-travel info canopy-cms-db
           echo "To roll the database back: npx wrangler d1 time-travel restore canopy-cms-db --timestamp=<ISO time from above>"
 
+      - name: Confirm the database replacement
+        if: ${{ inputs.replace_database }}
+        run: |
+          if [ "${{ inputs.confirm_replace }}" != 'REPLACE' ]; then
+            echo "::error::replace_database overwrites the live content. Type REPLACE in confirm_replace, or turn replace_database off."
+            exit 1
+          fi
+
+      - name: Back up the live database before replacing it
+        if: ${{ inputs.replace_database }}
+        run: npx wrangler d1 export canopy-cms-db --remote --output "$RUNNER_TEMP/live-before-replace.sql"
+
+      - name: Keep the backup
+        if: ${{ inputs.replace_database }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-database-before-replace
+          path: ${{ runner.temp }}/live-before-replace.sql
+          retention-days: 30
+
       - name: Replace remote database content with the seed
         if: ${{ inputs.replace_database }}
-        run: npm run replace:db -- --yes
+        run: npm run replace:db -- --yes ${{ inputs.allow_data_loss && '--allow-data-loss' || '' }}
 
       - name: Create R2 bucket if missing
         if: ${{ inputs.upload_media }}
@@ -187,6 +217,6 @@ jobs:
           if [ -n "$media" ]; then
             code=$(curl -sL -o /dev/null -w '%{http_code}' --retry 3 "$CMS_URL$media")
             echo "GET $media -> $code"
-            [ "$code" = "200" ] || { echo "::error::Media is not served from R2. Run npm run sync:media -- --yes locally."; exit 1; }
+            [ "$code" = "200" ] || { echo "::error::Media is not served from R2. Re-run Deploy CMS with upload_media ticked (replace_database can stay off)."; exit 1; }
           fi
           echo "CMS content and media are live."
