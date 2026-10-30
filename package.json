@@ -30,7 +30,8 @@
     "sync:db": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/sync-remote-db.ts",
     "sync:media": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/sync-remote-media.ts",
     "predeploy": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/predeploy.ts",
-    "schema:expected": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" PAYLOAD_MIGRATING=true node scripts/generate-expected-schema.ts"
+    "schema:expected": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" PAYLOAD_MIGRATING=true node scripts/generate-expected-schema.ts",
+    "check:media": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/check-media.ts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.14",

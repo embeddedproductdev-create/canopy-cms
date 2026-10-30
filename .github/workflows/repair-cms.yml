@@ -1,0 +1,64 @@
+name: Repair CMS database
+
+# Applies pending database migrations to the live CMS and checks that every image loads, without rebuilding or
+# redeploying the Worker (a few minutes instead of a full Deploy CMS). Use it for database-only fixes, such as the
+# missing media `_objectkey` column that made every image 404.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cms
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    name: Migrate database and check media
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CMS_URL: ${{ secrets.CMS_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Cloudflare credentials
+        run: |
+          set -euo pipefail
+          for name in CMS_URL CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is not set."
+              exit 1
+            fi
+          done
+          npx wrangler whoami
+
+      - name: Back up the live database
+        run: npx wrangler d1 export canopy-cms-db --remote --output "$RUNNER_TEMP/live-before-repair.sql"
+
+      - name: Keep the backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-database-before-repair
+          path: ${{ runner.temp }}/live-before-repair.sql
+          retention-days: 30
+
+      - name: Apply pending migrations to the live database
+        run: npm run apply:cleanup
+
+      - name: Verify live migrations and schema
+        run: npm run verify:remote
+
+      - name: Check every image loads from R2
+        run: npm run check:media

@@ -16,6 +16,7 @@ import { applyFormSubmissionPhone } from '../migrations/20261101_000000_form_sub
 import { applySectionsToFields } from '../migrations/20261102_000000_sections_to_fields'
 import { applyCapabilityBreadcrumbs } from '../migrations/20261103_000000_capability_breadcrumbs'
 import { applyMediaObjectKey } from '../migrations/20261104_000000_media_object_key'
+import { applyMediaObjectkeyColumn } from '../migrations/20261105_000000_media_objectkey_column'
 import { buildVersionRepair } from './versionRepair'
 
 type Db = Parameters<typeof applyRestructure>[0]
@@ -46,6 +47,7 @@ export async function prepareDatabase(db: Db): Promise<{ rebuiltVersions: number
   await runOnce(db, '20261102_000000_sections_to_fields', applySectionsToFields)
   await runOnce(db, '20261103_000000_capability_breadcrumbs', applyCapabilityBreadcrumbs)
   await runOnce(db, '20261104_000000_media_object_key', applyMediaObjectKey)
+  await runOnce(db, '20261105_000000_media_objectkey_column', applyMediaObjectkeyColumn)
   const repair =await buildVersionRepair(async (query) => (await db.all(sql.raw(query))) as Record<string, unknown>[])
   for (const statement of repair) await db.run(sql.raw(statement))
   return { rebuiltVersions: repair.length }

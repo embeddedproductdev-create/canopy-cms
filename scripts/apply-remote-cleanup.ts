@@ -12,6 +12,7 @@ import { buildFormSubmissionPhone } from '../src/migrations/20261101_000000_form
 import { buildSectionsToFields, buildSectionsToFieldsSchema } from '../src/migrations/20261102_000000_sections_to_fields'
 import { buildCapabilityBreadcrumbs, buildCapabilityBreadcrumbsSchema } from '../src/migrations/20261103_000000_capability_breadcrumbs'
 import { buildMediaObjectKey } from '../src/migrations/20261104_000000_media_object_key'
+import { buildMediaObjectkeyColumn } from '../src/migrations/20261105_000000_media_objectkey_column'
 import { buildPayload392Columns } from '../src/migrations/20261031_000000_payload_3_92_columns'
 import { buildSectionGroups } from '../src/migrations/20261030_000000_section_groups'
 import { buildVersionRepair } from '../src/utilities/versionRepair'
@@ -59,6 +60,7 @@ const steps: { name: string; schema?: (read: Reader) => Promise<string[]>; plan:
   { name: '20261102_000000_sections_to_fields', schema: buildSectionsToFieldsSchema, plan: async (r) => ({ statements: await buildSectionsToFields(r) }) },
   { name: '20261103_000000_capability_breadcrumbs', schema: buildCapabilityBreadcrumbsSchema, plan: async (r) => ({ statements: await buildCapabilityBreadcrumbs(r) }) },
   { name: '20261104_000000_media_object_key', plan: async (r) => ({ statements: await buildMediaObjectKey(r) }) },
+  { name: '20261105_000000_media_objectkey_column', plan: async (r) => ({ statements: await buildMediaObjectkeyColumn(r) }) },
 ]
 
 for (const step of steps) {

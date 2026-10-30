@@ -13,7 +13,7 @@ import { buildPayload392Columns } from '../../src/migrations/20261031_000000_pay
 import { buildFormSubmissionPhone } from '../../src/migrations/20261101_000000_form_submission_phone'
 import { buildSectionsToFieldsSchema } from '../../src/migrations/20261102_000000_sections_to_fields'
 import { buildCapabilityBreadcrumbsSchema } from '../../src/migrations/20261103_000000_capability_breadcrumbs'
-import { buildMediaObjectKey } from '../../src/migrations/20261104_000000_media_object_key'
+import { buildMediaObjectkeyColumn } from '../../src/migrations/20261105_000000_media_objectkey_column'
 import expected from '../../scripts/lib/expected-schema.json'
 import { STORAGE_COLUMNS } from '../../scripts/lib/storage-columns'
 
@@ -54,7 +54,7 @@ describe('database schema check', () => {
     const db = new DatabaseSync(':memory:')
     db.exec(seed)
     const read = async (query: string) => db.prepare(query).all() as Record<string, unknown>[]
-    for (const build of [buildBlogMarkdownContent, buildHeroImageFit, buildSectionGroups, buildPayload392Columns, buildFormSubmissionPhone, buildSectionsToFieldsSchema, buildCapabilityBreadcrumbsSchema, buildMediaObjectKey]) {
+    for (const build of [buildBlogMarkdownContent, buildHeroImageFit, buildSectionGroups, buildPayload392Columns, buildFormSubmissionPhone, buildSectionsToFieldsSchema, buildCapabilityBreadcrumbsSchema, buildMediaObjectkeyColumn]) {
       for (const statement of await build(read)) db.exec(statement)
     }
     expect(findSchemaGaps(expectedSchema, actualOf(db))).toEqual([])

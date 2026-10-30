@@ -21,6 +21,7 @@ import * as migration_20261101_000000_form_submission_phone from './20261101_000
 import * as migration_20261102_000000_sections_to_fields from './20261102_000000_sections_to_fields';
 import * as migration_20261103_000000_capability_breadcrumbs from './20261103_000000_capability_breadcrumbs';
 import * as migration_20261104_000000_media_object_key from './20261104_000000_media_object_key';
+import * as migration_20261105_000000_media_objectkey_column from './20261105_000000_media_objectkey_column';
 
 export const migrations = [
   {
@@ -137,5 +138,10 @@ export const migrations = [
     up: migration_20261104_000000_media_object_key.up,
     down: migration_20261104_000000_media_object_key.down,
     name: '20261104_000000_media_object_key',
+  },
+  {
+    up: migration_20261105_000000_media_objectkey_column.up,
+    down: migration_20261105_000000_media_objectkey_column.down,
+    name: '20261105_000000_media_objectkey_column',
   },
 ];

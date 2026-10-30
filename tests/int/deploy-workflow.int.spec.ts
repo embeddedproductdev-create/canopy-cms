@@ -32,3 +32,29 @@ describe('deploy-cms workflow', () => {
     expect(workflow).toContain('--allow-data-loss')
   })
 })
+
+describe('repair-cms workflow (database fix only, no redeploy)', () => {
+  const file = path.resolve(__dirname, '../../.github/workflows/repair-cms.yml')
+  const repair = () => fs.readFileSync(file, 'utf8')
+
+  it('exists and only runs when started by hand', () => {
+    expect(fs.existsSync(file)).toBe(true)
+    expect(repair()).toMatch(/on:\s*\n\s*workflow_dispatch:/)
+    expect(repair()).not.toMatch(/\bpush:|\bschedule:/)
+  })
+
+  it('backs the database up, applies pending migrations, verifies them, then checks every image', () => {
+    const text = repair()
+    const order = ['wrangler d1 export', 'npm run apply:cleanup', 'npm run verify:remote', 'npm run check:media']
+    const at = order.map((step) => text.indexOf(step))
+    expect(at.every((index) => index > -1)).toBe(true)
+    expect([...at].sort((a, b) => a - b)).toEqual(at)
+  })
+
+  it('never redeploys the Worker or replaces content', () => {
+    const text = repair()
+    expect(text).not.toContain('wrangler deploy')
+    expect(text).not.toContain('replace:db')
+    expect(text).not.toContain('build:cf')
+  })
+})
