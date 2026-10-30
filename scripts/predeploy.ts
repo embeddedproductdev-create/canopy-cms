@@ -1,6 +1,7 @@
 import { spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
+import { uncommittedFiles } from './lib/generated-check'
 
 // Run before every CMS deploy (`npm run predeploy`). It repeats, locally, the checks the deploy workflow makes plus
 // the ones that have caused failed deploys before (see CLAUDE.md), so a problem shows up here and not in GitHub Actions.
@@ -45,6 +46,16 @@ for (const { file, command } of generated) {
     results.push({ step: `${file} is up to date`, ok: false, note: 'it was stale and has been regenerated; commit the new version' })
   }
 }
+
+// Up to date on disk is not enough: the workflow regenerates from what is pushed, so an uncommitted regeneration
+// still fails its "up to date" check (CMS-GUIDE.md on 2026-10-30).
+const porcelain = spawnSync(`git status --porcelain -- ${generated.map(({ file }) => `"${file}"`).join(' ')}`, { shell: true, encoding: 'utf8' }).stdout ?? ''
+const notCommitted = uncommittedFiles(generated.map(({ file }) => file), porcelain)
+results.push({
+  step: 'Generated files are committed',
+  ok: !notCommitted.length,
+  note: notCommitted.length ? `commit before pushing: ${notCommitted.join(', ')}` : undefined,
+})
 
 const dbReady = fs.existsSync(path.resolve('.wrangler/state/v3/d1'))
 if (dbReady) run('Local database matches the code (verify:remote --local)', 'npm run verify:remote -- --local')

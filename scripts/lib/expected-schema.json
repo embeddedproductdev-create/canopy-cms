@@ -645,7 +645,8 @@
   "mime_type",
   "filesize",
   "width",
-  "height"
+  "height",
+  "_object_key"
  ],
  "page": [
   "id",

@@ -13,7 +13,9 @@ import { buildPayload392Columns } from '../../src/migrations/20261031_000000_pay
 import { buildFormSubmissionPhone } from '../../src/migrations/20261101_000000_form_submission_phone'
 import { buildSectionsToFieldsSchema } from '../../src/migrations/20261102_000000_sections_to_fields'
 import { buildCapabilityBreadcrumbsSchema } from '../../src/migrations/20261103_000000_capability_breadcrumbs'
+import { buildMediaObjectKey } from '../../src/migrations/20261104_000000_media_object_key'
 import expected from '../../scripts/lib/expected-schema.json'
+import { STORAGE_COLUMNS } from '../../scripts/lib/storage-columns'
 
 const expectedSchema = expected as Record<string, string[]>
 const seed = fs.readFileSync(path.resolve('seed/db-dump.sql'), 'utf8')
@@ -32,7 +34,7 @@ describe('database schema check', () => {
     const current = Object.fromEntries(
       Object.values(tables).map((table) => {
         const { name, columns } = getTableConfig(table)
-        return [name, columns.map((column) => column.name)]
+        return [name, [...columns.map((column) => column.name), ...(STORAGE_COLUMNS[name] ?? [])]]
       }),
     )
     const sort = (value: Record<string, string[]>) => Object.fromEntries(Object.entries(value).sort().map(([table, columns]) => [table, [...columns].sort()]))
@@ -52,7 +54,7 @@ describe('database schema check', () => {
     const db = new DatabaseSync(':memory:')
     db.exec(seed)
     const read = async (query: string) => db.prepare(query).all() as Record<string, unknown>[]
-    for (const build of [buildBlogMarkdownContent, buildHeroImageFit, buildSectionGroups, buildPayload392Columns, buildFormSubmissionPhone, buildSectionsToFieldsSchema, buildCapabilityBreadcrumbsSchema]) {
+    for (const build of [buildBlogMarkdownContent, buildHeroImageFit, buildSectionGroups, buildPayload392Columns, buildFormSubmissionPhone, buildSectionsToFieldsSchema, buildCapabilityBreadcrumbsSchema, buildMediaObjectKey]) {
       for (const statement of await build(read)) db.exec(statement)
     }
     expect(findSchemaGaps(expectedSchema, actualOf(db))).toEqual([])

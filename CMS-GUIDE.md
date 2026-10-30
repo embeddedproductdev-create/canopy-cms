@@ -263,6 +263,9 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | hero > Hero image description | Text | - |
 | hero > Hero image fit | Select: Show whole image (recommended), Fill the space (may crop edges) | - |
 | hero > Hero image position | Select: Centre, Sit on the bottom edge | - |
+| hero > Breadcrumb | List | - |
+| hero > breadcrumbs > Label * | Text | - |
+| hero > breadcrumbs > Url | Text | - |
 | What is included | Group | - |
 | scope > Included section heading | Text | - |
 | scope > Included capabilities | List | - |
@@ -272,7 +275,7 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | scope > included > Tags | Text | - |
 | scope > Intro band heading | Text | - |
 | scope > Intro band text | Long text | - |
-| Technology | Group | - |
+|  | Group | - |
 | technology > Technology and materials | List | - |
 | technology > stacks > Kind | Select: Logo strip, Tag chips, Rows, Cards | - |
 | technology > stacks > Heading | Text | - |

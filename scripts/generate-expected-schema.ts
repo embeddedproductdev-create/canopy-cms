@@ -3,6 +3,7 @@ import path from 'path'
 import { getPayload } from 'payload'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import config from '../src/payload.config'
+import { STORAGE_COLUMNS } from './lib/storage-columns'
 
 // Writes every table and column Payload expects to scripts/lib/expected-schema.json. `npm run verify:remote` compares
 // the live database against it before a deploy, so a database that was not migrated fails the workflow instead of
@@ -13,7 +14,7 @@ const schema = Object.fromEntries(
   Object.values(tables)
     .map((table) => getTableConfig(table))
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(({ name, columns }) => [name, columns.map((column) => column.name)]),
+    .map(({ name, columns }) => [name, [...columns.map((column) => column.name), ...(STORAGE_COLUMNS[name] ?? [])]]),
 )
 const file = path.resolve('scripts/lib/expected-schema.json')
 fs.writeFileSync(file, JSON.stringify(schema, null, 1) + '\n')
