@@ -522,16 +522,6 @@ export interface CaseStudy {
         }[]
       | null;
   };
-  features?: {
-    heading?: string | null;
-    intro?: string | null;
-    items?:
-      | {
-          text: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
   specs?: {
     heading?: string | null;
     intro?: string | null;
@@ -1381,18 +1371,6 @@ export interface CaseStudySelect<T extends boolean = true> {
           | {
               label?: T;
               value?: T;
-              id?: T;
-            };
-      };
-  features?:
-    | T
-    | {
-        heading?: T;
-        intro?: T;
-        items?:
-          | T
-          | {
-              text?: T;
               id?: T;
             };
       };

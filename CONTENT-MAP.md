@@ -195,21 +195,53 @@ Identity: slug `mechanical-industrial-design`, summary "Form, function, and manu
 
 ### Apps & Cloud
 
-Identity: slug `iot-apps-cloud`, summary "Mobile apps and cloud dashboards built against the same firmware spec from day o"
+Identity: slug `iot-apps-cloud`, summary "Mobile apps, real-time IoT dashboards, and factory calibration software built ag"
 
   - **hero** - Apps & Cloud - Hero: "App Development & Cloud Systems"
     - Capabilities _(breadcrumb)_
     - App Development & Cloud Systems _(breadcrumb)_
-  - **cards grid2 icons** - Apps & Cloud - Included: "What's included"
-    - Cross-Platform Mobile Apps - iOS/Android apps for BLE/Wi-Fi provisioning, tested against the same GATT spec t
-    - Cloud IoT Dashboards & Telematics - Fleet-level visibility built on the device's real telemetry schema, not retrofit
-    - Desktop Calibration / Engineering Software - Bench and factory-floor tools for calibration, diagnostics, and end-of-line test
-    - Full-Stack Web Architecture - The business-facing web layer — account management, provisioning, reporting — bu
+  - **cards grid2 icons** - Apps & Cloud - Included: "Our Capabilities"
+    - Cross-Platform Mobile Apps (iOS & Android) - Native-performance Flutter and React Native mobile applications engineered for h
+    - Cloud IoT Dashboards & Fleet Telematics - Real-time operational dashboards, fleet management portals, and historical analy
+    - Desktop Calibration & Factory Tools - Cross-platform desktop tools (Electron, Tauri, Python/Qt) engineered for factory
+    - Full-Stack Web Architecture & Portals - Customer and administrator web portals with granular Role-Based Access Control (
+    - Secure Over-the-Air (OTA) Infrastructure - Resilient cloud-to-device firmware deployment infrastructure supporting phased r
+    - High-Throughput Ingestion & Data Pipelines - Low-latency, high-concurrency data streaming pipelines capable of processing mil
+    - Device Security & Zero-Touch Identity Provisioning - Hardware-anchored cloud authentication integrating secure elements (ATECC608, TP
   - **text surface** - Apps & Cloud - Intro: "Why It Matters"
-  - **chips** - Apps & Cloud - Stack we build on: "Stack we build on"
-  - **faq** - Apps & Cloud - FAQ: "FAQ"
-    - Single device or a fleet? - Both. Auth, pairing and telemetry costs are designed for fleet scale from the st
-  - **articles related** - Apps & Cloud - Insights: "Insights"
+  - **marquee** - Apps & Cloud - Cloud & Ecosystem Platforms We Build With: "Cloud & Ecosystem Platforms We Build With"
+  - **table list** - Apps & Cloud - Frameworks & Development Stacks: "Frameworks & Development Stacks"
+    - Mobile Platforms - Flutter (Dart), React Native (TypeScript), Swift (Native iOS), Kotlin (Native An
+    - Web & Portals - Next.js, React, Node.js, TypeScript, NestJS, Go, FastAPI (Python)
+    - Desktop & Factory Tools - Electron, Tauri, Python (PyQt / PySide), C++ / Qt
+    - APIs & Interfaces - RESTful HTTPS, GraphQL, WebSockets, gRPC, Protobuf
+  - **table list** - Apps & Cloud - Protocols & Edge-to-Cloud Connectivity: "Protocols & Edge-to-Cloud Connectivity"
+    - Local Device Connectivity - BLE (GATT / GAP), Wi-Fi SoftAP, Web Bluetooth, NFC, USB HID / CDC
+    - Cloud Ingestion Protocols - MQTT / MQTTS (TLS 1.3), HTTPS, WebSockets, CoAP
+    - LPWAN & Cellular - LoRaWAN, NB-IoT, LTE-M (Cat-M1), 4G Cat-1, GSM / GPRS
+    - Security & Encryption - Mutual TLS (mTLS), X.509 Device Certificates, OAuth 2.0 / OIDC, JWT, AES-GCM
+  - **table list** - Apps & Cloud - Data Architecture, Storage & DevOps: "Data Architecture, Storage & DevOps"
+    - Time-Series & Relational DBs - TimescaleDB, InfluxDB, PostgreSQL, Amazon DynamoDB, Redis
+    - Streaming & Message Queues - Apache Kafka, RabbitMQ, AWS SQS / SNS, AWS Kinesis
+    - DevOps & Infrastructure as Code - Terraform, AWS CDK, Docker, GitHub Actions, Datadog, Grafana
+    - Cloud Providers - Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP)
+  - **chips surface** - Apps & Cloud - Solutions We Build: "Solutions We Build"
+  - **steps nodes** - Apps & Cloud - Workflow: "Seven Gates. Edge to Cloud. Zero Integration Gaps."
+    - Gate 1: Data Contract & Protocol Definition - Before any application or firmware code is written, we formally specify the exac
+    - Gate 2: Cloud Architecture & Threat Modeling - We map out the cloud topology, data retention policies, mTLS certificate lifecyc
+    - Gate 3: Firmware Simulator & API Mocking - Mobile and web engineers build against firmware mock servers and telemetry repla
+    - Gate 4: Hardware-in-the-Loop Integration - As soon as alpha boards are assembled, real mobile apps and cloud backends conne
+    - Gate 5: End-to-End OTA & Security Hardening - Dual-bank cryptographic OTA firmware updates are executed and validated on actua
+    - Gate 6: Factory & EOL Diagnostic Tooling - We deliver standalone calibration and testing software to your manufacturing lin
+    - Gate 7: Production Release & Telemetry Monitoring - We manage Apple App Store and Google Play compliance submissions, deploy contain
+  - **projects related** - Apps & Cloud - Projects: "Related Projects"
+  - **faq** - Apps & Cloud - FAQ: "Frequently Asked Questions"
+    - Single device or a fleet? How does your software scale? - Both. We architect the authentication, device registry, and telemetry ingestion 
+    - Can you integrate with our existing enterprise cloud (AWS, Azure, or p - Yes. We routinely build inside our clients' cloud accounts across AWS (IoT Core,
+    - How do you handle Bluetooth (BLE) reliability across different Android - Mobile Bluetooth Low Energy stacks vary widely across Android OEMs and iOS versi
+    - Do you handle Apple App Store and Google Play submissions and regulato - Yes. We manage the entire store submission process, including developer account 
+    - Who owns the source code, design assets, and cloud infrastructure? - You do. Upon milestone delivery, 100% of the source code, Git repositories, Figm
+  - **articles related** - Apps & Cloud - Insights: "Engineering Insights"
 
 ### UI/UX & HMI
 

@@ -140,25 +140,14 @@ export const CaseStudy: CollectionConfig = {
         },
       ],
     },
-    section('glance', 'At a glance', [
+    section('glance', '', [
       {
         name: 'atAGlance',
         type: 'array',
-        label: 'At a glance',
         fields: [
           { name: 'label', type: 'text', required: true },
           { name: 'value', type: 'text', required: true },
         ],
-      },
-    ]),
-    section('features', 'Features', [
-      { name: 'heading', type: 'text' },
-      { name: 'intro', type: 'textarea' },
-      {
-        name: 'items',
-        type: 'array',
-        label: 'Feature list',
-        fields: [{ name: 'text', type: 'text', required: true }],
       },
     ]),
     section('specs', 'Specifications', [
@@ -193,7 +182,7 @@ export const CaseStudy: CollectionConfig = {
         ],
       },
     ]),
-    section('content', 'Body', [
+    section('content', '', [
       { name: 'body', type: 'richText' },
     ]),
     {

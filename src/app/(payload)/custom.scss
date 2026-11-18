@@ -1,0 +1,14 @@
+// Collapse duplicate borders between adjacent group sections in CMS admin
+.render-fields > .group-field {
+  border-bottom: none;
+}
+
+// Remove ghost margin and spacing from hidden fields so no extra divider/gap appears above SEO
+.field-type:has(> input[type='hidden']),
+.field-type:has(> [type='hidden']),
+.field-type.hidden {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
