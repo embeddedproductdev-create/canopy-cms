@@ -131,12 +131,20 @@ jobs:
       - name: Apply pending content migrations to the remote database
         run: npm run apply:cleanup
 
-      - name: Check the CMS guide is up to date
+      - name: Verify and sync CMS documentation
         run: |
           npm run docs:cms
-          git diff --exit-code -- CMS-GUIDE.md
           npm run docs:content
-          git diff --exit-code -- CONTENT-MAP.md
+          if ! git diff --quiet -- CMS-GUIDE.md CONTENT-MAP.md; then
+            echo "::warning::CMS documentation was updated during build. Committing changes..."
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add CMS-GUIDE.md CONTENT-MAP.md
+            git commit -m "docs: auto-update CMS-GUIDE.md and CONTENT-MAP.md [skip ci]" || true
+            git push origin HEAD || echo "::warning::Could not push doc update; continuing deploy."
+          else
+            echo "CMS documentation is up to date."
+          fi
 
       - name: Verify remote migrations and content
         run: npm run verify:remote

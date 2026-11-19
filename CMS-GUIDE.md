@@ -401,15 +401,10 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | Page Call to Action | Group | - |
 | pageCta > CTA Label | Text | - |
 | pageCta > CTA URL | Text | - |
-| At a glance | Group | - |
-| glance > At a glance | List | - |
+|  | Group | - |
+| glance > At A Glance | List | - |
 | glance > atAGlance > Label * | Text | - |
 | glance > atAGlance > Value * | Text | - |
-| Features | Group | - |
-| features > Heading | Text | - |
-| features > Intro | Long text | - |
-| features > Feature list | List | - |
-| features > items > Text * | Text | - |
 | Specifications | Group | - |
 | specs > Heading | Text | - |
 | specs > Intro | Long text | - |
@@ -424,7 +419,7 @@ Every field of every collection and global. Fields hidden by the layout rules ap
 | gap > Cards | List | - |
 | gap > cards > Title * | Text | - |
 | gap > cards > Text | Long text | - |
-| Body | Group | - |
+|  | Group | - |
 | content > Body | Rich text | - |
 | SEO | Group | - |
 | seo > SEO Title | Text | - |

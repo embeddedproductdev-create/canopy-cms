@@ -23,7 +23,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "notify:test": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node --env-file-if-exists=.env scripts/notify-test.ts",
     "docs:content": "node --no-warnings --import=tsx/esm scripts/generate-content-map.ts",
-    "docs:cms": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/generate-cms-guide.ts",
+    "docs:cms": "cross-env PAYLOAD_CONFIG_ONLY=true NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/generate-cms-guide.ts",
     "seed:rebuild": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/rebuild-seed.ts",
     "seed:local": "wrangler d1 execute D1 --local --file seed/db-dump.sql -y && node -e \"require('fs').cpSync('seed/media','media',{recursive:true})\"",
     "replace:db": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" node scripts/replace-remote-db.ts",

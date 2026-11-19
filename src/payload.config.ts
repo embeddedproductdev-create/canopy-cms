@@ -92,9 +92,11 @@ const cloudflareLogger = {
 } as any
 
 const cloudflare =
-  isCLI || useLocalBindings || !isProduction
-    ? await getCloudflareContextFromWrangler()
-    : await getCloudflareContext({ async: true })
+  process.env.PAYLOAD_CONFIG_ONLY === 'true'
+    ? ({ env: { D1: {} as any, R2: {} as any }, cf: {} as any, ctx: {} as any, caches: {} as any } as unknown as CloudflareContext)
+    : isCLI || useLocalBindings || !isProduction
+      ? await getCloudflareContextFromWrangler()
+      : await getCloudflareContext({ async: true })
 
 const allowedOrigins = [
   ...(isProduction ? [] : ['http://localhost:4200', 'http://localhost:3000']),
